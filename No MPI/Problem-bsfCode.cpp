@@ -100,48 +100,22 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 
 	MakeObjVector(PD_c, PP_OBJECTIVE_VECTOR_LENGTH, PD_objVector);
 
-	while (objF_w < objF_u + PP_EPS_ZERO) {
+	Vector_Addition(u, PD_objVector, v);
 
-		Vector_Addition(u, PD_objVector, v);
+	PseudorojectionOnEdge(v, w, PP_EPS_P_PROJ_ON_EDGE);
 
-		PseudorojectionOnEdge(v, w, PP_EPS_P_PROJ_ON_EDGE);
+	PD_m = mOld;
 
-		PD_m = mOld;
-
-		objF_w = ObjF(w);
-
-		if (objF_w < objF_u + PP_EPS_ZERO) {
-
-			if (Vector_Norm(PD_objVector) < PP_EPS_ZERO) {
-
-#ifdef PP_DEBUG
-				cout << "\tF(u) = " << setw(PP_SETW) << objF_u << "\nLength of objective vector = " << Vector_Norm(PD_objVector) << " < PP_EPS_ZERO  ===>>> movement is impossible.\n";
-#endif // PP_DEBUG
-				Vector_Zero((*reduceElem).d);
-				reduceElem->objF_p = objF_u;
-				return;
-			}
-
-			Vector_DivideEquals(PD_objVector, 2);
-		}
-	}
+	objF_w = ObjF(w);
 
 	Vector_Subtraction(w, u, (*reduceElem).d);
 	DirVectorCleanup((*reduceElem).d, PP_EPS_ZERO);
 
 	double norm_d = Vector_Norm((*reduceElem).d);
 	if (norm_d < PP_EPS_ZERO) {
-
 #ifdef PP_DEBUG
-		cout << "u =\t    ";
-		for (int j = 0; j < PF_MIN(PP_OUTPUT_LIMIT, PD_n); j++)
-			cout << setw(PP_SETW) << u[j];
-		if (PP_OUTPUT_LIMIT < PD_n) cout << " ...";
-		cout << "\tF(u) = " << setw(PP_SETW) << objF_u << endl;
-		cout << "||w-u|| < PP_EPS_ZERO" << objF_u << " >= ObjF(w) = " << objF_w 
-			 << "  ===>>> movement is impossible.\n";
+		cout << "d = ||w-u|| < PP_EPS_ZERO ===>>> movement is impossible.\n";
 #endif // PP_DEBUG
-
 		Vector_Zero((*reduceElem).d);
 		reduceElem->objF_p = objF_u;
 		return;
@@ -153,7 +127,6 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 	Vector_Addition(u, (*reduceElem).d, p);
 
 	if (!PointInPolytope(p)) {
-
 #ifdef PP_DEBUG
 		cout << "Shifted point p = ";
 		for (int j = 0; j < PF_MIN(PP_OUTPUT_LIMIT, PD_n); j++)
@@ -161,7 +134,6 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 		if (PP_OUTPUT_LIMIT < PD_n) cout << " ...";
 		cout << "\tnot in feasible polytope ===>>> movement is impossible." << endl;
 #endif // PP_DEBUG
-
 		Vector_Zero((*reduceElem).d);
 		reduceElem->objF_p = objF_u;
 		return;

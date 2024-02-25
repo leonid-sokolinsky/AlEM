@@ -11,15 +11,15 @@ Initial surface points for these problems were calculated using BSF-Apex-Quest.
 #pragma once
 
 //=========================== Method Parameters =========================
-#define PP_EPS_ZERO			1E-8		// Accuracy for comparison with zero
+#define PP_EPS_ZERO						1E-8	// Accuracy for comparison with zero
 #define PP_EPS_P_PROJ_ON_EDGE			1E-12	// Precision for calculating pseudoprojection onto edge
-#define PP_EPS_P_PROJ_ON_POLYTOPE		1E-9	// Precision for calculating pseudoprojection onto edge
+#define PP_EPS_P_PROJ_ON_POLYTOPE		1E-9	// Precision for calculating pseudoprojection onto polytope
 #define PP_OBJECTIVE_VECTOR_LENGTH		100000	// Starting length of Objective Vector
 #define PP_EPS_MAKE_H_PLANE_LIST		1E-5	// Precision for MakeHyperplaneList()
 #define PP_MAX_B_NO_CORRECT				200		// Maximum b that does not require correction
 #define PP_RND_EPS_POINT_IN_POLYTOPE	1E-6	// Precision for random inequality in PointInPolytope()
 
-/*============================== rnd5-0 LP problem ==============================*/
+/*============================== rnd5-0 LP problem ==============================*
 // Start point:	0               0             200             200             200
 // Exact solution:   100   200   200   200   200
 // Edge hyperplanes: {2, 3, 4, 6}. Shift = 200     F(x) = 2800
@@ -67,11 +67,11 @@ Initial surface points for these problems were calculated using BSF-Apex-Quest.
 #define PP_OPTIMAL_OBJ_VALUE 2300.1127587
 //------------------------------------------------------------------/**/
 
-/*============================== rnd5-1-5 LP problem ==============================*
+/*============================== rnd5-1-5 LP problem ==============================*/
 // Start point:	0           200           200             0             0
-// Edge hyperplanes: {1, 2, 9, 10}.        Shift = 200			F(x) = 2400
-// Edge hyperplanes: {0, 1, 2, 10}.        Shift = 107.84709	F(x) = 2615.6942
-// Edge hyperplanes : {1, 2, 5, 10}.        Shift = 108.80206   F(x) = 2626.4732
+// Edge hyperplanes: {1, 2, 9, 10}.		Shift = 200			F(x) = 2400
+// Edge hyperplanes: {0, 1, 2, 10}.		Shift = 107.84709	F(x) = 2615.6942
+// Edge hyperplanes: {1, 2, 5, 10}.		Shift = 108.80206	F(x) = 2626.4732
 #define PP_PROBLEM_NAME	"rnd5-1-5"
 #define PP_M 6		// Number of equations (number of rows in *.mtx)
 #define PP_N 11		// Number of variables (number of cols in *.mtx)
