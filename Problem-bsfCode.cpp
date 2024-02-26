@@ -44,6 +44,7 @@ void PC_bsf_Init(bool* success) {
 		if (PP_OUTPUT_LIMIT < PD_n) cout << "	...";
 		cout << "\tObjF(u) = " << ObjF(PD_u) << endl;
 		*success = false;
+		return;
 	}
 
 	MakeEdgeCodeList(PD_mh);
