@@ -19,7 +19,6 @@ This source code has been produced with using BSF-skeleton
 //================================ Problem Paramrters ===========================
 #define PP_MM (2*(PP_M+PP_N))			// Maximal number of inequalities
 #define PP_KK 131072					// Maximal number of edges that include start point: 2^17 = 131072
-#define PP_PROBE_LENGTH			1		// length of probe shift
 #define PP_MAX_ITER_COUNT	10000000000 // Maximal count of iterations
 #define PP_DBL_MAX			1E+308		// Highest value
 //-------------------------- Input/Outpoot Parameters ---------------------------

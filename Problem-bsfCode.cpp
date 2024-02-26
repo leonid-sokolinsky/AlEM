@@ -307,7 +307,9 @@ void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
 		cout << " ...";
 	cout << "\tF(x) = " << setw(PP_SETW) << ObjF(PD_u);
 	cout << endl;
+#ifdef PP_DEBUG
 	cout << "u0 on hyperplanes: "; Print_VectorOnHyperplanes(PD_u);
+#endif // PP_DEBUG
 	if (!PointInPolytope(PD_u))
 		cout << "u0 is outside feasible polytope!!!\n";
 	else
@@ -370,14 +372,14 @@ void PC_bsf_ProblemOutput(PT_bsf_reduceElem_T* reduceResult, int reduceCounter, 
 		cout << "Value of the objective function cannot be refined!\n";
 		return;
 	}
-
+#ifdef PP_DEBUG
 	CodeToSubset(reduceResult->edgeIndex, PD_index_activeHalfspaces);
 	cout << "Edge hyperplanes: {";
 	for (int i = 0; i < PD_ma - 1; i++)
 		cout << PD_index_activeHalfspaces[i] << ", ";
 	cout << PD_index_activeHalfspaces[PD_ma - 1]
 		<< "}.\tShift = " << PD_shiftLength << "\tF(x) = " << PD_objF_u << endl;
-
+#endif // PP_DEBUG
 	cout << "New vertex:\t";
 	for (int j = 0; j < PF_MIN(PP_OUTPUT_LIMIT, PD_n); j++) cout << setw(PP_SETW) << PD_u[j];
 	if (PP_OUTPUT_LIMIT < PD_n) cout << "	...";
