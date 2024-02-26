@@ -33,7 +33,7 @@ void	Print_VectorOnActiveHyperplanes(PT_vector_T x);
 void	Print_VectorOnHyperplanes(PT_vector_T x);
 double	ProblemScale();
 void	PseudorojectionOnEdge(PT_vector_T v, PT_vector_T w, double eps);
-void	PseudorojectionOnPolytope(PT_vector_T v, PT_vector_T w);
+void	PseudopojectionOnPolytope(PT_vector_T v, PT_vector_T w);
 double	relativeError(double trueValue, double calcValue);
 void	Shift(PT_vector_T basePoint, PT_vector_T direction, double PD_shiftLength, PT_vector_T endPoint);
 void	SkipComments(FILE* stream);

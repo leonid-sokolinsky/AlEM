@@ -352,7 +352,7 @@ void PC_bsf_ProblemOutput(PT_bsf_reduceElem_T* reduceResult, int reduceCounter, 
 	cout << setprecision(PP_SETW / 2);
 
 	PT_vector_T refined_u;
-	PseudorojectionOnPolytope(PD_u, refined_u);
+	PseudopojectionOnPolytope(PD_u, refined_u);
 	Vector_Round(refined_u, PP_EPS_ZERO);
 	Vector_Copy(refined_u, PD_u);
 
@@ -433,7 +433,7 @@ inline void MakeEdgeCodeList(int mh) {
 		PD_edgeCodeList[k] = k;
 }
 
-inline void PseudorojectionOnPolytope(PT_vector_T v, PT_vector_T w) {
+inline void PseudopojectionOnPolytope(PT_vector_T v, PT_vector_T w) {
 	double maxResidual;
 	int nonZeroCounter;
 	PT_vector_T sum_r;
