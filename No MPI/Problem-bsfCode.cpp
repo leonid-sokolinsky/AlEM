@@ -352,7 +352,7 @@ void PC_bsf_ProblemOutput(PT_bsf_reduceElem_T* reduceResult, int reduceCounter, 
 	cout << setprecision(PP_SETW / 2);
 
 	PT_vector_T refined_u;
-	PseudorojectionOnPolytope(PD_u, refined_u, PP_EPS_P_PROJ_ON_POLYTOPE);
+	PseudorojectionOnPolytope(PD_u, refined_u);
 	Vector_Round(refined_u, PP_EPS_ZERO);
 	Vector_Copy(refined_u, PD_u);
 
@@ -433,7 +433,7 @@ inline void MakeEdgeCodeList(int mh) {
 		PD_edgeCodeList[k] = k;
 }
 
-inline void PseudorojectionOnPolytope(PT_vector_T v, PT_vector_T w, double eps) {
+inline void PseudorojectionOnPolytope(PT_vector_T v, PT_vector_T w) {
 	double maxResidual;
 	int nonZeroCounter;
 	PT_vector_T sum_r;
@@ -451,7 +451,7 @@ inline void PseudorojectionOnPolytope(PT_vector_T v, PT_vector_T w, double eps) 
 			int exitcode;
 			PT_vector_T r;
 			double halfspaceResidual =
-				Vector_OrthogonalProjectionOntoHalfspace(w, PD_A[i], PD_b[i], r, eps, &exitcode);
+				Vector_OrthogonalProjectionOntoHalfspace(w, PD_A[i], PD_b[i], r, PP_EPS_P_PROJ_ON_POLYTOPE, &exitcode);
 			assert(exitcode != PP_EXITCODE_DEGENERATE_INEQUALITY);
 			if (exitcode == PP_EXITCODE_NATURAL_PROJECTING) {
 				for (int j = 0; j < PD_n; j++) {
@@ -474,7 +474,7 @@ inline void PseudorojectionOnPolytope(PT_vector_T v, PT_vector_T w, double eps) 
 				cout << "\tF(w) = " << setw(PP_SETW) << ObjF(w) << "\tmaxResidual = " << maxResidual << endl;
 		#endif // PP_DEBUG
 		/**/
-	} while (maxResidual >= eps);
+	} while (maxResidual >= PP_EPS_P_PROJ_ON_POLYTOPE);
 }
 
 inline void PseudorojectionOnEdge(PT_vector_T v, PT_vector_T w, double eps) {

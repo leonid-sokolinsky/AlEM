@@ -9,7 +9,6 @@ This source code has been produced with using BSF-skeleton
 #include "Problem-Types.h"
 //====================== Problem Functions ===========================
 void	AddOppositeInequality(int hyperplaneIndex, int m);
-void	PseudorojectionOnEdge(PT_vector_T v, PT_vector_T w, double eps);
 void	CodeToSubset(int code, int subset[PP_MM]);
 bool	Conversion();
 void	DirVectorCleanup(PT_vector_T x, double eps);
@@ -33,7 +32,8 @@ double	PolytopeResidual(PT_vector_T x);
 void	Print_VectorOnActiveHyperplanes(PT_vector_T x);
 void	Print_VectorOnHyperplanes(PT_vector_T x);
 double	ProblemScale();
-void	PseudorojectionOnPolytope(PT_vector_T v, PT_vector_T w, double eps);
+void	PseudorojectionOnEdge(PT_vector_T v, PT_vector_T w, double eps);
+void	PseudorojectionOnPolytope(PT_vector_T v, PT_vector_T w);
 double	relativeError(double trueValue, double calcValue);
 void	Shift(PT_vector_T basePoint, PT_vector_T direction, double PD_shiftLength, PT_vector_T endPoint);
 void	SkipComments(FILE* stream);
