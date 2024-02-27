@@ -20,33 +20,6 @@ Initial surface points for these problems were calculated using BSF-Apex-Quest.
 #define PP_RND_EPS_POINT_IN_POLYTOPE	1E-6	// Precision for random inequality in PointInPolytope()
 #define PP_PROBE_LENGTH					1		// length of probe shift
 
-/*============================== rnd400-0 LP problem ==============================*
-// Start point:	200	0 ... 0
-// Exact solution:   100   200   ...   200
-#define PP_PROBLEM_NAME	"rnd400-0"
-#define PP_M 401		// Number of equations (number of rows in *.mtx)
-#define PP_N 801		// Number of variables (number of cols in *.mtx)
-#define PP_OPTIMAL_OBJ_VALUE 		0
-//------------------------------------------------------------------/**/
-
-/*============================== rnd500-0 LP problem ==============================*
-// Start point:	200	0 ... 0
-// Exact solution:   100   200   ...   200
-#define PP_PROBLEM_NAME	"rnd500-0"
-#define PP_M 501		// Number of equations (number of rows in *.mtx)
-#define PP_N 1001		// Number of variables (number of cols in *.mtx)
-#define PP_OPTIMAL_OBJ_VALUE 		0
-//------------------------------------------------------------------/**/
-
-/*============================== rnd600-0 LP problem ==============================*
-// Start point:	200	0 ... 0
-// Exact solution:   100   200   ...   200
-#define PP_PROBLEM_NAME	"rnd600-0"
-#define PP_M 601		// Number of equations (number of rows in *.mtx)
-#define PP_N 1201		// Number of variables (number of cols in *.mtx)
-#define PP_OPTIMAL_OBJ_VALUE 		0
-//------------------------------------------------------------------/**/
-
 /*============================== rnd5-0 LP problem ==============================*/
 // Start point:	0               0             200             200             200
 // Exact solution:   100   200   200   200   200
