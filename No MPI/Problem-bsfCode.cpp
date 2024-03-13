@@ -3,7 +3,7 @@ Project: LiFe
 Theme: Edge movement method (No MPI)
 Module: Problem-bsfCode.cpp (Implementation of Problem Code)
 Prefix: PC
-Authors: Nikolay A. Olkhovsky & Leonid B. Sokolinsky
+Author: Leonid B. Sokolinsky
 This source code has been produced with using BSF-skeleton
 ==============================================================================*/
 #include "Problem-Data.h"			// Problem Types 
@@ -47,14 +47,21 @@ void PC_bsf_Init(bool* success) {
 		return;
 	}
 
-	MakeEdgeCodeList(PD_mh);
+	CalculateNumberOfEdges(PD_n, PD_mh, &PD_me, success);
+	if (!*success)
+		return;
+	MakeEdgeCodeList(PD_me);
+	PD_TWIDDLE_done = false;
+	PD_TWIDDLE_nextEdgeI = 0;
+	TWIDDLE_Make_p(PD_TWIDDLE_p, PD_mh, PD_n - 1);
+	PD_ma = PD_n - 1;
 
 	PD_objF_u = ObjF(PD_u);
 	PD_objF_initialValue = PD_objF_u;
 }
 
 void PC_bsf_SetListSize(int* listSize) {
-	*listSize = PD_mh;
+	*listSize = PD_me;
 }
 
 void PC_bsf_SetMapListElem(PT_bsf_mapElem_T* elem, int i) {
@@ -63,12 +70,14 @@ void PC_bsf_SetMapListElem(PT_bsf_mapElem_T* elem, int i) {
 
 void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int* success) {
 	// Map-List index = BSF_sv_addressOffset + BSF_sv_numberInSublist
-	int mOld; // Saves value of m before adding opposite inequalities
+	int old_PD_m; // Saves value of PD_m before adding opposite inequalities
+	int old_PD_ma; // Saves value of PD_ma before adding opposite inequalities
 	int edgeIndex = *mapElem->edgeIndex;
 	PT_vector_T u;		// current surface point
 	PT_vector_T v;		// v = u + PD_objVector (objVector = PP_OBJECTIVE_VECTOR_LENGTH*e_c)
 	PT_vector_T w;		// pseudiprojection of v
 	double objF_w = -PP_DBL_MAX; // F(w)
+	double norm_d;
 
 	Vector_Zero((*reduceElem).d);
 
@@ -76,12 +85,12 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 	cout << "------------------------------------ Map(" << BSF_sv_addressOffset + BSF_sv_numberInSublist << ") ------------------------------------" << endl;
 #endif // PP_DEBUG
 
-	mOld = PD_m;
+	old_PD_m = PD_m;
 	Vector_Copy(BSF_sv_parameter.x, u);
 	double objF_u = ObjF(u);
 	reduceElem->edgeIndex = edgeIndex;
 
-	CodeToSubset(edgeIndex, PD_index_activeHalfspaces);
+	TWIDDLE_CodeToSubset(edgeIndex, PD_index_includingHyperplanes, PD_index_activeHalfspaces, PD_mh, PD_ma);
 
 #ifdef PP_DEBUG
 	cout << "Edge index: " << edgeIndex << ".\tHyperplanes: {";
@@ -91,7 +100,7 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 	cout << PD_index_activeHalfspaces[PD_ma - 1] << "}.\n";
 #endif // PP_DEBUG
 
-	int old_PD_ma = PD_ma;
+	old_PD_ma = PD_ma;
 	for (int i = 0; i < old_PD_ma; i++) {
 		PD_index_activeHalfspaces[PD_ma] = PD_m;
 		PD_ma++; assert(PD_ma <= PP_MM);
@@ -105,17 +114,17 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 
 	PseudorojectionOnEdge(v, w, PP_EPS_P_PROJ_ON_EDGE);
 
-	PD_m = mOld;
-
+	PD_m = old_PD_m;
+	PD_ma = old_PD_ma;
 	objF_w = ObjF(w);
 
 	Vector_Subtraction(w, u, (*reduceElem).d);
 	DirVectorCleanup((*reduceElem).d, PP_EPS_ZERO);
 
-	double norm_d = Vector_Norm((*reduceElem).d);
+	norm_d = Vector_Norm((*reduceElem).d);
 	if (norm_d < PP_EPS_ZERO) {
 #ifdef PP_DEBUG
-		cout << "d = ||w-u|| < PP_EPS_ZERO ===>>> movement is impossible.\n";
+		cout << "||d|| = ||w-u|| = " << norm_d << " < PP_EPS_ZERO ===>>> movement is impossible.\n";
 #endif // PP_DEBUG
 		Vector_Zero((*reduceElem).d);
 		reduceElem->objF_p = objF_u;
@@ -159,7 +168,6 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 	}
 
 #ifdef PP_DEBUG
-	CodeToSubset(reduceElem->edgeIndex, PD_index_activeHalfspaces);
 	cout << "Shifted point p = ";
 	for (int j = 0; j < PF_MIN(PP_OUTPUT_LIMIT, PD_n); j++)
 		cout << setw(PP_SETW) << p[j];
@@ -168,7 +176,7 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 		<< setw(PP_SETW) << reduceElem->objF_p << "\t\t---> Movement is possible." << endl;
 #endif // PP_DEBUG
 	return;
-}
+} // end PC_bsf_MapF
 
 void PC_bsf_MapF_1(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T_1* reduceElem, int* success) {
 	// not used
@@ -307,7 +315,9 @@ void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
 		cout << " ...";
 	cout << "\tF(x) = " << setw(PP_SETW) << ObjF(PD_u);
 	cout << endl;
+#ifdef PP_DEBUG
 	cout << "u0 on hyperplanes: "; Print_VectorOnHyperplanes(PD_u);
+#endif // PP_DEBUG
 	if (!PointInPolytope(PD_u))
 		cout << "u0 is outside feasible polytope!!!\n";
 	else
@@ -370,14 +380,17 @@ void PC_bsf_ProblemOutput(PT_bsf_reduceElem_T* reduceResult, int reduceCounter, 
 		cout << "Value of the objective function cannot be refined!\n";
 		return;
 	}
-
-	CodeToSubset(reduceResult->edgeIndex, PD_index_activeHalfspaces);
-	cout << "Edge hyperplanes: {";
+#ifdef PP_DEBUG
+	PD_TWIDDLE_done = false;
+	PD_TWIDDLE_nextEdgeI = 0;
+	TWIDDLE_Make_p(PD_TWIDDLE_p, PD_mh, PD_n - 1);
+	TWIDDLE_CodeToSubset(reduceResult->edgeIndex, PD_index_includingHyperplanes, PD_index_activeHalfspaces, PD_mh, PD_ma);
+	cout << "Edge index: " << reduceResult->edgeIndex << ".\tHyperplanes: {";
 	for (int i = 0; i < PD_ma - 1; i++)
 		cout << PD_index_activeHalfspaces[i] << ", ";
 	cout << PD_index_activeHalfspaces[PD_ma - 1]
 		<< "}.\tShift = " << PD_shiftLength << "\tF(x) = " << PD_objF_u << endl;
-
+#endif // PP_DEBUG
 	cout << "New vertex:\t";
 	for (int j = 0; j < PF_MIN(PP_OUTPUT_LIMIT, PD_n); j++) cout << setw(PP_SETW) << PD_u[j];
 	if (PP_OUTPUT_LIMIT < PD_n) cout << "	...";
@@ -388,7 +401,7 @@ void PC_bsf_ProblemOutput(PT_bsf_reduceElem_T* reduceResult, int reduceCounter, 
 	if (MTX_Save_sp(PD_u, t))
 		cout << "Coordinates of new vertex is saved into file *.sp" << endl;
 #endif // PP_SAVE_RESULT
-}
+} // end PC_bsf_ProblemOutput
 
 void PC_bsf_ProblemOutput_1(PT_bsf_reduceElem_T_1* reduceResult, int reduceCounter, PT_bsf_parameter_T parameter, double t) {
 	// not used
@@ -429,8 +442,8 @@ inline void MakeHyperplaneList(int* mh) {
 	}
 }
 
-inline void MakeEdgeCodeList(int mh) {
-	for (int k = 0; k < mh; k++)
+inline void MakeEdgeCodeList(int me) {
+	for (int k = 0; k < me; k++)
 		PD_edgeCodeList[k] = k;
 }
 
@@ -1444,13 +1457,22 @@ inline double relativeError(double trueValue, double calcValue) {
 		return fabs(calcValue - trueValue);
 }
 
-inline void CodeToSubset(int code, int index_activeHalfspaces[PP_MM]) {
-	PD_ma = 0;
-	for (int i = 0; i < PD_mh; i++)
-		if (i != code) {
-			index_activeHalfspaces[PD_ma] = PD_index_includingHyperplanes[i];
-			PD_ma++;  assert(PD_ma <= PP_MM);
+inline void TWIDDLE_CodeToSubset(int code, int a[PP_MM], int c[PP_N - 1], int n, int m) {
+	if (PD_TWIDDLE_nextEdgeI == 0) {
+		for (int k = 0; k < m; k++)
+			c[k] = a[n - m + k];
+		if (code == 0) {
+			PD_TWIDDLE_nextEdgeI++;
+			return;
 		}
+	}
+
+	do {
+		TWIDDLE(&PD_TWIDDLE_x, &PD_TWIDDLE_y, &PD_TWIDDLE_z, PD_TWIDDLE_p, &PD_TWIDDLE_done);
+		assert(!PD_TWIDDLE_done);
+		c[PD_TWIDDLE_z - 1] = a[PD_TWIDDLE_x - 1];
+		PD_TWIDDLE_nextEdgeI++;
+	} while (PD_TWIDDLE_nextEdgeI < code);
 }
 
 inline void Print_VectorOnHyperplanes(PT_vector_T x) {
@@ -1468,3 +1490,108 @@ inline void Print_VectorOnActiveHyperplanes(PT_vector_T x) {
 	}
 	cout << endl;
 }
+
+inline void TWIDDLE // https://doi.org/10.1145/362384.362502
+(int* x, int* y, int* z, int p[PP_N + 2], bool* done) {
+	int i, j, k;
+	j = 0;
+	*done = false;
+
+	do {
+		j++;
+	} while (p[j] <= 0);
+
+	if (p[j - 1] == 0) {
+		i = j - 1;
+		while (i != 1) {
+			p[i] = -1;
+			i -= 1;
+		}
+		p[j] = 0;
+		p[1] = *x = *z = 1;
+		*y = j;
+		return;
+	}
+
+	if (j > 1)
+		p[j - 1] = 0;
+
+	do {
+		j++;
+	} while (p[j] > 0);
+
+	i = k = j - 1;
+
+	i++;
+	while (p[i] == 0) {
+		p[i] = -1;
+		i++;
+	}
+
+	if (p[i] == -1) {
+		p[i] = *z = p[k];
+		*x = i;
+		*y = k;
+		p[k] = -1;
+		return;
+	}
+
+	if (i == p[0]) {
+		*done = true;
+		return;
+	}
+
+	*z = p[j] = p[i];
+	p[i] = 0;
+	*x = j;
+	*y = i;
+}
+
+inline unsigned long long BinomialCoefficient(int n, int k) {
+	unsigned long long res = 1;
+	if (k > n / 2) k = n - k;
+	if (k == 1)  return n;
+	if (k == 0)  return 1;
+	for (int i = 1; i <= k; ++i) {
+		res *= n - k + i;
+		res /= i;
+	}
+	return res;
+}
+
+inline void CalculateNumberOfEdges(int n, int mh, int* me, bool* success) {
+	if (mh == n)
+		*me = mh;
+	else {
+		if (mh > 62) {
+			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
+				cout << "It is impossible to calculate binomial coefficient for number of including hyperplanes mh = "
+				<< mh << " > 62" << endl;
+			*success = false;
+			return;
+		}
+
+		unsigned long long long_me = BinomialCoefficient(mh, n - 1);
+
+		if (long_me > PP_KK) {
+			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
+				cout
+				<< "Number of including edges *me = " << long_me << " must be less than or equal to " << PP_KK << "\n";
+			*success = false;
+			return;
+		}
+		*me = (int)long_me;
+	}
+	*success = true;
+}
+
+inline void TWIDDLE_Make_p(int p[PP_MM + 2], int n, int m) {
+	// p - auxiliary integer array for generating all combinations of m out of n objects.
+	assert(n >= m && m > 0);
+	p[0] = n + 1;
+	p[n + 1] = -2;
+	for (int j = 1; j <= n - m; j++)
+		p[j] = 0;
+	for (int j = n - m + 1; j <= n; j++)
+		p[j] = j - n + m;
+};

@@ -3,7 +3,7 @@ Project: LiFe
 Theme: Edge movement method (MPI)
 Module: Problem-Types.h (BSF Types)
 Prefix: PT
-Authors: Nikolay A. Olkhovsky & Leonid B. Sokolinsky
+Author: Leonid B. Sokolinsky
 This source code has been produced with using BSF-skeleton
 ==============================================================================*/			
 #pragma once

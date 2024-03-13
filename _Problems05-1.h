@@ -52,7 +52,7 @@ Initial surface points for these problems were calculated using BSF-Apex-Quest.
 
 /*============================== rnd5-1-3 LP problem ==============================*
 // Start point:	200           200           200             0             0
-// Edge hyperplanes: {0, 1, 2, 9}. Shift = 74.973058       F(x) = 2424.9191
+// Edge hyperplanes: {0, 1, 2, 9}. Shift = 74.973058       F(x) = 2424.9192
 #define PP_PROBLEM_NAME	"rnd5-1-3"
 #define PP_M 6		// Number of equations (number of rows in *.mtx)
 #define PP_N 11		// Number of variables (number of cols in *.mtx)

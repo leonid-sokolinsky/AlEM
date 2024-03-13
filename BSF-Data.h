@@ -3,7 +3,7 @@ Project: LiFe
 Theme: Edge movement method (MPI)
 Module: BSF-Data.h (Problem Independent Variables & Data Structures)
 Prefix: BD
-Authors: Nikolay A. Olkhovsky & Leonid B. Sokolinsky
+Author: Leonid B. Sokolinsky
 This source code is a part of BSF Skeleton (https://github.com/leonid-sokolinsky/BSF-skeleton)
 ==============================================================================*/
 #include "BSF-Include.h"			// Problem Independent "Include" Files

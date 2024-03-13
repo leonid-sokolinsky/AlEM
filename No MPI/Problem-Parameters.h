@@ -3,18 +3,29 @@ Project: LiFe
 Theme: Edge movement method (No MPI)
 Module: Problem-Parameters.h (Problem Parameters)
 Prefix: PP
-Authors: Nikolay A. Olkhovsky & Leonid B. Sokolinsky
+Author: Leonid B. Sokolinsky
 This source code has been produced with using BSF-skeleton
 ==============================================================================*/
 
-#include "../_Problems05-1.h"
+/**
+#include "..\_Problems05-1.h"
+#define PP_PATH "D:/YandexDisk/_private/Programming/LP-Rnd-Problems/"
+//#define PP_PATH "Problems/"/**/
+
+/**/
+#include "..\_Problems-Cone-LP.h"
+#define PP_PATH "D:/YandexDisk/_private/Programming/LP-Cone-Problems/"
+//#define PP_PATH "Problems/"/**/
+
+/**
+#include "..\_Problems-NetLib-LP.h"
+#define PP_PATH "D:/YandexDisk/_private/Programming/LP-NetLib-Problems/"
+//#define PP_PATH "Problems/"/**/
 
 //-------------------------- Compilation Modes -----------------------
 #define PP_DEBUG
-#define PP_MATRIX_OUTPUT
-#define PP_SAVE_RESULT
-// No MPI
-#define PP_PATH "D:/YandexDisk/_private/Programming/LP-Rnd-Problems/"
+//#define PP_MATRIX_OUTPUT
+//#define PP_SAVE_RESULT
 
 //================================ Problem Paramrters ===========================
 #define PP_MM (2*(PP_M+PP_N))			// Maximal number of inequalities

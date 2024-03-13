@@ -2,14 +2,15 @@
 Project: LiFe
 Theme: Edge movement method (No MPI)
 Module: Problem-Forwards.h (Problem Function Forwards)
-Authors: Nikolay A. Olkhovsky & Leonid B. Sokolinsky
+Author: Leonid B. Sokolinsky
 This source code has been produced with using BSF-skeleton
 ==============================================================================*/
 #include "Problem-bsfTypes.h"
 #include "Problem-Types.h"
 //====================== Problem Functions ===========================
 void	AddOppositeInequality(int hyperplaneIndex, int m);
-void	CodeToSubset(int code, int subset[PP_MM]);
+unsigned long long BinomialCoefficient(int n, int k);
+void	CalculateNumberOfEdges(int n, int mh, int* me, bool* success);
 bool	Conversion();
 void	DirVectorCleanup(PT_vector_T x, double eps);
 double	Distance(PT_vector_T x, PT_vector_T y);
@@ -37,6 +38,9 @@ void	PseudoprojectionOnPolytope(PT_vector_T v, PT_vector_T w);
 double	relativeError(double trueValue, double calcValue);
 void	Shift(PT_vector_T basePoint, PT_vector_T direction, double PD_shiftLength, PT_vector_T endPoint);
 void	SkipComments(FILE* stream);
+void	TWIDDLE(int* x, int* y, int* z, int p[PP_N + 2], bool* done);
+void	TWIDDLE_CodeToSubset(int code, int a[PP_MM], int c[PP_N - 1], int n, int m);
+void	TWIDDLE_Make_p(int p[PP_MM + 2], int n, int m);
 void	Vector_Addition(PT_vector_T x, PT_vector_T y, PT_vector_T z);
 void	Vector_Copy(PT_vector_T fromPoint, PT_vector_T toPoint);
 double	Vector_DistanceToHalfspace(PT_vector_T z, PT_vector_T a, double b);
