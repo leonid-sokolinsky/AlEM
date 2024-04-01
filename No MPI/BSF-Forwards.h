@@ -2,7 +2,7 @@
 Project: LiFe
 Theme: Edge movement method (No MPI)
 Module: BSF-Forwards.h (Problem Independent Function Forwards)
-Author: Leonid B. Sokolinsky 
+Authors: Alexandr E. Zhulev & Leonid B. Sokolinsky 
 This source code is a part of BSF Skeleton (https://github.com/leonid-sokolinsky/BSF-skeleton)
 ==============================================================================*/
 #include "BSF-Types.h"					// Problem Independent Types 

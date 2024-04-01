@@ -3,7 +3,7 @@ Project: LiFe
 Theme: Edge movement method (No MPI)
 Module: Problems10-1.h (LP problems of dimension 10 with 1 randome inequality)
 Prefix: PP
-Authors: Nikolay A. Olkhovsky & Leonid B. Sokolinsky
+Authors: Alexandr E. Zhulev & Leonid B. Sokolinsky
 This include file is part of Problem-Parameters.h
 LP problems were obtained using BSF-LPP-Generator.
 Initial surface points for these problems were calculated using BSF-Apex-Quest.

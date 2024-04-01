@@ -3,7 +3,7 @@ Project: LiFe
 Theme: Edge movement method (No MPI)
 Module: Problem-Parameters.h (Problem Parameters)
 Prefix: PP
-Author: Leonid B. Sokolinsky
+Authors: Alexandr E. Zhulev & Leonid B. Sokolinsky
 This source code has been produced with using BSF-skeleton
 ==============================================================================*/
 

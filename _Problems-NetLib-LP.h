@@ -3,7 +3,7 @@ Project: LiFe
 Theme: Quest (No MPI)
 Module: _Problems-NetLib-LP.h (Problems from the NETLIB LP Test Problem Set)
 Prefix: PP
-Author: Leonid B. Sokolinsky
+Authors: Alexandr E. Zhulev & Leonid B. Sokolinsky
 This include file is part of Problem-Parameters.h
 LP problems were obtained using BSF-LPP-Generator.
 ==============================================================================*/

@@ -2,7 +2,7 @@
 Project: LiFe
 Theme: Edge movement method (MPI)
 Module: Problem-Forwards.h (Problem Function Forwards)
-Author: Leonid B. Sokolinsky
+Authors: Alexandr E. Zhulev & Leonid B. Sokolinsky
 This source code has been produced with using BSF-skeleton
 ==============================================================================*/
 #include "Problem-bsfTypes.h"
