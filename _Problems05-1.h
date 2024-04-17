@@ -1,6 +1,6 @@
 /*==============================================================================
-Project: LiFe
-Theme: Edge movement method (No MPI)
+Project: LiFe - New Linear Programming Solvers - New Linear Programming Solvers
+Theme: AlEM method - Along Edges Movement (No MPI)
 Module: Problems05-1.h (LP problems of dimension 5 with 1 randome inequality)
 Prefix: PP
 Authors: Alexandr E. Zhulev & Leonid B. Sokolinsky
@@ -38,7 +38,7 @@ Initial surface points for these problems were calculated using BSF-Apex-Quest.
 #define PP_PROBLEM_NAME	"rnd5-1-1"
 #define PP_M 6		// Number of equations (number of rows in *.mtx)
 #define PP_N 11		// Number of variables (number of cols in *.mtx)
-#define PP_OPTIMAL_OBJ_VALUE	2584.3495
+#define PP_OPTIMAL_OBJ_VALUE	2584.3494897
 //------------------------------------------------------------------/**/
 
 /*============================== rnd5-1-2 LP problem ==============================*
@@ -76,7 +76,7 @@ Initial surface points for these problems were calculated using BSF-Apex-Quest.
 #define PP_PROBLEM_NAME	"rnd5-1-5"
 #define PP_M 6		// Number of equations (number of rows in *.mtx)
 #define PP_N 11		// Number of variables (number of cols in *.mtx)
-#define PP_OPTIMAL_OBJ_VALUE 2626.4731647
+#define PP_OPTIMAL_OBJ_VALUE 2626.4732362
 //------------------------------------------------------------------/**/
 
 /*============================== rnd5-1-6 LP problem ==============================*
@@ -86,5 +86,5 @@ Initial surface points for these problems were calculated using BSF-Apex-Quest.
 #define PP_PROBLEM_NAME	"rnd5-1-6"
 #define PP_M 6		// Number of equations (number of rows in *.mtx)
 #define PP_N 11		// Number of variables (number of cols in *.mtx)
-#define PP_OPTIMAL_OBJ_VALUE 2675.351984	
+#define PP_OPTIMAL_OBJ_VALUE 2675.3519942	
 //------------------------------------------------------------------/**/

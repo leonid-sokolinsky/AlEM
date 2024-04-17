@@ -1,35 +1,26 @@
 /*==============================================================================
-Project: LiFe
-Theme: Edge movement method (MPI)
+Project: LiFe - New Linear Programming Solvers
+Theme: AlEM method - Along Edges Movement (MPI)
 Module: Problem-Parameters.h (Problem Parameters)
 Prefix: PP
 Authors: Alexandr E. Zhulev & Leonid B. Sokolinsky
 This source code has been produced with using BSF-skeleton
 ==============================================================================*/
-
-/**
 #include "_Problems05-1.h"
-#define PP_PATH "D:/YandexDisk/_private/Programming/LP-Rnd-Problems/"
-//#define PP_PATH "Problems/"/**/
-
-/**/
-#include "_Problems-Cone-LP.h"
-#define PP_PATH "D:/YandexDisk/_private/Programming/LP-Cone-Problems/"
-//#define PP_PATH "Problems/"/**/
-
-/**
-#include "_Problems-NetLib-LP.h"
-#define PP_PATH "D:/YandexDisk/_private/Programming/LP-NetLib-Problems/"
-//#define PP_PATH "Problems/"/**/
-
+//#include "_Problems-Cone-LP.h"
+//#include "_Problems-NetLib-LP.h"
 //-------------------------- Compilation Modes -----------------------
-#define PP_DEBUG
+//#define PP_DEBUG
 //#define PP_MATRIX_OUTPUT
 //#define PP_SAVE_RESULT
+//#define PP_PATH "Problems/"
+#define PP_PATH "D:/YandexDisk/_private/Programming/LP-Rnd-Problems/"
+//#define PP_PATH "D:/YandexDisk/_private/Programming/LP-Cone-Problems/"
+//#define PP_PATH "D:/YandexDisk/_private/Programming/LP-NetLib-Problems/"
 
 //================================ Problem Paramrters ===========================
-#define PP_MM (2*(PP_M+PP_N))			// Maximal number of inequalities
-#define PP_KK 131072					// Maximal number of edges that include start point: 2^17 = 131072
+#define PP_MM (2*PP_M+PP_N)	// Maximal number of inequalities
+#define PP_KK 55			// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
 #define PP_MAX_ITER_COUNT	10000000000 // Maximal count of iterations
 #define PP_DBL_MAX			1E+308		// Highest value
 //-------------------------- Input/Outpoot Parameters ---------------------------
@@ -40,10 +31,11 @@ This source code has been produced with using BSF-skeleton
 #define PP_MTX_PREFIX		"lp_"
 #define PP_MTX_POSTFIX_A	".mtx"
 #define PP_MTX_POSTFIX_B	"_b.mtx"
-#define PP_MTX_POSTFIX_LO	"_lo.mtx"
-#define PP_MTX_POSTFIX_HI	"_hi.mtx"
 #define PP_MTX_POSTFIX_C	"_c.mtx"
-#define PP_MTX_POSTFIX_SP	"_sp.mtx" // Surface point
+#define PP_MTX_POSTFIX_HI	"_hi.mtx"
+#define PP_MTX_POSTFIX_LO	"_lo.mtx"
+#define PP_MTX_POSTFIX_SO	"_so.mtx"	// Solution point
+#define PP_MTX_POSTFIX_U0	"_u0.mtx"	// Start point
 //-------------------------- Jobs  -----------------------
 #define PP_JOB_GET_BEST_DIRECTION	0 
 //------------- Vector Projection Onto Halfspace exit codes -------------

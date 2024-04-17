@@ -1,6 +1,6 @@
 /*==============================================================================
-Project: LiFe
-Theme: Edge movement method (MPI)
+Project: LiFe - New Linear Programming Solvers
+Theme: AlEM method - Along Edges Movement (MPI)
 Module: BSF-Data.h (Problem Independent Variables & Data Structures)
 Prefix: BD
 Authors: Alexandr E. Zhulev & Leonid B. Sokolinsky

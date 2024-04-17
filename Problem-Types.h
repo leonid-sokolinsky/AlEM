@@ -1,9 +1,9 @@
 /*==============================================================================
-Project: LiFe
-Theme: Edge movement method (MPI)
+Project: LiFe - New Linear Programming Solvers
+Theme: AlEM method - Along Edges Movement (MPI)
 Module: Problem-Types.h (BSF Types)
 Prefix: PT
-Author: Leonid B. Sokolinsky
+Authors: Alexandr E. Zhulev & Leonid B. Sokolinsky
 This source code has been produced with using BSF-skeleton
 ==============================================================================*/			
 #pragma once

@@ -1,6 +1,6 @@
 /*==============================================================================
-Project: LiFe
-Theme: Edge movement method (MPI)
+Project: LiFe - New Linear Programming Solvers
+Theme: AlEM method - Along Edges Movement (MPI)
 Module: Problem-bsfParameters.h (BSF-skeleton Parameters)
 Prefix: PP_BSF
 Authors: Alexandr E. Zhulev & Leonid B. Sokolinsky

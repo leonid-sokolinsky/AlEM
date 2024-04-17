@@ -1,6 +1,6 @@
 ﻿/*==============================================================================
-Project: LiFe
-Theme: Edge movement method (No MPI)
+Project: LiFe - New Linear Programming Solvers
+Theme: AlEM method - Along Edges Movement (No MPI)
 Module: Problem-bsfCode.cpp (Implementation of Problem Code)
 Prefix: PC
 Authors: Alexandr E. Zhulev & Leonid B. Sokolinsky
@@ -14,8 +14,7 @@ This source code has been produced with using BSF-skeleton
 using namespace std;
 
 void PC_bsf_SetInitParameter(PT_bsf_parameter_T* parameter) {
-	for (int j = 0; j < PD_n; j++) // Generating initial approximation
-		parameter->x[j] = PD_u[j];
+	Vector_Copy(PD_u, parameter->x);
 }
 
 void PC_bsf_Init(bool* success) {
@@ -26,42 +25,15 @@ void PC_bsf_Init(bool* success) {
 
 	if (!PointInPolytope(PD_u)) {
 		if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-			cout
-			<< "Starting point does not belong to the feasible polytope with precision PP_RND_EPS_POINT_IN_POLYTOPE = "
+			cout << "Starting point does not belong to the feasible polytope with precision PP_RND_EPS_POINT_IN_POLYTOPE = "
 			<< PP_RND_EPS_POINT_IN_POLYTOPE << "!!!\n";
 		*success = false;
 		return;
 	}
-
-	MakeHyperplaneList(&PD_mh);
-
-	if (PD_mh < PD_n) {
-		if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-			cout << "Start point u is not vertex! Number of including hyperplanes " << PD_mh
-			<< " < n = " << PD_n << "\n";
-		cout << "u: ";
-		for (int j = 0; j < PF_MIN(PP_OUTPUT_LIMIT, PD_n); j++) cout << setw(PP_SETW) << PD_u[j];
-		if (PP_OUTPUT_LIMIT < PD_n) cout << "	...";
-		cout << "\tObjF(u) = " << ObjF(PD_u) << endl;
-		*success = false;
-		return;
-	}
-
-	CalculateNumberOfEdges(PD_n, PD_mh, &PD_me, success);
-	if (!*success)
-		return;
-	MakeEdgeCodeList(PD_me);
-	PD_TWIDDLE_done = false;
-	PD_TWIDDLE_nextEdgeI = 0;
-	TWIDDLE_Make_p(PD_TWIDDLE_p, PD_mh, PD_n - 1);
-	PD_ma = PD_n - 1;
-
-	PD_objF_u = ObjF(PD_u);
-	PD_objF_initialValue = PD_objF_u;
 }
 
 void PC_bsf_SetListSize(int* listSize) {
-	*listSize = PD_me;
+	*listSize = PP_KK;
 }
 
 void PC_bsf_SetMapListElem(PT_bsf_mapElem_T* elem, int i) {
@@ -70,43 +42,36 @@ void PC_bsf_SetMapListElem(PT_bsf_mapElem_T* elem, int i) {
 
 void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int* success) {
 	// Map-List index = BSF_sv_addressOffset + BSF_sv_numberInSublist
-	int old_PD_m; // Saves value of PD_m before adding opposite inequalities
-	int old_PD_ma; // Saves value of PD_ma before adding opposite inequalities
 	int edgeIndex = *mapElem->edgeIndex;
 	PT_vector_T u;		// current surface point
 	PT_vector_T v;		// v = u + PD_objVector (objVector = PP_OBJECTIVE_VECTOR_LENGTH*e_c)
 	PT_vector_T w;		// pseudiprojection of v
 	double objF_w = -PP_DBL_MAX; // F(w)
-	double norm_d;
 
-	Vector_Zero((*reduceElem).d);
+	if (edgeIndex == -1) {
+		Vector_Zero((*reduceElem).d);
+		reduceElem->objF_p = -PP_DBL_MAX;
+		reduceElem->edgeIndex = -1;
+		return;
+	}
 
 #ifdef PP_DEBUG
 	cout << "------------------------------------ Map(" << BSF_sv_addressOffset + BSF_sv_numberInSublist << ") ------------------------------------" << endl;
 #endif // PP_DEBUG
 
-	old_PD_m = PD_m;
 	Vector_Copy(BSF_sv_parameter.x, u);
 	double objF_u = ObjF(u);
 	reduceElem->edgeIndex = edgeIndex;
 
-	TWIDDLE_CodeToSubset(edgeIndex, PD_index_includingHyperplanes, PD_index_activeHalfspaces, PD_mh, PD_ma);
+	TWIDDLE_CodeToSubset(edgeIndex, PD_index_includingHyperplanes, PD_index_activeHyperplanes, PD_mh, PD_ma);
 
 #ifdef PP_DEBUG
 	cout << "Edge index: " << edgeIndex << ".\tHyperplanes: {";
 	for (int i = 0; i < PD_ma - 1; i++) {
-		cout << PD_index_activeHalfspaces[i] << ", ";
+		cout << PD_index_activeHyperplanes[i] << ", ";
 	}
-	cout << PD_index_activeHalfspaces[PD_ma - 1] << "}.\n";
+	cout << PD_index_activeHyperplanes[PD_ma - 1] << "}.\n";
 #endif // PP_DEBUG
-
-	old_PD_ma = PD_ma;
-	for (int i = 0; i < old_PD_ma; i++) {
-		PD_index_activeHalfspaces[PD_ma] = PD_m;
-		PD_ma++; assert(PD_ma <= PP_MM);
-		AddOppositeInequality(PD_index_activeHalfspaces[i], PD_m);
-		PD_m++; assert(PD_m <= PP_MM);
-	}
 
 	MakeObjVector(PD_c, PP_OBJECTIVE_VECTOR_LENGTH, PD_objVector);
 
@@ -114,17 +79,15 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 
 	PseudorojectionOnEdge(v, w, PP_EPS_P_PROJ_ON_EDGE);
 
-	PD_m = old_PD_m;
-	PD_ma = old_PD_ma;
 	objF_w = ObjF(w);
 
 	Vector_Subtraction(w, u, (*reduceElem).d);
 	DirVectorCleanup((*reduceElem).d, PP_EPS_ZERO);
 
-	norm_d = Vector_Norm((*reduceElem).d);
+	double norm_d = Vector_Norm((*reduceElem).d);
 	if (norm_d < PP_EPS_ZERO) {
 #ifdef PP_DEBUG
-		cout << "||d|| = ||w-u|| = " << norm_d << " < PP_EPS_ZERO ===>>> movement is impossible.\n";
+		cout << "\t\t\t\t\t\t\t\t\t\t\t\t\t||d|| = ||w-u|| < PP_EPS_ZERO ===>>> movement is impossible.\n";
 #endif // PP_DEBUG
 		Vector_Zero((*reduceElem).d);
 		reduceElem->objF_p = objF_u;
@@ -152,7 +115,6 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 	reduceElem->objF_p = ObjF(p);
 
 	if (relativeError(objF_u, reduceElem->objF_p) < PP_EPS_ZERO) {
-
 #ifdef PP_DEBUG
 		cout << "u =\t    ";
 		for (int j = 0; j < PF_MIN(PP_OUTPUT_LIMIT, PD_n); j++)
@@ -162,6 +124,19 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 		cout << "|F(u1)-F(u2)|/|F(u1)| = " << relativeError(objF_u, reduceElem->objF_p) << " < PP_EPS_ZERO ===>>> movement is impossible.\n";
 #endif // PP_DEBUG
 
+		Vector_Zero((*reduceElem).d);
+		reduceElem->objF_p = objF_u;
+		return;
+	}
+
+	if (reduceElem->objF_p < objF_u) {
+#ifdef PP_DEBUG
+		cout << "u =\t    ";
+		for (int j = 0; j < PF_MIN(PP_OUTPUT_LIMIT, PD_n); j++)
+			cout << setw(PP_SETW) << u[j];
+		if (PP_OUTPUT_LIMIT < PD_n) cout << " ...";
+		cout << "\tF(w) = " << setw(PP_SETW) << reduceElem->objF_p << " < F(u) = " << objF_u << " ===>>> movement is impossible.\n";
+#endif // PP_DEBUG
 		Vector_Zero((*reduceElem).d);
 		reduceElem->objF_p = objF_u;
 		return;
@@ -224,11 +199,32 @@ void PC_bsf_ProcessResults(
 	int* nextJob,
 	bool* exit // "true" if Stopping Criterion is satisfied, and "false" otherwise
 ) {
-	Vector_Copy(PD_u, PD_previous_u);
-	bool success = MovingOnSurface(reduceResult->d, PD_u);
-	if (!success)
-		Vector_Copy(PD_previous_u, PD_u);
-	*exit = true;
+	bool success;
+	success = MovingOnSurface(reduceResult->d, PD_u);
+	if (success) {
+		*exit = false;
+		PD_TWIDDLE_done = false;
+		PD_TWIDDLE_nextEdgeI = 0;
+		TWIDDLE_Make_p(PD_TWIDDLE_p, PD_mh, PD_n - 1);
+		TWIDDLE_CodeToSubset(reduceResult->edgeIndex, PD_index_includingHyperplanes, PD_index_activeHyperplanes, PD_mh, PD_ma);
+		cout << "________________________________________________________________________________________________________________" << endl;
+		PD_objF_u = ObjF(PD_u);
+		cout << "Edge index: " << reduceResult->edgeIndex << ".\tGenerating hyperplanes: {";
+		for (int i = 0; i < PD_ma - 1; i++)
+			cout << PD_index_activeHyperplanes[i] << ", ";
+		cout << PD_index_activeHyperplanes[PD_ma - 1]
+			<< "}.\tShift = " << PD_shiftLength << "\tF(x) = " << PD_objF_u << endl;
+
+		cout << "New vertex:\t";
+		for (int j = 0; j < PF_MIN(PP_OUTPUT_LIMIT, PD_n); j++) cout << setw(PP_SETW) << PD_u[j];
+		if (PP_OUTPUT_LIMIT < PD_n) cout << "	...";
+		cout << endl;
+
+		Vector_Copy(PD_u, parameter->x);
+	}
+	else {
+		*exit = true;
+	}
 }
 
 void PC_bsf_ProcessResults_1(
@@ -267,7 +263,7 @@ void PC_bsf_JobDispatcher(
 	bool* exit,
 	double t
 ) {
-	// not used
+	// Not used
 }
 
 void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
@@ -323,11 +319,14 @@ void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
 	else
 		cout << "u0 is inside feasible polytope.\n";
 	cout << "-------------------------------------------" << endl;
+	cout << "Number of including hyperplanes:\t"; Print_Number_of_hyperplanes(PD_u);
+	cout << "Number of including edges:\t"; Print_Number_of_edges(PD_u);
 }
 
 void PC_bsf_CopyParameter(PT_bsf_parameter_T parameterIn, PT_bsf_parameter_T* parameterOutP) {
 	for (int j = 0; j < PD_n; j++)
 		parameterOutP->x[j] = parameterIn.x[j];
+	Preparation_for_Movement(parameterOutP->x);
 }
 
 void PC_bsf_IterOutput(PT_bsf_reduceElem_T* reduceResult, int reduceCounter, PT_bsf_parameter_T parameter,
@@ -376,30 +375,17 @@ void PC_bsf_ProblemOutput(PT_bsf_reduceElem_T* reduceResult, int reduceCounter, 
 	cout << "Relative error = " << setprecision(PP_SETW / 2) << relativeError(PP_OPTIMAL_OBJ_VALUE, PD_objF_u) << endl;
 	cout << "=============================================" << endl;
 
-	if (fabs(PD_objF_u - PD_objF_initialValue) < PP_EPS_ZERO) {
-		cout << "Value of the objective function cannot be refined!\n";
-		return;
-	}
-#ifdef PP_DEBUG
-	PD_TWIDDLE_done = false;
-	PD_TWIDDLE_nextEdgeI = 0;
-	TWIDDLE_Make_p(PD_TWIDDLE_p, PD_mh, PD_n - 1);
-	TWIDDLE_CodeToSubset(reduceResult->edgeIndex, PD_index_includingHyperplanes, PD_index_activeHalfspaces, PD_mh, PD_ma);
-	cout << "Edge index: " << reduceResult->edgeIndex << ".\tHyperplanes: {";
-	for (int i = 0; i < PD_ma - 1; i++)
-		cout << PD_index_activeHalfspaces[i] << ", ";
-	cout << PD_index_activeHalfspaces[PD_ma - 1]
-		<< "}.\tShift = " << PD_shiftLength << "\tF(x) = " << PD_objF_u << endl;
-#endif // PP_DEBUG
-	cout << "New vertex:\t";
+	cout << "Solution point:\t";
 	for (int j = 0; j < PF_MIN(PP_OUTPUT_LIMIT, PD_n); j++) cout << setw(PP_SETW) << PD_u[j];
 	if (PP_OUTPUT_LIMIT < PD_n) cout << "	...";
 	cout << endl;
+#ifdef PP_DEBUG
 	cout << "Polytope residual: " << PolytopeResidual(PD_u) << endl;
+#endif // PP_DEBUG
 
 #ifdef PP_SAVE_RESULT
-	if (MTX_Save_sp(PD_u, t))
-		cout << "Coordinates of new vertex is saved into file *.sp" << endl;
+	if (MTX_Save_so(PD_u, t))
+		cout << "Calculated solution point is saved into file *.so" << endl;
 #endif // PP_SAVE_RESULT
 } // end PC_bsf_ProblemOutput
 
@@ -431,11 +417,11 @@ void PC_bsfAssignParameter(PT_bsf_parameter_T parameter) { PC_bsf_CopyParameter(
 void PC_bsfAssignSublistLength(int value) { BSF_sv_sublistLength = value; };
 
 //---------------------------------- Problem functions -------------------------
-inline void MakeHyperplaneList(int* mh) {
+inline void MakeHyperplaneList(PT_vector_T u, int* mh) {
 	double residual;
 	*mh = 0;
 	for (int i = 0; i < PD_m; i++) {
-		if (Vector_OnHyperplane(PD_u, PD_A[i], PD_b[i], PP_EPS_MAKE_H_PLANE_LIST, &residual)) {
+		if (Vector_OnHyperplane(u, PD_A[i], PD_b[i], PP_EPS_MAKE_H_PLANE_LIST, &residual)) {
 			PD_index_includingHyperplanes[*mh] = i;
 			(*mh)++; assert((*mh) <= PP_MM);
 		}
@@ -443,8 +429,33 @@ inline void MakeHyperplaneList(int* mh) {
 }
 
 inline void MakeEdgeCodeList(int me) {
-	for (int k = 0; k < me; k++)
-		PD_edgeCodeList[k] = k;
+	int index;
+
+	for (int k = 0; k < PP_KK; k++) {
+		PD_edgeCodeList[k] = -1;
+	}
+
+	for (int k = 0; k < me; k++) {
+		index = rand() % PP_KK;
+		if (PD_edgeCodeList[index] == -1)
+			PD_edgeCodeList[index] = 0;
+		else {
+			for (int ki = 1; ki < me; ki++) {
+				if (PD_edgeCodeList[(index + ki) % me] == -1) {
+					PD_edgeCodeList[(index + ki) % me] = 0;
+					break;
+				}
+			}
+		}
+	}
+
+	index = 0;
+	for (int k = 0; k < PP_KK; k++) {
+		if (PD_edgeCodeList[k] == 0) {
+			PD_edgeCodeList[k] = index;
+			index++;
+		}
+	}
 }
 
 inline void PseudoprojectionOnPolytope(PT_vector_T v, PT_vector_T w) {
@@ -479,61 +490,34 @@ inline void PseudoprojectionOnPolytope(PT_vector_T v, PT_vector_T w) {
 		if (nonZeroCounter > 0)
 			Vector_DivideEquals(sum_r, nonZeroCounter);
 		Vector_PlusEquals(w, sum_r);
-		/**
-		#ifdef PP_DEBUG
-				cout << "w =\t    ";
-				for (int j = 0; j < PF_MIN(PP_OUTPUT_LIMIT, PD_n); j++)
-					cout << setw(PP_SETW) << w[j];
-				if (PP_OUTPUT_LIMIT < PD_n) cout << " ...";
-				cout << "\tF(w) = " << setw(PP_SETW) << ObjF(w) << "\tmaxResidual = " << maxResidual << endl;
-		#endif // PP_DEBUG
-		/**/
 	} while (maxResidual >= PP_EPS_P_PROJ_ON_POLYTOPE);
 }
 
 inline void PseudorojectionOnEdge(PT_vector_T v, PT_vector_T w, double eps) {
 	double maxResidual;
-	int nonZeroCounter;
 	PT_vector_T sum_r;
 
 	Vector_Copy(v, w);
 
 	do {
-		/*PseudorojectionOnEdge***
-		cout << "PseudorojectionOnEdge: w on active hyperplanes: "; Print_VectorOnActiveHyperplanes(w);
-		/**/
 		maxResidual = 0;
-		nonZeroCounter = 0;
 		Vector_Zero(sum_r);
 
 		for (int i = 0; i < PD_ma; i++) {
-			int ia = PD_index_activeHalfspaces[i];
-			int exitcode;
+			int ia = PD_index_activeHyperplanes[i];
 			PT_vector_T r;
-			double halfspaceResidual =
-				Vector_OrthogonalProjectionOntoHalfspace(w, PD_A[ia], PD_b[ia], r, eps, &exitcode);
-			assert(exitcode != PP_EXITCODE_DEGENERATE_INEQUALITY);
-			if (exitcode == PP_EXITCODE_NATURAL_PROJECTING) {
-				Vector_PlusEquals(sum_r, r);
-				nonZeroCounter++;
-				maxResidual = PF_MAX(maxResidual, halfspaceResidual);
-			}
+			double hyperplaneResidual =
+				Vector_OrthogonalProjectionOntoHyperplane(w, PD_A[ia], PD_b[ia], r, eps);
+			Vector_PlusEquals(sum_r, r);
+			maxResidual = PF_MAX(maxResidual, hyperplaneResidual);
 		}
 
 		Vector_Round(sum_r, eps * 10);
 		if (Vector_NormSquare(sum_r) == 0)
 			break;
 
-		if (nonZeroCounter > 0)
-			Vector_DivideEquals(sum_r, nonZeroCounter);
+		Vector_DivideEquals(sum_r, PD_ma);
 		Vector_PlusEquals(w, sum_r);
-		/*PseudorojectionOnEdge***
-				cout << "w =\t    ";
-				for (int j = 0; j < PF_MIN(PP_OUTPUT_LIMIT, PD_n); j++)
-					cout << setw(PP_SETW) << w[j];
-				if (PP_OUTPUT_LIMIT < PD_n) cout << " ...";
-				cout << "\tF(w) = " << setw(PP_SETW) << ObjF(w) << "\tmaxResidual = " << maxResidual << endl;
-		/**/
 	} while (maxResidual >= eps);
 }
 
@@ -721,7 +705,7 @@ static bool MTX_Load__Problem() {
 		return false;
 
 	//--------------- Reading surfase point ------------------
-	if (!MTX_Load_sp(&nor, &noc))
+	if (!MTX_Load_u0(&nor, &noc))
 		return false;
 
 	return true;
@@ -747,37 +731,32 @@ inline bool MTX_Load_A( // Reading A
 
 	if (stream == NULL) {
 		if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-			cout
-			<< "Failure of opening file '" << mtxFile << "'.\n";
+			cout << "Failure of opening file '" << mtxFile << "'.\n";
 		return false;
 	}
 
 	SkipComments(stream);
 	if (fscanf(stream, "%d%d%d", nor, noc, non) < 3) {
 		if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-			cout
-			<< "Unexpected end of file " << mtxFile << endl;
+			cout << "Unexpected end of file " << mtxFile << endl;
 		return false;
 	}
 
 	if (*nor >= *noc) {
 		if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-			cout
-			<< "Number of rows m = " << *nor << " must be < " << "Number of columns n = " << *noc << "\n";
+			cout << "Number of rows m = " << *nor << " must be < " << "Number of columns n = " << *noc << "\n";
 		return false;
 	}
 
 	if (*noc != PP_N) {
 		if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-			cout
-			<< "Invalid input data: PP_N must be = " << *noc << "\n";
+			cout << "Invalid input data: PP_N must be = " << *noc << "\n";
 		return false;
 	}
 
 	if (*nor != PP_M) {
 		if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-			cout
-			<< "Invalid input data: PP_M must be = " << *nor << "\n";
+			cout << "Invalid input data: PP_M must be = " << *nor << "\n";
 		return false;
 	}
 
@@ -786,8 +765,7 @@ inline bool MTX_Load_A( // Reading A
 
 	if (2 * *nor + *noc > PP_MM) {
 		if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-			cout
-			<< "Invalid input data: number of inequalities m = " << 2 * *nor + *noc
+			cout << "Invalid input data: number of inequalities m = " << 2 * *nor + *noc
 			<< " must be < PP_MM + 1 =" << PP_MM + 1 << "\n";
 		return false;
 	}
@@ -843,28 +821,24 @@ inline bool MTX_Load_b(
 
 	if (stream == NULL) {
 		if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-			cout
-			<< "Failure of opening file '" << mtxFile << "'.\n";
+			cout << "Failure of opening file '" << mtxFile << "'.\n";
 		return false;
 	}
 
 	SkipComments(stream);
 	if (fscanf(stream, "%d%d", nor, noc) < 2) {
 		if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-			cout
-			<< "Unexpected end of file'" << mtxFile << "'." << endl;
+			cout << "Unexpected end of file'" << mtxFile << "'." << endl;
 		return false;
 	}
 	if (*noe != *nor) {
 		if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-			cout
-			<< "Incorrect number of rows in'" << mtxFile << "'.\n";
+			cout << "Incorrect number of rows in'" << mtxFile << "'.\n";
 		return false;
 	}
 	if (*noc != 1) {
 		if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-			cout
-			<< "Incorrect number of columnws in'" << mtxFile << "'.\n";
+			cout << "Incorrect number of columnws in'" << mtxFile << "'.\n";
 		return false;
 	}
 
@@ -900,28 +874,24 @@ inline bool MTX_Load_lo(
 
 	if (stream == NULL) {
 		if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-			cout
-			<< "Failure of opening file '" << mtxFile << "'.\n";
+			cout << "Failure of opening file '" << mtxFile << "'.\n";
 		return false;
 	}
 
 	SkipComments(stream);
 	if (fscanf(stream, "%d%d", nor, noc) < 2) {
 		if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-			cout
-			<< "Unexpected end of file'" << mtxFile << "'." << endl;
+			cout << "Unexpected end of file'" << mtxFile << "'." << endl;
 		return false;
 	}
 	if (*nor != PD_n) {
 		if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-			cout
-			<< "Incorrect number of rows in'" << mtxFile << "'.\n";
+			cout << "Incorrect number of rows in'" << mtxFile << "'.\n";
 		return false;
 	}
 	if (*noc != 1) {
 		if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-			cout
-			<< "Incorrect number of columnws in'" << mtxFile << "'.\n";
+			cout << "Incorrect number of columnws in'" << mtxFile << "'.\n";
 		return false;
 	}
 
@@ -957,36 +927,31 @@ inline bool MTX_Load_hi(
 
 	if (stream == NULL) {
 		if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-			cout
-			<< "Failure of opening file '" << mtxFile << "'.\n";
+			cout << "Failure of opening file '" << mtxFile << "'.\n";
 		return false;
 	}
 
 	SkipComments(stream);
 	if (fscanf(stream, "%d%d", nor, noc) < 2) {
 		if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-			cout
-			<< "Unexpected end of file'" << mtxFile << "'." << endl;
+			cout << "Unexpected end of file'" << mtxFile << "'." << endl;
 		return false;
 	}
 	if (*nor != PD_n) {
 		if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-			cout
-			<< "Incorrect number of rows in'" << mtxFile << "'.\n";
+			cout << "Incorrect number of rows in'" << mtxFile << "'.\n";
 		return false;
 	}
 	if (*noc != 1) {
 		if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-			cout
-			<< "Incorrect number of columnws in'" << mtxFile << "'.\n";
+			cout << "Incorrect number of columnws in'" << mtxFile << "'.\n";
 		return false;
 	}
 
 	for (int j = 0; j < PD_n; j++) {
 		if (fscanf(stream, "%s", str) < 1) {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-				cout
-				<< "Unexpected end of file '" << mtxFile << "'." << endl;
+				cout << "Unexpected end of file '" << mtxFile << "'." << endl;
 			return false;
 		}
 		PD_hi[j] = strtod(str, &chr);
@@ -1013,28 +978,24 @@ inline bool MTX_Load_c(
 
 	if (stream == NULL) {
 		if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-			cout
-			<< "Failure of opening file '" << mtxFile << "'.\n";
+			cout << "Failure of opening file '" << mtxFile << "'.\n";
 		return false;
 	}
 
 	SkipComments(stream);
 	if (fscanf(stream, "%d%d", nor, noc) < 2) {
 		if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-			cout
-			<< "Unexpected end of file'" << mtxFile << "'." << endl;
+			cout << "Unexpected end of file'" << mtxFile << "'." << endl;
 		return false;
 	}
 	if (*nor != PD_n) {
 		if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-			cout
-			<< "Incorrect number of rows in'" << mtxFile << "'.\n";
+			cout << "Incorrect number of rows in'" << mtxFile << "'.\n";
 		return false;
 	}
 	if (*noc != 1) {
 		if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-			cout
-			<< "Incorrect number of columnws in'" << mtxFile << "'.\n";
+			cout << "Incorrect number of columnws in'" << mtxFile << "'.\n";
 		return false;
 	}
 
@@ -1052,7 +1013,7 @@ inline bool MTX_Load_c(
 	return true;
 }
 
-inline bool MTX_Load_sp(
+inline bool MTX_Load_u0(
 	int* nor,	// Number of matrix rows
 	int* noc	// Number of matrix columns
 ) {
@@ -1061,37 +1022,33 @@ inline bool MTX_Load_sp(
 	char str[80] = { '\0' };
 	char* chr = str;
 
-	PD_MTX_File_sp = PP_PATH;
-	PD_MTX_File_sp += PP_MTX_PREFIX;
-	PD_MTX_File_sp += PD_problemName;
-	PD_MTX_File_sp += PP_MTX_POSTFIX_SP;
-	mtxFile = PD_MTX_File_sp.c_str();
+	PD_MTX_File_u0 = PP_PATH;
+	PD_MTX_File_u0 += PP_MTX_PREFIX;
+	PD_MTX_File_u0 += PD_problemName;
+	PD_MTX_File_u0 += PP_MTX_POSTFIX_U0;
+	mtxFile = PD_MTX_File_u0.c_str();
 	stream = fopen(mtxFile, "r+b");
 
 	if (stream == NULL) {
 		if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-			cout
-			<< "Failure of opening file '" << mtxFile << "'.\n";
+			cout << "Failure of opening file '" << mtxFile << "'.\n";
 		return false;
 	}
 
 	SkipComments(stream);
 	if (fscanf(stream, "%d%d", nor, noc) < 2) {
 		if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-			cout
-			<< "Unexpected end of file'" << mtxFile << "'." << endl;
+			cout << "Unexpected end of file'" << mtxFile << "'." << endl;
 		return false;
 	}
 	if (*nor != PD_n) {
 		if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-			cout
-			<< "Incorrect number of rows in'" << mtxFile << "'.\n";
+			cout << "Incorrect number of rows in'" << mtxFile << "'.\n";
 		return false;
 	}
 	if (*noc != 1) {
 		if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-			cout
-			<< "Incorrect number of columnws in'" << mtxFile << "'.\n";
+			cout << "Incorrect number of columnws in'" << mtxFile << "'.\n";
 		return false;
 	}
 
@@ -1239,15 +1196,15 @@ static bool Conversion() { // Transformation to inequalities & dimensionality re
 	return true;
 }
 
-static bool MTX_Save_sp(PT_vector_T x, double elapsedTime) {
+static bool MTX_Save_so(PT_vector_T x, double elapsedTime) {
 	const char* mtxFile;
 	FILE* stream;// Input stream
 
-	PD_MTX_File_sp = PP_PATH;
-	PD_MTX_File_sp += PP_MTX_PREFIX;
-	PD_MTX_File_sp += PD_problemName;
-	PD_MTX_File_sp += PP_MTX_POSTFIX_SP;
-	mtxFile = PD_MTX_File_sp.c_str();
+	PD_MTX_File_so = PP_PATH;
+	PD_MTX_File_so += PP_MTX_PREFIX;
+	PD_MTX_File_so += PD_problemName;
+	PD_MTX_File_so += PP_MTX_POSTFIX_SO;
+	mtxFile = PD_MTX_File_so.c_str();
 	stream = fopen(mtxFile, "w");
 	if (stream == NULL) {
 		if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
@@ -1299,6 +1256,20 @@ Vector_OrthogonalProjectionOntoHalfspace(PT_vector_T z, PT_vector_T a, double b,
 	Vector_MultiplyByNumber(a, factor, r);
 	*exitCode = PP_EXITCODE_NATURAL_PROJECTING;
 	return a_dot_z_minus_b;
+}
+
+// Vector r of orthogonal projection of point z onto hyperplane <a,x> = b
+inline double // maxResidual
+Vector_OrthogonalProjectionOntoHyperplane(PT_vector_T z, PT_vector_T a, double b, PT_vector_T r, double eps) {
+	double factor;
+	double aNormSquare = Vector_NormSquare(a); // ||a||^2
+	double a_dot_z_minus_b = Vector_DotProduct(a, z) - b; // <a,z> - b
+
+	assert(sqrt(aNormSquare) >= eps);
+
+	factor = -a_dot_z_minus_b / aNormSquare; // (b - <z,a>) / ||a||^2
+	Vector_MultiplyByNumber(a, factor, r);
+	return fabs(a_dot_z_minus_b);
 }
 
 // Distance from point z to halfspace <a,x> <= b: |<a,z> - b|/||a||
@@ -1386,7 +1357,6 @@ inline void SkipComments(FILE* stream) {
 }
 
 inline bool MovingOnSurface(PT_vector_T directionVector, PT_vector_T point) {
-	int numShiftsSameRate = 0; // Number of shifts with the same length
 	double leftBound = 0;
 	double rightBound = PP_DBL_MAX;
 	double factor;
@@ -1438,18 +1408,6 @@ inline double PolytopeResidual(PT_vector_T x) { // Measure of distance from poin
 	return sum;
 }
 
-inline double ProblemScale() {
-	double problemScale = 0;
-	for (int i = 0; i < PD_m; i++) {
-		for (int j = 0; j < PD_n; j++) {
-			if (fabs(PD_A[i][j]) < PP_EPS_ZERO)
-				continue;
-			problemScale = PF_MAX(problemScale, fabs(PD_b[i] / PD_A[i][j]));
-		}
-	}
-	return problemScale;
-}
-
 inline double relativeError(double trueValue, double calcValue) {
 	if (fabs(trueValue) >= PP_EPS_ZERO)
 		return fabs(calcValue - trueValue) / fabs(trueValue);
@@ -1476,19 +1434,72 @@ inline void TWIDDLE_CodeToSubset(int code, int a[PP_MM], int c[PP_N - 1], int n,
 }
 
 inline void Print_VectorOnHyperplanes(PT_vector_T x) {
-	for (int i = 0; i < PD_mh; i++)
-		cout << PD_index_includingHyperplanes[i] << " ";
+	double residual;
+	for (int i = 0; i < PD_m; i++) {
+		if (Vector_OnHyperplane(x, PD_A[i], PD_b[i], PP_EPS_ZERO, &residual))
+			cout << i << " ";
+	}
 	cout << endl;
 }
 
-inline void Print_VectorOnActiveHyperplanes(PT_vector_T x) {
+inline void Print_Number_of_hyperplanes(PT_vector_T x) {
+	int mh;
 	double residual;
-	for (int i = 0; i < PD_ma; i++) {
-		int ia = PD_index_activeHalfspaces[i];
-		if (Vector_OnHyperplane(x, PD_A[ia], PD_b[ia], PP_EPS_ZERO, &residual))
-			cout << ia << " ";
+
+	mh = 0;
+	for (int i = 0; i < PD_m; i++) {
+		if (Vector_OnHyperplane(x, PD_A[i], PD_b[i], PP_EPS_MAKE_H_PLANE_LIST, &residual))
+			mh++;
 	}
-	cout << endl;
+	cout << mh << endl;
+}
+
+inline void Print_Number_of_edges(PT_vector_T x) {
+	int mh;
+	unsigned long long me;
+	double residual;
+
+	mh = 0;
+	for (int i = 0; i < PD_m; i++) {
+		if (Vector_OnHyperplane(x, PD_A[i], PD_b[i], PP_EPS_MAKE_H_PLANE_LIST, &residual))
+			mh++;
+	}
+
+	if (mh == PD_n)
+		me = (unsigned long long) mh;
+	else {
+		if (mh > 62) {
+			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
+				cout << "\nIt is impossible to calculate binomial coefficient for number of including hyperplanes mh = "
+				<< mh << " > 62" << endl;
+			abort();
+		}
+		me = BinomialCoefficient(mh, PD_n - 1);
+	}
+	cout << me << endl;
+}
+
+inline void Preparation_for_Movement(PT_vector_T u) {
+	MakeHyperplaneList(u, &PD_mh);
+	if (PD_mh < PD_n) {
+		if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
+			cout << "Start point u is not vertex! Number of including hyperplanes " << PD_mh
+			<< " < n = " << PD_n << "\n";
+		cout << "u: ";
+		for (int j = 0; j < PF_MIN(PP_OUTPUT_LIMIT, PD_n); j++) cout << setw(PP_SETW) << PD_u[j];
+		if (PP_OUTPUT_LIMIT < PD_n) cout << "	...";
+		cout << "\tObjF(u) = " << ObjF(PD_u) << endl;
+		abort();
+	}
+	CalculateNumberOfEdges(PD_n, PD_mh, &PD_me);
+	MakeEdgeCodeList(PD_me);
+	PD_TWIDDLE_done = false;
+	PD_TWIDDLE_nextEdgeI = 0;
+	TWIDDLE_Make_p(PD_TWIDDLE_p, PD_mh, PD_n - 1);
+	PD_ma = PD_n - 1;
+
+	PD_objF_u = ObjF(PD_u);
+	PD_objF_initialValue = PD_objF_u;
 }
 
 inline void TWIDDLE // https://doi.org/10.1145/362384.362502
@@ -1559,30 +1570,32 @@ inline unsigned long long BinomialCoefficient(int n, int k) {
 	return res;
 }
 
-inline void CalculateNumberOfEdges(int n, int mh, int* me, bool* success) {
-	if (mh == n)
+inline void CalculateNumberOfEdges(int n, int mh, int* me) {
+	if (mh == n) {
 		*me = mh;
+		if (*me > PP_KK) {
+			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
+				cout << "Parameter PP_KK = " << PP_KK << " must be greater than or equal to " << *me << "\n";
+			abort();
+		}
+	}
 	else {
 		if (mh > 62) {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
 				cout << "It is impossible to calculate binomial coefficient for number of including hyperplanes mh = "
 				<< mh << " > 62" << endl;
-			*success = false;
-			return;
+			abort();
 		}
 
 		unsigned long long long_me = BinomialCoefficient(mh, n - 1);
 
 		if (long_me > PP_KK) {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-				cout
-				<< "Number of including edges *me = " << long_me << " must be less than or equal to " << PP_KK << "\n";
-			*success = false;
-			return;
+				cout << "Parameter PP_KK = " << PP_KK << " must be greater than or equal to " << long_me << "\n";
+			abort();
 		}
 		*me = (int)long_me;
 	}
-	*success = true;
 }
 
 inline void TWIDDLE_Make_p(int p[PP_MM + 2], int n, int m) {
@@ -1594,4 +1607,4 @@ inline void TWIDDLE_Make_p(int p[PP_MM + 2], int n, int m) {
 		p[j] = 0;
 	for (int j = n - m + 1; j <= n; j++)
 		p[j] = j - n + m;
-};
+}

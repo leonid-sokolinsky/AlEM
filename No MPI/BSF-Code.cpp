@@ -1,6 +1,6 @@
 /*==============================================================================
-Project: LiFe
-Theme: Edge movement method (No MPI)
+Project: LiFe - New Linear Programming Solvers
+Theme: AlEM method - Along Edges Movement (No MPI)
 Module: BSF-Code.cpp (Problem Independent Code)
 Prefix: BC
 Authors: Alexandr E. Zhulev & Leonid B. Sokolinsky

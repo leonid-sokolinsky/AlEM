@@ -1,5 +1,5 @@
 /*==============================================================================
-Project: LiFe
+Project: LiFe - New Linear Programming Solvers - New Linear Programming Solvers
 Theme: Quest (No MPI)
 Module: _Problems-NetLib-LP.h (Problems from the NETLIB LP Test Problem Set)
 Prefix: PP
@@ -19,7 +19,7 @@ LP problems were obtained using BSF-LPP-Generator.
 #define PP_RND_EPS_POINT_IN_POLYTOPE	1E-6	// Precision for random inequality in PointInPolytope()
 #define PP_PROBE_LENGTH					0.1	// length of probe shift
 
-/*============================== afiro LP problem ==============================*
+/*============================== afiro LP problem ==============================*/
 #define PP_PROBLEM_NAME	"afiro"
 #define PP_M 27		// Number of equations (number of rows in *.mtx)
 #define PP_N 51		// Number of variables (number of cols in *.mtx)
@@ -33,7 +33,7 @@ LP problems were obtained using BSF-LPP-Generator.
 #define PP_OPTIMAL_OBJ_VALUE 		1749.9
 //------------------------------------------------------------------
 
-/*============================== sc50a LP problem ==============================*/
+/*============================== sc50a LP problem ==============================*
 #define PP_PROBLEM_NAME		"sc50a"	
 #define PP_M 50	// Number of equations (number of rows in *.mtx)
 #define PP_N 78	// Number of variables (number of cols in *.mtx)

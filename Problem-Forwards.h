@@ -1,6 +1,6 @@
 /*==============================================================================
-Project: LiFe
-Theme: Edge movement method (MPI)
+Project: LiFe - New Linear Programming Solvers
+Theme: AlEM method - Along Edges Movement (MPI)
 Module: Problem-Forwards.h (Problem Function Forwards)
 Authors: Alexandr E. Zhulev & Leonid B. Sokolinsky
 This source code has been produced with using BSF-skeleton
@@ -10,12 +10,12 @@ This source code has been produced with using BSF-skeleton
 //====================== Problem Functions ===========================
 void	AddOppositeInequality(int hyperplaneIndex, int m);
 unsigned long long BinomialCoefficient(int n, int k);
-void	CalculateNumberOfEdges(int n, int mh, int* me, bool* success);
+void	CalculateNumberOfEdges(int n, int mh, int* me);
 bool	Conversion();
 void	DirVectorCleanup(PT_vector_T x, double eps);
 double	Distance(PT_vector_T x, PT_vector_T y);
-void	MakeHyperplaneList(int* mh);
-void	MakeEdgeCodeList(int mh);
+void	MakeHyperplaneList(PT_vector_T u, int* mh);
+void	MakeEdgeCodeList(int me);
 void	MakeObjVector(PT_vector_T c, double length, PT_vector_T objVector);
 bool	MovingOnSurface(PT_vector_T directionVector, PT_vector_T point);
 bool	MTX_Load__Problem();
@@ -24,15 +24,16 @@ bool	MTX_Load_b(int* nor, int* noc, int* noe);
 bool	MTX_Load_c(int* nor, int* noc);
 bool	MTX_Load_hi(int* nor, int* noc);
 bool	MTX_Load_lo(int* nor, int* noc);
-bool	MTX_Load_sp(int* nor, int* noc);
-bool	MTX_Save_sp(PT_vector_T x, double elapsedTime);
+bool	MTX_Load_u0(int* nor, int* noc);
+bool	MTX_Save_so(PT_vector_T x, double elapsedTime);
 double	ObjF(PT_vector_T x);
 bool	PointInHalfspace(PT_vector_T point, PT_vector_T a, double b, double eps);
 bool	PointInPolytope(PT_vector_T x);
 double	PolytopeResidual(PT_vector_T x);
-void	Print_VectorOnActiveHyperplanes(PT_vector_T x);
+void	Print_Number_of_edges(PT_vector_T x);
+void	Print_Number_of_hyperplanes(PT_vector_T x);
 void	Print_VectorOnHyperplanes(PT_vector_T x);
-double	ProblemScale();
+void	Preparation_for_Movement(PT_vector_T u);
 void	PseudorojectionOnEdge(PT_vector_T v, PT_vector_T w, double eps);
 void	PseudoprojectionOnPolytope(PT_vector_T v, PT_vector_T w);
 double	relativeError(double trueValue, double calcValue);
@@ -57,6 +58,7 @@ void	Vector_PlusEquals(PT_vector_T equalVector, PT_vector_T plusVector);
 void	Vector_ObliqueProjectionOntoHalfspace(PT_vector_T z, PT_vector_T a, double b, PT_vector_T g, PT_vector_T o, int* exitCode);
 bool	Vector_OnHyperplane(PT_vector_T point, PT_vector_T a, double b, double eps, double* residual);
 double	Vector_OrthogonalProjectionOntoHalfspace(PT_vector_T z, PT_vector_T a, double b, PT_vector_T r, double eps, int* exitCode);
+double	Vector_OrthogonalProjectionOntoHyperplane(PT_vector_T z, PT_vector_T a, double b, PT_vector_T r, double eps);
 void	Vector_Round(PT_vector_T x, double eps);
 void	Vector_Subtraction(PT_vector_T x, PT_vector_T y, PT_vector_T z);
 void	Vector_Unit(PT_vector_T vector);

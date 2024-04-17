@@ -1,6 +1,6 @@
 /*==============================================================================
-Project: LiFe
-Theme: Edge movement method (No MPI)
+Project: LiFe - New Linear Programming Solvers - New Linear Programming Solvers
+Theme: AlEM method - Along Edges Movement (No MPI)
 Module: Problems10-1.h (LP problems of dimension 10 with 1 randome inequality)
 Prefix: PP
 Authors: Alexandr E. Zhulev & Leonid B. Sokolinsky
