@@ -1,7 +1,7 @@
 /*==============================================================================
 Project: LiFe - New Linear Programming Solvers - New Linear Programming Solvers
 Theme: Quest (No MPI)
-Module: _Problems-NetLib-LP.h (Problems from the NETLIB LP Test Problem Set)
+Module: _Problems-NetLib-LP.h (Problems from the LP-NetLib-Problems Set)
 Prefix: PP
 Authors: Alexandr E. Zhulev & Leonid B. Sokolinsky
 This include file is part of Problem-Parameters.h
@@ -11,8 +11,8 @@ LP problems were obtained using BSF-LPP-Generator.
 
 //=========================== Method Parameters =========================
 #define PP_EPS_ZERO						1E-8	// Accuracy for comparison with zero
-#define PP_EPS_P_PROJ_ON_EDGE			1E-12	// Precision for calculating pseudoprojection onto edge
-#define PP_EPS_P_PROJ_ON_POLYTOPE		1E-9	// Precision for calculating pseudoprojection onto polytope
+#define PP_EPS_PPROJ_ON_EDGE_RESIDUAL			1E-12	// Precision for calculating pseudoprojection onto edge
+#define PP_EPS_PPROJ_ON_POLYTOPE		1E-9	// Precision for calculating pseudoprojection onto polytope
 #define PP_OBJECTIVE_VECTOR_LENGTH		1000	// Starting length of Objective Vector
 #define PP_EPS_MAKE_H_PLANE_LIST		1E-5	// Precision for MakeHyperplaneList()
 #define PP_MAX_B_NO_CORRECT				1E+308	// Maximum b that does not require correction

@@ -1,7 +1,7 @@
 /*==============================================================================
 Project: LiFe - New Linear Programming Solvers - New Linear Programming Solvers
 Theme: Quest (No MPI)
-Module: _Problems-NetLib-LP.h (Problems from the NETLIB LP Test Problem Set)
+Module: _Problems-Cone-LP.h (Problems from the LP-Cone-Problems Set)
 Prefix: PP
 Authors: Alexandr E. Zhulev & Leonid B. Sokolinsky
 This include file is part of Problem-Parameters.h
@@ -10,9 +10,13 @@ LP problems were obtained using BSF-LPP-Generator.
 #pragma once
 
 //=========================== Method Parameters =========================
+#define PP_KK							55		// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
 #define PP_EPS_ZERO						1E-8	// Accuracy for comparison with zero
-#define PP_EPS_P_PROJ_ON_EDGE			1E-12	// Precision for calculating pseudoprojection onto edge
-#define PP_EPS_P_PROJ_ON_POLYTOPE		1E-9	// Precision for calculating pseudoprojection onto polytope
+#define PP_EPS_U0_ROUND					0		// Precision of rounding starting point
+#define PP_EPS_PPROJ_ON_EDGE_RESIDUAL	1E-12	// Precision for calculating pseudoprojection onto edge
+#define PP_EPS_PPROJ_ON_EDGE_DIR		1E-10	// Direction precision for calculating pseudoprojection onto edge
+#define PP_EPS_PPROJ_ON_POLYTOPE		1E-9	// Precision for calculating pseudoprojection onto polytope
+#define PP_EPS_POINT_IN_POLYTOPE		1E-10	// Precision for point to be in halfspace
 #define PP_OBJECTIVE_VECTOR_LENGTH		100000	// Starting length of Objective Vector
 #define PP_EPS_MAKE_H_PLANE_LIST		1E-5	// Precision for MakeHyperplaneList()
 #define PP_MAX_B_NO_CORRECT				1E+308	// Maximum b that does not require correction

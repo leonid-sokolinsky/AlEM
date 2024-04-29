@@ -30,6 +30,8 @@ void PC_bsf_Init(bool* success) {
 		*success = false;
 		return;
 	}
+	PD_iterNo = 0;
+	Preparation_for_Movement(PD_u);
 }
 
 void PC_bsf_SetListSize(int* listSize) {
@@ -77,7 +79,7 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 
 	Vector_Addition(u, PD_objVector, v);
 
-	PseudorojectionOnEdge(v, w, PP_EPS_P_PROJ_ON_EDGE);
+	PseudorojectionOnEdge(v, w);
 
 	objF_w = ObjF(w);
 
@@ -201,6 +203,7 @@ void PC_bsf_ProcessResults(
 ) {
 	bool success;
 	success = MovingOnSurface(reduceResult->d, PD_u);
+	Vector_Round(PD_u, PP_EPS_U0_ROUND);
 	if (success) {
 		*exit = false;
 		PD_TWIDDLE_done = false;
@@ -208,6 +211,7 @@ void PC_bsf_ProcessResults(
 		TWIDDLE_Make_p(PD_TWIDDLE_p, PD_mh, PD_n - 1);
 		TWIDDLE_CodeToSubset(reduceResult->edgeIndex, PD_index_includingHyperplanes, PD_index_activeHyperplanes, PD_mh, PD_ma);
 		cout << "________________________________________________________________________________________________________________" << endl;
+		PD_iterNo++;
 		PD_objF_u = ObjF(PD_u);
 		cout << "Edge index: " << reduceResult->edgeIndex << ".\tGenerating hyperplanes: {";
 		for (int i = 0; i < PD_ma - 1; i++)
@@ -221,6 +225,7 @@ void PC_bsf_ProcessResults(
 		cout << endl;
 
 		Vector_Copy(PD_u, parameter->x);
+		Preparation_for_Movement(PD_u);
 	}
 	else {
 		*exit = true;
@@ -361,15 +366,13 @@ void PC_bsf_IterOutput_3(PT_bsf_reduceElem_T_3* reduceResult, int reduceCounter,
 void PC_bsf_ProblemOutput(PT_bsf_reduceElem_T* reduceResult, int reduceCounter, PT_bsf_parameter_T parameter, double t) {
 	cout << setprecision(PP_SETW / 2);
 
-	PT_vector_T refined_u;
-	PseudoprojectionOnPolytope(PD_u, refined_u);
-	Vector_Round(refined_u, PP_EPS_ZERO);
-	Vector_Copy(refined_u, PD_u);
+	Vector_Round(PD_u, PP_EPS_U0_ROUND);
 
 	PD_objF_u = ObjF(PD_u);
 
 	cout << "=============================================" << endl;
 	cout << "Elapsed time: " << t << endl;
+	cout << "Number of iterations: " << PD_iterNo << endl;
 	cout << "Current objective value: " << setprecision(16) << PD_objF_u << endl;
 	cout << "Optimal objective value: " << PP_OPTIMAL_OBJ_VALUE << endl;
 	cout << "Relative error = " << setprecision(PP_SETW / 2) << relativeError(PP_OPTIMAL_OBJ_VALUE, PD_objF_u) << endl;
@@ -401,9 +404,9 @@ void PC_bsf_ProblemOutput_3(PT_bsf_reduceElem_T_3* reduceResult, int reduceCount
 	// not used
 }
 
-// MPI
-// MPI
-// MPI
+void PC_bsf_MainArguments(int argc, char* argv[]) {
+	// not used
+}
 
 //----------------------- Assigning Values to BSF-skeleton Variables (Do not modify!) -----------------------
 void PC_bsfAssignAddressOffset(int value) { BSF_sv_addressOffset = value; };
@@ -476,7 +479,7 @@ inline void PseudoprojectionOnPolytope(PT_vector_T v, PT_vector_T w) {
 			int exitcode;
 			PT_vector_T r;
 			double halfspaceResidual =
-				Vector_OrthogonalProjectionOntoHalfspace(w, PD_A[i], PD_b[i], r, PP_EPS_P_PROJ_ON_POLYTOPE, &exitcode);
+				Vector_OrthogonalProjectionOntoHalfspace(w, PD_A[i], PD_b[i], r, PP_EPS_PPROJ_ON_POLYTOPE, &exitcode);
 			assert(exitcode != PP_EXITCODE_DEGENERATE_INEQUALITY);
 			if (exitcode == PP_EXITCODE_NATURAL_PROJECTING) {
 				for (int j = 0; j < PD_n; j++) {
@@ -490,10 +493,10 @@ inline void PseudoprojectionOnPolytope(PT_vector_T v, PT_vector_T w) {
 		if (nonZeroCounter > 0)
 			Vector_DivideEquals(sum_r, nonZeroCounter);
 		Vector_PlusEquals(w, sum_r);
-	} while (maxResidual >= PP_EPS_P_PROJ_ON_POLYTOPE);
+	} while (maxResidual >= PP_EPS_PPROJ_ON_POLYTOPE);
 }
 
-inline void PseudorojectionOnEdge(PT_vector_T v, PT_vector_T w, double eps) {
+inline void PseudorojectionOnEdge(PT_vector_T v, PT_vector_T w) {
 	double maxResidual;
 	PT_vector_T sum_r;
 
@@ -507,18 +510,17 @@ inline void PseudorojectionOnEdge(PT_vector_T v, PT_vector_T w, double eps) {
 			int ia = PD_index_activeHyperplanes[i];
 			PT_vector_T r;
 			double hyperplaneResidual =
-				Vector_OrthogonalProjectionOntoHyperplane(w, PD_A[ia], PD_b[ia], r, eps);
+				Vector_OrthogonalProjectionOntoHyperplane(w, PD_A[ia], PD_b[ia], r);
 			Vector_PlusEquals(sum_r, r);
 			maxResidual = PF_MAX(maxResidual, hyperplaneResidual);
 		}
 
-		Vector_Round(sum_r, eps * 10);
-		if (Vector_NormSquare(sum_r) == 0)
+		if (Vector_Is_Tiny(sum_r, PP_EPS_PPROJ_ON_EDGE_DIR))
 			break;
 
 		Vector_DivideEquals(sum_r, PD_ma);
 		Vector_PlusEquals(w, sum_r);
-	} while (maxResidual >= eps);
+	} while (maxResidual >= PP_EPS_PPROJ_ON_EDGE_RESIDUAL);
 }
 
 inline void AddOppositeInequality(int hyperplaneIndex, int m) {
@@ -559,7 +561,7 @@ inline bool PointInPolytope(PT_vector_T x) { // If the point belongs to the poly
 		if (PD_b[i] > PP_MAX_B_NO_CORRECT)
 			eps = PP_RND_EPS_POINT_IN_POLYTOPE;
 		else
-			eps = PP_EPS_ZERO;
+			eps = PP_EPS_POINT_IN_POLYTOPE;
 
 		if (!PointInHalfspace(x, PD_A[i], PD_b[i], eps))
 			return false;
@@ -1260,12 +1262,12 @@ Vector_OrthogonalProjectionOntoHalfspace(PT_vector_T z, PT_vector_T a, double b,
 
 // Vector r of orthogonal projection of point z onto hyperplane <a,x> = b
 inline double // maxResidual
-Vector_OrthogonalProjectionOntoHyperplane(PT_vector_T z, PT_vector_T a, double b, PT_vector_T r, double eps) {
+Vector_OrthogonalProjectionOntoHyperplane(PT_vector_T z, PT_vector_T a, double b, PT_vector_T r) {
 	double factor;
 	double aNormSquare = Vector_NormSquare(a); // ||a||^2
 	double a_dot_z_minus_b = Vector_DotProduct(a, z) - b; // <a,z> - b
 
-	assert(sqrt(aNormSquare) >= eps);
+	assert(sqrt(aNormSquare) >= PP_EPS_PPROJ_ON_EDGE_RESIDUAL);
 
 	factor = -a_dot_z_minus_b / aNormSquare; // (b - <z,a>) / ||a||^2
 	Vector_MultiplyByNumber(a, factor, r);
@@ -1483,7 +1485,7 @@ inline void Preparation_for_Movement(PT_vector_T u) {
 	MakeHyperplaneList(u, &PD_mh);
 	if (PD_mh < PD_n) {
 		if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-			cout << "Start point u is not vertex! Number of including hyperplanes " << PD_mh
+			cout << "Starting point u is not vertex! Number of including hyperplanes = " << PD_mh
 			<< " < n = " << PD_n << "\n";
 		cout << "u: ";
 		for (int j = 0; j < PF_MIN(PP_OUTPUT_LIMIT, PD_n); j++) cout << setw(PP_SETW) << PD_u[j];
@@ -1607,4 +1609,11 @@ inline void TWIDDLE_Make_p(int p[PP_MM + 2], int n, int m) {
 		p[j] = 0;
 	for (int j = n - m + 1; j <= n; j++)
 		p[j] = j - n + m;
+}
+
+inline bool Vector_Is_Tiny(PT_vector_T x, double eps) {
+	for (int j = 0; j < PD_n; j++)
+		if (fabs(x[j]) >= eps)
+			return false;
+	return true;
 }
