@@ -7,21 +7,23 @@ Authors: Alexandr E. Zhulev & Leonid B. Sokolinsky
 This source code has been produced with using BSF-skeleton
 ==============================================================================*/
 
-/**/
+/*----------------------------- Problems -------------------------------*/
+/**
 #include "../_Problems05-1.h"
-#define PP_PATH "D:/YandexDisk/_private/Programming/LP-Rnd-Problems/"/**/
+#define PP_PATH "D:/YandexDisk/_private/Programming/LP-Rnd-Problems/"
  
 /**
 #include "../_Problems-Cone-LP.h"
-#define PP_PATH "D:/YandexDisk/_private/Programming/LP-Cone-Problems/"/**/
+#define PP_PATH "D:/YandexDisk/_private/Programming/LP-Cone-Problems/"
 
-/**
+/**/
 #include "../_Problems-Klee-Minty-Cube.h"
-#define PP_PATH "D:/YandexDisk/_private/Programming/LP-Klee-Minty-Cube/"/**/
+#define PP_PATH "D:/YandexDisk/_private/Programming/LP-Klee-Minty-Cube/"
 
 /**
 #include "../_Problems-NetLib-LP.h"
-#define PP_PATH "D:/YandexDisk/_private/Programming/LP-NetLib-Problems/"/**/
+#define PP_PATH "D:/YandexDisk/_private/Programming/LP-NetLib-Problems/"
+/*---------------------------------------------------------------------*/
 
 //-------------------------- Compilation Modes -----------------------
 //#define PP_DEBUG

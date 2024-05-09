@@ -515,7 +515,7 @@ inline void PseudorojectionOnEdge(PT_vector_T v, PT_vector_T w) {
 			maxResidual = PF_MAX(maxResidual, hyperplaneResidual);
 		}
 
-		if (Vector_Is_Tiny(sum_r, PP_EPS_PPROJ_ON_EDGE_DIR))
+		if (Vector_Is_Tiny(sum_r, PP_EPS_PPROJ_ON_EDGE_TINY_VEC))
 			break;
 
 		Vector_DivideEquals(sum_r, PD_ma);
@@ -561,7 +561,7 @@ inline bool PointInPolytope(PT_vector_T x) { // If the point belongs to the poly
 		if (PD_b[i] > PP_MAX_B_NO_CORRECT)
 			eps = PP_RND_EPS_POINT_IN_POLYTOPE;
 		else
-			eps = PP_EPS_POINT_IN_POLYTOPE;
+			eps = PP_EPS_POINT_IN_HALFSPACE;
 
 		if (!PointInHalfspace(x, PD_A[i], PD_b[i], eps))
 			return false;
