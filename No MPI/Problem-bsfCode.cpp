@@ -25,8 +25,8 @@ void PC_bsf_Init(bool* success) {
 
 	if (!PointInPolytope(PD_u)) {
 		if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-			cout << "Starting point does not belong to the feasible polytope with precision PP_RND_EPS_POINT_IN_POLYTOPE = "
-			<< PP_RND_EPS_POINT_IN_POLYTOPE << "!!!\n";
+			cout << "Starting point does not belong to the feasible polytope with precision PP_EPS_POINT_IN_HALFSPACE = "
+			<< PP_EPS_POINT_IN_HALFSPACE << "!!!\n";
 		*success = false;
 		return;
 	}
@@ -58,7 +58,7 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 	}
 
 #ifdef PP_DEBUG
-	cout << "------------------------------------ Map(" << BSF_sv_addressOffset + BSF_sv_numberInSublist << ") ------------------------------------" << endl;
+	cout << "------------------------------------ Map(" << MAP_LIST_INDEX << ") ------------------------------------" << endl;
 #endif // PP_DEBUG
 
 	Vector_Copy(BSF_sv_parameter.x, u);
@@ -461,66 +461,24 @@ inline void MakeEdgeCodeList(int me) {
 	}
 }
 
-inline void PseudoprojectionOnPolytope(PT_vector_T v, PT_vector_T w) {
-	double maxResidual;
-	int nonZeroCounter;
-	PT_vector_T sum_r;
-
-	for (int j = 0; j < PD_n; j++) {
-		w[j] = v[j];
-	}
-
-	do {
-		maxResidual = 0;
-		nonZeroCounter = 0;
-		Vector_Zero(sum_r);
-
-		for (int i = 0; i < PD_m; i++) {
-			int exitcode;
-			PT_vector_T r;
-			double halfspaceResidual =
-				Vector_OrthogonalProjectionOntoHalfspace(w, PD_A[i], PD_b[i], r, PP_EPS_PPROJ_ON_POLYTOPE, &exitcode);
-			assert(exitcode != PP_EXITCODE_DEGENERATE_INEQUALITY);
-			if (exitcode == PP_EXITCODE_NATURAL_PROJECTING) {
-				for (int j = 0; j < PD_n; j++) {
-					sum_r[j] += r[j];
-				}
-				nonZeroCounter++;
-				maxResidual = PF_MAX(maxResidual, halfspaceResidual);
-			}
-		}
-
-		if (nonZeroCounter > 0)
-			Vector_DivideEquals(sum_r, nonZeroCounter);
-		Vector_PlusEquals(w, sum_r);
-	} while (maxResidual >= PP_EPS_PPROJ_ON_POLYTOPE);
-}
-
 inline void PseudorojectionOnEdge(PT_vector_T v, PT_vector_T w) {
-	double maxResidual;
 	PT_vector_T sum_r;
 
 	Vector_Copy(v, w);
 
 	do {
-		maxResidual = 0;
 		Vector_Zero(sum_r);
 
 		for (int i = 0; i < PD_ma; i++) {
 			int ia = PD_index_activeHyperplanes[i];
 			PT_vector_T r;
-			double hyperplaneResidual =
-				Vector_OrthogonalProjectionOntoHyperplane(w, PD_A[ia], PD_b[ia], r);
+			Vector_OrthogonalProjectionOntoHyperplane(w, PD_A[ia], PD_b[ia], r);
 			Vector_PlusEquals(sum_r, r);
-			maxResidual = PF_MAX(maxResidual, hyperplaneResidual);
 		}
-
-		if (Vector_Is_Tiny(sum_r, PP_EPS_PPROJ_ON_EDGE_TINY_VEC))
-			break;
 
 		Vector_DivideEquals(sum_r, PD_ma);
 		Vector_PlusEquals(w, sum_r);
-	} while (maxResidual >= PP_EPS_PPROJ_ON_EDGE_RESIDUAL);
+	} while (!Vector_Is_Tiny(sum_r, PP_EPS_TINY_PPROJ_VEC));
 }
 
 inline void AddOppositeInequality(int hyperplaneIndex, int m) {
@@ -559,7 +517,7 @@ inline bool PointInPolytope(PT_vector_T x) { // If the point belongs to the poly
 	double eps;
 	for (int i = 0; i < PD_m; i++) {
 		if (PD_b[i] > PP_MAX_B_NO_CORRECT)
-			eps = PP_RND_EPS_POINT_IN_POLYTOPE;
+			eps = PP_EPS_POINT_IN_RND_HALFSPACE;
 		else
 			eps = PP_EPS_POINT_IN_HALFSPACE;
 
@@ -1267,7 +1225,7 @@ Vector_OrthogonalProjectionOntoHyperplane(PT_vector_T z, PT_vector_T a, double b
 	double aNormSquare = Vector_NormSquare(a); // ||a||^2
 	double a_dot_z_minus_b = Vector_DotProduct(a, z) - b; // <a,z> - b
 
-	assert(sqrt(aNormSquare) >= PP_EPS_PPROJ_ON_EDGE_RESIDUAL);
+	assert(sqrt(aNormSquare) >= 0);
 
 	factor = -a_dot_z_minus_b / aNormSquare; // (b - <z,a>) / ||a||^2
 	Vector_MultiplyByNumber(a, factor, r);

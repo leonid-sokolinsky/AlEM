@@ -11,12 +11,12 @@ LP problems were obtained using BSF-LPP-Generator.
 
 //=========================== Method Parameters =========================
 #define PP_EPS_ZERO						1E-8	// Accuracy for comparison with zero
-#define PP_EPS_PPROJ_ON_EDGE_RESIDUAL			1E-12	// Precision for calculating pseudoprojection onto edge
-#define PP_EPS_PPROJ_ON_POLYTOPE		1E-9	// Precision for calculating pseudoprojection onto polytope
+
+
 #define PP_OBJECTIVE_VECTOR_LENGTH		1000	// Length of Objective Vector
 #define PP_EPS_MAKE_H_PLANE_LIST		1E-5	// Precision for MakeHyperplaneList()
 #define PP_MAX_B_NO_CORRECT				1E+308	// Maximum b that does not require correction
-#define PP_RND_EPS_POINT_IN_POLYTOPE	1E-6	// Precision for random inequality in PointInPolytope()
+#define PP_EPS_POINT_IN_RND_HALFSPACE	1E-6	// Precision for random inequality in PointInPolytope()
 #define PP_PROBE_LENGTH					0.1	// length of probe shift
 
 /*============================== afiro LP problem ==============================*/
