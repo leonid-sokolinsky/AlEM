@@ -123,7 +123,7 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 			cout << setw(PP_SETW) << u[j];
 		if (PP_OUTPUT_LIMIT < PD_n) cout << " ...";
 		cout << "\tF(u) = " << setw(PP_SETW) << objF_u << endl;
-		cout << "|F(u1)-F(u2)|/|F(u1)| = " << relativeError(objF_u, reduceElem->objF_p) << " < PP_EPS_ZERO ===>>> movement is impossible.\n";
+		cout << "|F(u1)-F(u2)|/|F(u1)| = " << relativeError(objF_u, reduceElem->objF_p) << " < PP_EPS_ZERO = " << PP_EPS_ZERO << " ===>>> movement is impossible.\n";
 #endif // PP_DEBUG
 
 		Vector_Zero((*reduceElem).d);
