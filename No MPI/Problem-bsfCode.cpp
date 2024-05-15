@@ -43,7 +43,6 @@ void PC_bsf_SetMapListElem(PT_bsf_mapElem_T* elem, int i) {
 }
 
 void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int* success) {
-	// Map-List index = BSF_sv_addressOffset + BSF_sv_numberInSublist
 	int edgeIndex = *mapElem->edgeIndex;
 	PT_vector_T u;		// current surface point
 	PT_vector_T v;		// v = u + PD_objVector (objVector = PP_OBJECTIVE_VECTOR_LENGTH*e_c)
@@ -58,7 +57,7 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 	}
 
 #ifdef PP_DEBUG
-	cout << "------------------------------------ Map(" << MAP_LIST_INDEX << ") ------------------------------------" << endl;
+	cout << "------------------------------------ Map(" << PF_MAP_LIST_INDEX << ") ------------------------------------" << endl;
 #endif // PP_DEBUG
 
 	Vector_Copy(BSF_sv_parameter.x, u);
@@ -533,9 +532,9 @@ inline bool PointInHalfspace // If the point belongs to the Halfspace with presc
 	return res <= eps;
 }
 
-inline void Shift(PT_vector_T point, PT_vector_T directionVector, double PD_shiftLength, PT_vector_T shiftedPoint) {
+inline void Shift(PT_vector_T point, PT_vector_T directionVector, double shiftLength, PT_vector_T shiftedPoint) {
 	for (int j = 0; j < PD_n; j++)
-		shiftedPoint[j] = point[j] + directionVector[j] * PD_shiftLength;
+		shiftedPoint[j] = point[j] + directionVector[j] * shiftLength;
 }
 
 inline void Vector_Copy(PT_vector_T fromPoint, PT_vector_T toPoint) { // toPoint = fromPoint
@@ -1325,7 +1324,7 @@ inline bool MovingOnSurface(PT_vector_T directionVector, PT_vector_T point) {
 	if (Vector_Norm(directionVector) < PP_EPS_ZERO)
 		return false;
 
-	PD_shiftLength = 100;
+	PD_shiftLength = PP_START_SHIFT_LENGTH;
 	factor = PD_shiftLength;
 
 	while (rightBound - leftBound >= PP_EPS_ZERO) {
@@ -1341,7 +1340,8 @@ inline bool MovingOnSurface(PT_vector_T directionVector, PT_vector_T point) {
 		}
 	}
 
-	Shift(point, directionVector, PD_shiftLength - factor, shiftedPoint);
+	PD_shiftLength -= factor;
+	Shift(point, directionVector, PD_shiftLength, shiftedPoint);
 
 	if (Vector_Equal(point, shiftedPoint, PP_EPS_ZERO))
 		return false;
