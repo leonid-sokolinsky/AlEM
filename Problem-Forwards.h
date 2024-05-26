@@ -32,7 +32,7 @@ bool	PointInPolytope(PT_vector_T x);
 double	PolytopeResidual(PT_vector_T x);
 void	Print_Number_of_edges(PT_vector_T x);
 void	Print_Number_of_hyperplanes(PT_vector_T x);
-void	Print_VectorOnHyperplanes(PT_vector_T x);
+void	Print_PointOnHyperplanes(PT_vector_T x);
 void	Preparation_for_Movement(PT_vector_T u);
 void	PseudorojectionOnEdge(PT_vector_T v, PT_vector_T w);
 double	relativeError(double trueValue, double calcValue);

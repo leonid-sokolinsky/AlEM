@@ -316,7 +316,7 @@ void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
 	cout << "\tF(x) = " << setw(PP_SETW) << ObjF(PD_u);
 	cout << endl;
 #ifdef PP_DEBUG
-	cout << "u0 on hyperplanes: "; Print_VectorOnHyperplanes(PD_u);
+	cout << "u0 on hyperplanes: "; Print_PointOnHyperplanes(PD_u);
 #endif // PP_DEBUG
 	if (!PointInPolytope(PD_u))
 		cout << "u0 is outside feasible polytope!!!\n";
@@ -373,8 +373,8 @@ void PC_bsf_ProblemOutput(PT_bsf_reduceElem_T* reduceResult, int reduceCounter, 
 	cout << "Elapsed time: " << t << endl;
 	cout << "Number of iterations: " << PD_iterNo << endl;
 	cout << "Current objective value: " << setprecision(16) << PD_objF_u << endl;
-	cout << "Optimal objective value: " << PP_OPTIMAL_OBJ_VALUE << endl;
-	cout << "Relative error = " << setprecision(PP_SETW / 2) << relativeError(PP_OPTIMAL_OBJ_VALUE, PD_objF_u) << endl;
+	cout << "Maximal objective value: " << PP_MAX_OBJ_VALUE << endl;
+	cout << "Relative error = " << setprecision(PP_SETW / 2) << relativeError(PP_MAX_OBJ_VALUE, PD_objF_u) << endl;
 	cout << "=============================================" << endl;
 
 	cout << "Solution point:\t";
@@ -1393,7 +1393,7 @@ inline void TWIDDLE_CodeToSubset(int code, int a[PP_MM], int c[PP_N - 1], int n,
 	} while (PD_TWIDDLE_nextEdgeI < code);
 }
 
-inline void Print_VectorOnHyperplanes(PT_vector_T x) {
+inline void Print_PointOnHyperplanes(PT_vector_T x) {
 		double residual;
 		for (int i = 0; i < PD_m; i++) {
 			if (Vector_OnHyperplane(x, PD_A[i], PD_b[i], PP_EPS_ZERO, &residual))

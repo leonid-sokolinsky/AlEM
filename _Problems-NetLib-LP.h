@@ -23,19 +23,19 @@ LP problems were obtained using BSF-LPP-Generator.
 #define PP_PROBLEM_NAME	"afiro"
 #define PP_M 27		// Number of equations (number of rows in *.mtx)
 #define PP_N 51		// Number of variables (number of cols in *.mtx)
-#define PP_OPTIMAL_OBJ_VALUE 		464.7531
+#define PP_MAX_OBJ_VALUE 		464.7531
 //------------------------------------------------------------------/**/
 
 /*============================== kb2 LP problem ==============================*
 #define PP_PROBLEM_NAME		"kb2"
 #define PP_M 43	// Number of equations (number of rows in *.mtx)
 #define PP_N 68	// Number of variables (number of cols in *.mtx)
-#define PP_OPTIMAL_OBJ_VALUE 		1749.9
+#define PP_MAX_OBJ_VALUE 		1749.9
 //------------------------------------------------------------------
 
 /*============================== sc50a LP problem ==============================*
 #define PP_PROBLEM_NAME		"sc50a"	
 #define PP_M 50	// Number of equations (number of rows in *.mtx)
 #define PP_N 78	// Number of variables (number of cols in *.mtx)
-#define PP_OPTIMAL_OBJ_VALUE 		64.575
+#define PP_MAX_OBJ_VALUE 		64.575
 //----------------------------------------------------------------------------/**/
