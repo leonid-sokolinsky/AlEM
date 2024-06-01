@@ -42,6 +42,10 @@ void PC_bsf_SetMapListElem(PT_bsf_mapElem_T* elem, int i) {
 	elem->edgeIndex = &(PD_edgeCodeList[i]);
 }
 
+void PC_bsf_MapInit(PT_bsf_parameter_T parameter) {
+	Preparation_for_Movement(parameter.x);
+}
+
 void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int* success) {
 	int edgeIndex = *mapElem->edgeIndex;
 	PT_vector_T u;		// current surface point
@@ -224,7 +228,6 @@ void PC_bsf_ProcessResults(
 		cout << endl;
 
 		Vector_Copy(PD_u, parameter->x);
-		Preparation_for_Movement(PD_u);
 	}
 	else {
 		*exit = true;
@@ -296,12 +299,7 @@ void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
 	cout << "--------------- Data ---------------\n";
 #ifdef PP_MATRIX_OUTPUT
 	cout << "------- Matrix PD_A & Column PD_b -------" << endl;
-	for (int i = 0; i < PD_m; i++) {
-		cout << i << ")";
-		for (int j = 0; j < PD_n; j++)
-			cout << setw(PP_SETW) << PD_A[i][j];
-		cout << "\t<=" << setw(PP_SETW) << PD_b[i] << endl;
-	}
+	Print_Matrix();
 #endif // PP_MATRIX_OUTPUT
 	cout << "Obj Function:\t";
 	for (int j = 0; j < PF_MIN(PP_OUTPUT_LIMIT, PD_n); j++)
@@ -310,10 +308,7 @@ void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
 		cout << " ...";
 	cout << endl;
 	cout << "u0 =\t\t";
-	for (int j = 0; j < PF_MIN(PP_OUTPUT_LIMIT, PD_n); j++) cout << setw(PP_SETW) << PD_u[j];
-	if (PP_OUTPUT_LIMIT < PD_n)
-		cout << " ...";
-	cout << "\tF(x) = " << setw(PP_SETW) << ObjF(PD_u);
+	Print_Vector(PD_u); cout << "\tF(x) = " << setw(PP_SETW) << ObjF(PD_u);
 	cout << endl;
 #ifdef PP_DEBUG
 	cout << "u0 on hyperplanes: "; Print_PointOnHyperplanes(PD_u);
@@ -330,7 +325,6 @@ void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
 void PC_bsf_CopyParameter(PT_bsf_parameter_T parameterIn, PT_bsf_parameter_T* parameterOutP) {
 	for (int j = 0; j < PD_n; j++)
 		parameterOutP->x[j] = parameterIn.x[j];
-	Preparation_for_Movement(parameterOutP->x);
 }
 
 void PC_bsf_IterOutput(PT_bsf_reduceElem_T* reduceResult, int reduceCounter, PT_bsf_parameter_T parameter,
@@ -378,9 +372,7 @@ void PC_bsf_ProblemOutput(PT_bsf_reduceElem_T* reduceResult, int reduceCounter, 
 	cout << "=============================================" << endl;
 
 	cout << "Solution point:\t";
-	for (int j = 0; j < PF_MIN(PP_OUTPUT_LIMIT, PD_n); j++) cout << setw(PP_SETW) << PD_u[j];
-	if (PP_OUTPUT_LIMIT < PD_n) cout << "	...";
-	cout << endl;
+	Print_Vector(PD_u);	cout << endl;
 #ifdef PP_DEBUG
 	cout << "Polytope residual: " << PolytopeResidual(PD_u) << endl;
 #endif // PP_DEBUG
@@ -660,8 +652,11 @@ static bool MTX_Load__Problem() {
 		return false;
 
 	//---------- Conversion to inequalities -----------
-	if (!Conversion())
-		return false;
+#ifdef PP_SIMPLE_CONVERSION
+	ConversionSimple();
+#else
+	if (!Conversion()) return false;
+#endif
 
 	//--------------- Reading surfase point ------------------
 	if (!MTX_Load_u0(&nor, &noc))
@@ -1002,7 +997,7 @@ inline bool MTX_Load_u0(
 	}
 	if (*nor != PD_n) {
 		if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-			cout << "Incorrect number of rows in'" << mtxFile << "'.\n";
+			cout << "Incorrect number of rows in'" << mtxFile << "'. Must be " << PD_n << ".\n";
 		return false;
 	}
 	if (*noc != 1) {
@@ -1155,7 +1150,43 @@ static bool Conversion() { // Transformation to inequalities & dimensionality re
 	return true;
 }
 
-static bool MTX_Save_so(PT_vector_T x, double elapsedTime) {
+inline void ConversionSimple() { // Transformation to inequalities
+	int m = PD_m;
+	for (int i = 0; i < m; i++) { // Conversion to inequalities
+		for (int j = 0; j < PD_n; j++)
+			PD_A[PD_m][j] = -PD_A[i][j];
+		PD_b[PD_m] = -PD_b[i];
+		PD_m++; assert(PD_m <= PP_MM);
+	}
+
+	for (int i = 0; i < PD_m; i++) // Remove negative sign for zero value
+		for (int j = 0; j < PD_n; j++)
+			if (PD_A[i][j] == 0)
+				PD_A[i][j] = 0;
+
+	for (int i = 0; i < PD_n; i++) { // Adding lower bound conditions
+		for (int j = 0; j < PD_n; j++)
+			PD_A[i + PD_m][j] = 0;
+		PD_A[i + PD_m][i] = -1;
+		if (PD_lo[i] == 0)
+			PD_b[i + PD_m] = 0;
+		else
+			PD_b[i + PD_m] = -PD_lo[i];
+	}
+	PD_m += PD_n; assert(PD_m <= PP_MM);
+
+	for (int i = 0; i < PD_n; i++) { // Adding higher bound conditions
+		if (PD_hi[i] != PP_INFINITY) {
+			for (int j = 0; j < PD_n; j++)
+				PD_A[PD_m][j] = 0;
+			PD_A[PD_m][i] = 1;
+			PD_b[PD_m] = PD_hi[i];
+			PD_m++; assert(PD_m <= PP_MM);
+		}
+	}
+}
+
+inline bool MTX_Save_so(PT_vector_T x, double elapsedTime) {
 	const char* mtxFile;
 	FILE* stream;// Input stream
 
@@ -1574,4 +1605,18 @@ inline bool Vector_Is_Tiny(PT_vector_T x, double eps) {
 		if (fabs(x[j]) >= eps)
 			return false;
 	return true;
+}
+
+inline void Print_Matrix(void) {
+	for (int i = 0; i < PD_m; i++) {
+		cout << i << ")";
+		for (int j = 0; j < PD_n; j++)
+			cout << setw(PP_SETW) << PD_A[i][j];
+		cout << "\t<=" << setw(PP_SETW) << PD_b[i] << endl;
+	}
+}
+
+inline void Print_Vector(PT_vector_T x) {
+	for (int j = 0; j < PF_MIN(PP_OUTPUT_LIMIT, PD_n); j++) cout << setw(PP_SETW) << x[j];
+	if (PP_OUTPUT_LIMIT < PD_n) cout << "	...";
 }
