@@ -18,7 +18,7 @@ Initial surface points for these problems were calculated using BSF-Apex-Quest.
 //						calculating pseudoprojection.
 //-----------------------------------------------------------------------
 #define PP_EPS_ZERO					1E-9				// Accuracy for comparison with zero
-#define PP_EPS_POINT_IN_HALFSPACE	PP_EPS_ZERO			// Precision for point to be in halfspace
+#define PP_EPS_POINT_IN_HALFSPACE	1E-8				// Precision for point to be in halfspace
 #define PP_EPS_MOVING_ON_POLYTOPE	(PP_EPS_ZERO/100)	// Precision for moving on polytope (affects Shift = 0)
 #define PP_EPS_PROJECTION_ROUND		PP_EPS_ZERO			// Precision of rounding pseudoprojecting vectors
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+9				// Length of Objective Vector
@@ -31,7 +31,7 @@ Initial surface points for these problems were calculated using BSF-Apex-Quest.
 #define PP_START_SHIFT_LENGTH	100
 //=============================================================================
 
-/*============================== rnd20-0 LP problem =========================*/
+/*============================== rnd20-0 LP problem =========================*
 // Solution:	100  200  ...  200
 #define PP_PROBLEM_NAME	"rnd20-0"
 #define PP_MAX_OBJ_VALUE 41900
@@ -57,7 +57,7 @@ Initial surface points for these problems were calculated using BSF-Apex-Quest.
 #define PP_MAX_OBJ_VALUE 35207.9205455114		
 //-----------------------------------------------------------------------------
 
-/*============================== rnd20-1-5 LP problem =========================*
+/*============================== rnd20-1-5 LP problem =========================*/
 #define PP_PROBLEM_NAME	"rnd20-1-5"
 #define PP_MAX_OBJ_VALUE 33275.82728933131		
 //-----------------------------------------------------------------------------

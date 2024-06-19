@@ -24,13 +24,13 @@ static int PD_TWIDDLE_x;			// Auxiliary TWIDDLE variable
 static int PD_TWIDDLE_y;			// Auxiliary TWIDDLE variable
 static int PD_TWIDDLE_z;			// Auxiliary TWIDDLE variable
 //========================== Problem structures ====================================
-static double PD_A[PP_MM][PP_N];	// Matrix of coefficients of inequalities
-static PT_column_T PD_b;			// Column of the constant terms of the system Ax <= PD_b
-static PT_vector_T PD_c;			// Gradient of Objective Function
-static PT_vector_T PD_e_c;			// PD_e_c = PD_c / ||PD_c||
-static PT_vector_T PD_u;			// Current surface point
-static PT_vector_T PD_hi;			// Higher bound
-static PT_vector_T PD_lo;			// Lower bound
+static PT_matrix_T PD_A;	// Matrix of coefficients of inequalities
+static PT_column_T PD_b;	// Column of the constant terms of the system Ax <= PD_b
+static PT_vector_T PD_c;	// Gradient of Objective Function
+static PT_vector_T PD_e_c;	// PD_e_c = PD_c / ||PD_c||
+static PT_vector_T PD_u;	// Current surface point
+static PT_vector_T PD_hi;	// Higher bound
+static PT_vector_T PD_lo;	// Lower bound
 static PT_column_T PD_norm_a;		// Column of norms of matrix rows
 static PT_vector_T PD_objVector;	// Used for pseudoprojecting
 static int PD_index_includingHyperplanes[PP_MM];	// Index of hyperplanes that include surface point u
