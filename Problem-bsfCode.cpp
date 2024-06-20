@@ -236,13 +236,20 @@ void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
 #endif // PP_BOMP
 
 #ifdef PP_BFRAGMENTED_MAP_LIST
-	cout << "Map List is Fragmented." << endl;
+	cout << "Map List is Fragmented" << endl;
 #else
-	cout << "Map List is not Fragmented." << endl;
+	cout << "Map List is not Fragmented" << endl;
 #endif
+
+#ifdef PP_SIMPLE_CONVERSION
+	cout << "Conversion mode: simple (with preservation of free variables)" << endl;
+#else
+	cout << "Conversion mode: full (with elimination of free variables)" << endl;
+#endif
+
 	cout << "Before conversion: m =\t" << PP_M << "\tn = " << PP_N << endl;
 	cout << "After conversion:  m =\t" << PD_m << "\tn = " << PD_n << endl;
-	cout << "PP_EPS_ZERO\t" << PP_EPS_ZERO << endl;
+	cout << "PP_EPS_ZERO\t\t\t" << PP_EPS_ZERO << endl;
 	cout << "PP_EPS_POINT_IN_HALFSPACE\t" << PP_EPS_POINT_IN_HALFSPACE << endl;
 	cout << "PP_EPS_MOVING_ON_POLYTOPE\t" << PP_EPS_MOVING_ON_POLYTOPE << endl;
 	cout << "PP_EPS_PROJECTION_ROUND\t\t" << PP_EPS_PROJECTION_ROUND << endl;
@@ -319,31 +326,22 @@ void PC_bsf_ProcessResults(PT_bsf_reduceElem_T* reduceResult, int reduceCounter,
 	MovingOnPolytope(PD_u, reduceResult->d, u_moved, PP_EPS_MOVING_ON_POLYTOPE);
 	shiftLength = Distance_PointToPoint(PD_u, u_moved);
 
-	Vector_Copy(u_moved, PD_u);
-
-	PD_iterNo++;
-
 #ifdef PP_DEBUG
-	MakeHyperplaneList(PD_u, PD_index_includingHyperplanes, &PD_mh, PP_EPS_POINT_IN_HALFSPACE);
-	PD_TWIDDLE_done = false;
-	PD_TWIDDLE_nextEdgeI = 0;
-	TWIDDLE_Make_p(PD_TWIDDLE_p, PD_mh, PD_n - 1);
-	TWIDDLE_CodeToSubset(reduceResult->edgeCode, PD_index_includingHyperplanes, PD_index_activeHyperplanes, PD_mh, PD_ma);
 	cout << "_________________________________________________ " << PD_iterNo << " _____________________________________________________" << endl;
-	cout << "Including hyperplanes:\t"; Print_HyperplanesIncludingPoint(PD_u, PP_EPS_POINT_IN_HALFSPACE); cout << endl;
+	cout << "Vertex:\t";
+	Print_Vector(PD_u); cout << "\tF(x) = " << PD_objF_u << endl;
+	cout << "Vertex hyperplanes:\t"; Print_HyperplanesIncludingPoint(PD_u, PP_EPS_POINT_IN_HALFSPACE); cout << endl;
 	PD_objF_u = ObjF(PD_u);
-		cout << "Edge code: " << reduceResult->edgeCode << ".\tHyperplanes: {";
-		for (int i = 0; i < PD_ma - 1; i++)
-			cout << PD_index_activeHyperplanes[i] << ", ";
-		cout << PD_index_activeHyperplanes[PD_ma - 1]
-			<< "}.\tShift = " << shiftLength << "\tF(x) = " << PD_objF_u << endl;
+	cout << "Edge hyperplanes:\t{";
+	for (int i = 0; i < PD_ma - 1; i++)
+		cout << PD_index_activeHyperplanes[i] << ", ";
+	cout << PD_index_activeHyperplanes[PD_ma - 1]
+		<< "}\t\t\t\t\tShift = " << shiftLength << endl;
+#endif // PP_DEBUG
 
-		cout << "New vertex:\t";
-		Print_Vector(PD_u);
-		cout << endl;
-#endif
-
-		Vector_Copy(PD_u, parameter->x);
+	Vector_Copy(u_moved, PD_u);
+	Vector_Copy(u_moved, parameter->x);
+	PD_iterNo++;
 }
 
 void PC_bsf_ProcessResults_1(PT_bsf_reduceElem_T_1* reduceResult, int reduceCounter, PT_bsf_parameter_T* parameter, int* nextJob, bool* exit) {
@@ -1541,7 +1539,7 @@ namespace PF {
 		int index;
 
 		if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-			cout << "List of edges in random order is generated...\n";
+			cout << "List of edges in random order is generated, please wait...\n";
 
 		for (int k = 0; k < PP_KK; k++) {
 			edgeCodeList[k] = -1;
