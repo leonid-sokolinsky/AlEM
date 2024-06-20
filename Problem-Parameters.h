@@ -3,7 +3,7 @@ Project: LiFe - New Linear Programming Solvers
 Theme: AlEM method - Along Edges Movement (MPI)
 Module: Problem-Parameters.h (Problem Parameters)
 Prefix: PP
-Authors: Alexandr E. Zhulev & Leonid B. Sokolinsky
+Authors: Alexander E. Zhulev & Leonid B. Sokolinsky
 This source code has been produced with using BSF-skeleton
 ==============================================================================*/
 //#define PP_PATH "Problems/"

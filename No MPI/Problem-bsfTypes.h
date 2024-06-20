@@ -3,7 +3,7 @@ Project: LiFe - New Linear Programming Solvers
 Theme: AlEM method - Along Edges Movement (No MPI)
 Module: Problem-bsfTypes.h (Predefined BSF Problem Types)
 Prefix: PT_bsf
-Authors: Alexandr E. Zhulev & Leonid B. Sokolinsky
+Authors: Alexander E. Zhulev & Leonid B. Sokolinsky
 This source code is a part of BSF Skeleton
 ==============================================================================*/
 #pragma once

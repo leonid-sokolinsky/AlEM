@@ -2,7 +2,7 @@
 Project: LiFe - New Linear Programming Solvers
 Theme: AlEM method - Along Edges Movement (No MPI)
 Module: BSF-Forwards.h (Problem Independent Function Forwards)
-Authors: Alexandr E. Zhulev & Leonid B. Sokolinsky 
+Authors: Alexander E. Zhulev & Leonid B. Sokolinsky 
 This source code is a part of BSF Skeleton (https://github.com/leonid-sokolinsky/BSF-skeleton)
 ==============================================================================*/
 #include "BSF-Types.h"					// Problem Independent Types 

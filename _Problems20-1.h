@@ -26,7 +26,7 @@ Initial surface points for these problems were calculated using BSF-Apex-Quest.
 #define PP_KK	20		// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
 #define PP_M	21		// Number of equations (number of rows in *.mtx)
 #define PP_N	41		// Number of variables (number of cols in *.mtx)
-#define PP_MAX_PROJECTING_ITER	1E+7	// Maximum acceptable number of iterations in PF_PseudoprojectionOnFace()
+#define PP_MAX_PROJECTING_ITER	1E+7	// Maximum acceptable number of iterations in PseudoprojectionOnFace()
 #define PP_PROBE_LENGTH			1					// Length of probe shift
 #define PP_START_SHIFT_LENGTH	100
 //=============================================================================

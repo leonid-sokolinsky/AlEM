@@ -3,7 +3,7 @@ Project: LiFe - New Linear Programming Solvers
 Theme: AlEM method - Along Edges Movement (No MPI)
 Module: Problems05-1.h (LP problems of dimension 5 with 1 randome inequality: LP-Rnd-Problems Set)
 Prefix: PP
-Authors: Alexandr E. Zhulev & Leonid B. Sokolinsky
+Authors: Alexander E. Zhulev & Leonid B. Sokolinsky
 This include file is part of Problem-Parameters.h
 LP problems were obtained using BSF-LPP-Generator.
 Initial surface points for these problems were calculated using BSF-Apex-Quest.
@@ -26,7 +26,7 @@ Initial surface points for these problems were calculated using BSF-Apex-Quest.
 #define PP_KK						5		// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
 #define PP_M						6		// Number of equations (number of rows in *.mtx)
 #define PP_N						11		// Number of variables (number of cols in *.mtx)
-#define PP_MAX_PROJECTING_ITER		1E+7	// Maximum acceptable number of iterations in PF_PseudoprojectionOnFace()
+#define PP_MAX_PROJECTING_ITER		1E+7	// Maximum acceptable number of iterations in PseudoprojectionOnFace()
 #define PP_PROBE_LENGTH				1		// Length of probe shift
 #define PP_START_SHIFT_LENGTH		100
 //-------------------------------------------------------------------------------
@@ -58,12 +58,12 @@ Initial surface points for these problems were calculated using BSF-Apex-Quest.
 
 //-------------------------------------------------------------------------------
 
-/*============================== rnd5-1-5 LP problem ============================*
+/*============================== rnd5-1-5 LP problem ============================*/
 #define PP_PROBLEM_NAME	"rnd5-1-5"
 #define PP_MAX_OBJ_VALUE 2626.473236206933
 //-------------------------------------------------------------------------------
 
-/*============================== rnd5-1-6 LP problem ============================*/
+/*============================== rnd5-1-6 LP problem ============================*
 #define PP_PROBLEM_NAME	"rnd5-1-6"
 #define PP_MAX_OBJ_VALUE 2675.351994186427
 //-------------------------------------------------------------------------------

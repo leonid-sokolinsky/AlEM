@@ -3,7 +3,7 @@ Project: LiFe - New Linear Programming Solvers
 Theme: AlEM method - Along Edges Movement (No MPI)
 Module: BSF-Data.h (Problem Independent Variables & Data Structures)
 Prefix: BD
-Authors: Alexandr E. Zhulev & Leonid B. Sokolinsky 
+Authors: Alexander E. Zhulev & Leonid B. Sokolinsky 
 This source code is a part of BSF Skeleton (https://github.com/leonid-sokolinsky/BSF-skeleton)
 ==============================================================================*/
 #include "BSF-Include.h"			// Problem Independent "Include" Files
@@ -25,13 +25,13 @@ static int	BD_tailLength;		// Length of the remainder of the list after dividing
 static double BD_t;				// Total time
 static int BD_iterCounter;
 // ========================= Lists ========================
-static BT_extendedReduceElem_T		BD_extendedReduceList[PP_BSF_REDUCE_LIST_LENGTH];
-static BT_extendedReduceElem_T_1	BD_extendedReduceList_1[PP_BSF_REDUCE_LIST_1_LENGTH];
-static BT_extendedReduceElem_T_2	BD_extendedReduceList_2[PP_BSF_REDUCE_LIST_2_LENGTH];
-static BT_extendedReduceElem_T_3	BD_extendedReduceList_3[PP_BSF_REDUCE_LIST_3_LENGTH];
+static BT_extendedReduceElem_T		BD_extendedReduceList[PP_BREDUCE_LIST_LENGTH];
+static BT_extendedReduceElem_T_1	BD_extendedReduceList_1[PP_BREDUCE_LIST_1_LENGTH];
+static BT_extendedReduceElem_T_2	BD_extendedReduceList_2[PP_BREDUCE_LIST_2_LENGTH];
+static BT_extendedReduceElem_T_3	BD_extendedReduceList_3[PP_BREDUCE_LIST_3_LENGTH];
 static BT_extendedReduceElem_T*		BD_extendedReduceResult_P;
 static BT_extendedReduceElem_T_1*	BD_extendedReduceResult_P_1;
 static BT_extendedReduceElem_T_2*	BD_extendedReduceResult_P_2;
 static BT_extendedReduceElem_T_3*	BD_extendedReduceResult_P_3;
-static PT_bsf_mapElem_T				BD_mapList[PP_BSF_MAP_LIST_LENGTH];
+static PT_bsf_mapElem_T				BD_mapList[PP_BMAP_LIST_LENGTH];
 static BT_order_T					BD_order;		// Order for Workers

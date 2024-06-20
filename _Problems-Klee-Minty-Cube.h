@@ -3,7 +3,7 @@ Project: LiFe - New Linear Programming Solvers
 Theme: AlEM method - Along Edges Movement (No MPI)
 Module: _Problems-Klee-Minty-Cube.h (Problems from the LP-Klee-Minty-Cube Set)
 Prefix: PP
-Authors: Alexandr E. Zhulev & Leonid B. Sokolinsky
+Authors: Alexander E. Zhulev & Leonid B. Sokolinsky
 This include file is part of Problem-Parameters.h
 ==============================================================================*/
 #pragma once
@@ -16,7 +16,7 @@ This include file is part of Problem-Parameters.h
 //						calculating pseudoprojection.
 //-----------------------------------------------------------------------
 #define PP_PROBE_LENGTH			0.1		// Length of probe shift
-#define PP_MAX_PROJECTING_ITER	1E+7	// Maximum acceptable number of iterations in PF_PseudoprojectionOnFace()
+#define PP_MAX_PROJECTING_ITER	1E+7	// Maximum acceptable number of iterations in PseudoprojectionOnFace()
 //=============================================================================
 
 /*============================== Klee-Minty5 LP problem ==============================*/
@@ -30,7 +30,7 @@ This include file is part of Problem-Parameters.h
 #define PP_MAX_OBJ_VALUE 3125
 //---------------------------------- Method parameters ------------------------
 #define PP_EPS_ZERO					1E-9			// Accuracy for comparison with zero
-#define PP_EPS_POINT_IN_HALFSPACE	PP_EPS_ZERO		// Precision for PF_MakeHyperplaneList()
+#define PP_EPS_POINT_IN_HALFSPACE	PP_EPS_ZERO		// Precision for MakeHyperplaneList()
 #define PP_EPS_MOVING_ON_POLYTOPE	(PP_EPS_ZERO/100)// Precision for moving on polytope (affects Shift = 0)
 #define PP_EPS_PROJECTION_ROUND		PP_EPS_ZERO		// Precision of rounding pseudoprojecting vectors
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+9			// Length of Objective Vector
@@ -64,7 +64,7 @@ This include file is part of Problem-Parameters.h
 // New vertex:                    0               0               0               0            3125
 //=============================================================================
 
-/*============================== Klee-Minty6 LP problem ==============================*
+/*============================== Klee-Minty6 LP problem ==============================*/
 // Starting point:	0 ... 0
 // Exact solution:	0 ... 0	15625
 #define PP_PROBLEM_NAME	"Klee-Minty6"
@@ -75,7 +75,7 @@ This include file is part of Problem-Parameters.h
 #define PP_MAX_OBJ_VALUE 15625
 //---------------------------------- Method parameters ------------------------
 #define PP_EPS_ZERO					1E-9			// Accuracy for comparison with zero
-#define PP_EPS_POINT_IN_HALFSPACE	1E-8		// Precision for PF_MakeHyperplaneList()
+#define PP_EPS_POINT_IN_HALFSPACE	1E-8		// Precision for MakeHyperplaneList()
 #define PP_EPS_MOVING_ON_POLYTOPE	(PP_EPS_ZERO/100)	// Precision for moving on polytope (affects Shift = 0)
 #define PP_EPS_PROJECTION_ROUND		1E-6			// Precision of rounding pseudoprojecting vectors
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+13			// Length of Objective Vector
@@ -126,7 +126,7 @@ This include file is part of Problem-Parameters.h
 #define PP_MAX_OBJ_VALUE 78125
 //---------------------------------- Method parameters ------------------------
 #define PP_EPS_ZERO					1E-9		// Accuracy for comparison with zero
-#define PP_EPS_POINT_IN_HALFSPACE	1E-6		// Precision for PF_MakeHyperplaneList()
+#define PP_EPS_POINT_IN_HALFSPACE	1E-6		// Precision for MakeHyperplaneList()
 #define PP_EPS_MOVING_ON_POLYTOPE	(PP_EPS_ZERO/100)	// Precision for moving on polytope (affects Shift = 0)
 #define PP_EPS_PROJECTION_ROUND		1E-5		// Precision of rounding pseudoprojecting vectors
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+15		// Length of Objective Vector
@@ -184,7 +184,7 @@ This include file is part of Problem-Parameters.h
 #define PP_MAX_OBJ_VALUE 390625
 //---------------------------------- Method parameters ------------------------
 #define PP_EPS_ZERO					1E-9			// Accuracy for comparison with zero
-#define PP_EPS_POINT_IN_HALFSPACE	1E-4		// Precision for PF_MakeHyperplaneList()
+#define PP_EPS_POINT_IN_HALFSPACE	1E-4		// Precision for MakeHyperplaneList()
 #define PP_EPS_MOVING_ON_POLYTOPE	(PP_EPS_ZERO/100)	// Precision for moving on polytope (affects Shift = 0)
 #define PP_EPS_PROJECTION_ROUND		1E-3			// Precision of rounding pseudoprojecting vectors
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+17			// Length of Objective Vector
@@ -202,7 +202,7 @@ This include file is part of Problem-Parameters.h
 #define PP_MAX_OBJ_VALUE 1953125
 //---------------------------------- Method parameters ------------------------
 #define PP_EPS_ZERO					1E-9			// Accuracy for comparison with zero
-#define PP_EPS_POINT_IN_HALFSPACE	1E-4		// Precision for PF_MakeHyperplaneList()
+#define PP_EPS_POINT_IN_HALFSPACE	1E-4		// Precision for MakeHyperplaneList()
 #define PP_EPS_MOVING_ON_POLYTOPE	(PP_EPS_ZERO/100)	// Precision for moving on polytope (affects Shift = 0)
 #define PP_EPS_PROJECTION_ROUND		1E-3			// Precision of rounding pseudoprojecting vectors
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+18			// Length of Objective Vector
