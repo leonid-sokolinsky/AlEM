@@ -27,6 +27,7 @@ namespace SF {
 	double	Distance_PointToPoint(PT_vector_T x, PT_vector_T y);
 	double	Distance_PointToPolytope(PT_vector_T x);
 	void	MakeColumnOfNorms(PT_matrix_T A, PT_column_T norm_a);
+	void	MakeListOfNotIncludingHalfspaces(PT_vector_T x, int* notIncludingHalfspacesList, double eps);
 	void	MovingOnPolytope(PT_vector_T startPoint, PT_vector_T directionVector, PT_vector_T finishPoint, double epsMoving);
 	void	MovingToPolytope(PT_vector_T startPoint, PT_vector_T directionVector, PT_vector_T finishPoint, double epsMoving);
 	void	MTX_Conversion();
@@ -47,11 +48,14 @@ namespace SF {
 	void	OrthogonalProjectingVectorOntoHyperplane_i(PT_vector_T x, int i, PT_vector_T p);
 	bool	PointBelongsHalfspace_i(PT_vector_T point, int i, double eps);
 	bool	PointBelongsHyperplane_i(PT_vector_T z, int i, double eps);
+	bool	PointBelongsOuterCone(PT_vector_T x, int* notIncludingHalfspacesList, double eps);
 	bool	PointBelongsPolytope(PT_vector_T x, double eps);
 	void	PointHomothety(PT_vector_T x, PT_vector_T center, double ratio);
 	bool	PointInsideHalfspace_i(PT_vector_T x, int i, double eps);
 	void	PolytopeHomothety(PT_vector_T center, double ratio);
 	void	Print_Inequalities();
+	void	Print_HalfspacesIncludingPoint(PT_vector_T x, double eps);
+	void	Print_HalfspacesOutOfPoint(PT_vector_T x, double eps);
 	void	Print_HyperplanesIncludingPoint(PT_vector_T x, double eps);
 	void	Print_Vector(PT_vector_T x);
 	double	RelativeError(double trueValue, double calculatedValue);
@@ -71,6 +75,7 @@ namespace SF {
 	double	Vector_NormSquare(PT_vector_T x);
 	void	Vector_PlusEquals(PT_vector_T equalVector, PT_vector_T plusVector);
 	void	Vector_Round(PT_vector_T x, double eps);
+	void	Vector_SetValue(PT_vector_T x, double v);
 	void	Vector_Subtraction(PT_vector_T x, PT_vector_T y, PT_vector_T z);
 	void	Vector_Zeroing(PT_vector_T x);
 }

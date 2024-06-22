@@ -13,8 +13,8 @@ This source code has been produced with using BSF-skeleton
 #include "Problem-bsfParameters.h"	// BSF-skeleton parameters
 #include "BSF-SkeletonVariables.h"	// Skeleton Variables
 using namespace std;
-using namespace PF;
 using namespace SF;
+using namespace PF;
 
 //---------------------------------- BSF Predefined Problem Functions -----------------------------
 
@@ -74,7 +74,7 @@ void PC_bsf_IterOutput_3(PT_bsf_reduceElem_T_3* reduceResult, int reduceCounter,
 	// Not used
 }
 
-void PC_bsf_JobDispatcher(PT_bsf_parameter_T* parameter, int* job, bool* exit, double t) {
+void PC_bsf_JobDispatcher(PT_bsf_parameter_T* parameter, int* job, bool* toExit, double t) {
 	// Not used
 }
 
@@ -98,7 +98,7 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 	
 	/*DEBUG PC_bsf_MapF**
 #ifdef PP_DEBUG
-	cout << "------------------------------------ Map(" << MAP_LIST_INDEX << ") ------------------------------------" << endl;
+	cout << "------------------------------------ Map(" << PF_MAP_LIST_INDEX << ") ------------------------------------" << endl;
 #endif // PP_DEBUG /**/
 
 // Condition for breakpoint: PD_iterNo == 2 && (BSF_sv_addressOffset + BSF_sv_numberInSublist == 2)
@@ -106,15 +106,15 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 	double objF_u = ObjF(u);
 	reduceElem->edgeCode = edgeCode;
 
-	TWIDDLE_CodeToSubset(edgeCode, PD_index_includingHyperplanes, PD_index_activeHyperplanes, PD_mh, PD_ma);
+	TWIDDLE_CodeToSubset(edgeCode, PD_index_includingHyperplanes, PD_edgeHyperplanes, PD_mh, PD_ma);
 
 /*DEBUG PC_bsf_MapF** 
 #ifdef PP_DEBUG
-		cout << "Edge code: " << edgeCode << ".\tHyperplanes: {";
+		cout << "Edge hyperplanes: {";
 	for (int i = 0; i < PD_ma - 1; i++) {
-		cout << PD_index_activeHyperplanes[i] << ", ";
+		cout << PD_edgeHyperplanes[i] << ", ";
 	}
-	cout << PD_index_activeHyperplanes[PD_ma - 1] << "}.\n";
+	cout << PD_edgeHyperplanes[PD_ma - 1] << "}.\n";
 #endif // PP_DEBUG /**/
 
 	Vector_MultiplyByNumber(PD_e_c, PP_OBJECTIVE_VECTOR_LENGTH, PD_objVector);
@@ -222,10 +222,16 @@ void PC_bsf_MapInit(PT_bsf_parameter_T parameter) {
 }
 
 void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
-	cout << "=================================================== BSF-EMM ====================================================" << endl;
+	cout << "=================================================== " << PP_METHOD_NAME << "====================================================" << endl;
 	cout << "Problem name: " << PD_problemName << endl;
+
+#ifdef PP_NO_MPI
+	cout << "No MPI" << endl;
+#else
 	cout << "Number of Workers: " << BSF_sv_numOfWorkers << endl;
-#ifdef PP_BOMP
+#endif // PP_NO_MPI
+
+#ifdef PP_BSF_OMP
 #ifdef PP_BNUM_THREADS
 	cout << "Number of Threads: " << PP_BNUM_THREADS << endl;
 #else
@@ -233,7 +239,7 @@ void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
 #endif // PP_BNUM_THREADS
 #else
 	cout << "OpenMP is turned off!" << endl;
-#endif // PP_BOMP
+#endif // PP_BSF_OMP
 
 #ifdef PP_BFRAGMENTED_MAP_LIST
 	cout << "Map List is Fragmented" << endl;
@@ -314,17 +320,24 @@ void PC_bsf_ProblemOutput_3(PT_bsf_reduceElem_T_3* reduceResult, int reduceCount
 	// Not used
 }
 
-void PC_bsf_ProcessResults(PT_bsf_reduceElem_T* reduceResult, int reduceCounter, PT_bsf_parameter_T* parameter, int* nextJob, bool* exit) {
+void PC_bsf_ProcessResults(PT_bsf_reduceElem_T* reduceResult, int reduceCounter, PT_bsf_parameter_T* parameter, int* nextJob, bool* toExit) {
 	PT_vector_T u_moved;
 	double shiftLength;
 
 	if (Vector_Norm(reduceResult->d) < PP_EPS_ZERO) {
-		*exit = true;
+		*toExit = true;
 		return;
 	}
 
 	MovingOnPolytope(PD_u, reduceResult->d, u_moved, PP_EPS_MOVING_ON_POLYTOPE);
 	shiftLength = Distance_PointToPoint(PD_u, u_moved);
+
+#ifdef PP_DEBUG
+	if (shiftLength < PP_EPS_ZERO) {
+		cout << "\nError in MovingOnPolytope(): Shift length < PP_EPS_ZERO! Possible you should increase PP_EPS_MOVING_ON_POLYTOPE or decrease PP_EPS_ZERO.\n";
+		exit(1);
+	}
+#endif // PP_DEBUG
 
 #ifdef PP_DEBUG
 	cout << "_________________________________________________ " << PD_iterNo << " _____________________________________________________" << endl;
@@ -334,8 +347,8 @@ void PC_bsf_ProcessResults(PT_bsf_reduceElem_T* reduceResult, int reduceCounter,
 	PD_objF_u = ObjF(PD_u);
 	cout << "Edge hyperplanes:\t{";
 	for (int i = 0; i < PD_ma - 1; i++)
-		cout << PD_index_activeHyperplanes[i] << ", ";
-	cout << PD_index_activeHyperplanes[PD_ma - 1]
+		cout << PD_edgeHyperplanes[i] << ", ";
+	cout << PD_edgeHyperplanes[PD_ma - 1]
 		<< "}\t\t\t\t\tShift = " << shiftLength << endl;
 #endif // PP_DEBUG
 
@@ -344,15 +357,15 @@ void PC_bsf_ProcessResults(PT_bsf_reduceElem_T* reduceResult, int reduceCounter,
 	PD_iterNo++;
 }
 
-void PC_bsf_ProcessResults_1(PT_bsf_reduceElem_T_1* reduceResult, int reduceCounter, PT_bsf_parameter_T* parameter, int* nextJob, bool* exit) {
+void PC_bsf_ProcessResults_1(PT_bsf_reduceElem_T_1* reduceResult, int reduceCounter, PT_bsf_parameter_T* parameter, int* nextJob, bool* toExit) {
 	// Not used
 }
 
-void PC_bsf_ProcessResults_2(PT_bsf_reduceElem_T_2* reduceResult, int reduceCounter, PT_bsf_parameter_T* parameter, int* nextJob, bool* exit) {
+void PC_bsf_ProcessResults_2(PT_bsf_reduceElem_T_2* reduceResult, int reduceCounter, PT_bsf_parameter_T* parameter, int* nextJob, bool* toExit) {
 	// Not used
 }
 
-void PC_bsf_ProcessResults_3(PT_bsf_reduceElem_T_3* reduceResult, int reduceCounter, PT_bsf_parameter_T* parameter, int* nextJob, bool* exit) {
+void PC_bsf_ProcessResults_3(PT_bsf_reduceElem_T_3* reduceResult, int reduceCounter, PT_bsf_parameter_T* parameter, int* nextJob, bool* toExit) {
 	// Not used
 }
 
@@ -451,6 +464,17 @@ inline void MakeColumnOfNorms(PT_matrix_T A, PT_column_T norm_a) {
 		norm_a[i] = Vector_Norm(A[i]);
 }
 
+inline void MakeListOfNotIncludingHalfspaces(PT_vector_T x, int* notIncludingHalfspacesList, double eps) {
+	int mo = 0;
+	for (int i = 0; i < PD_m; i++)
+		if (!PointBelongsHalfspace_i(x, i, eps)) {
+			notIncludingHalfspacesList[mo] = i;
+			mo++;
+		}
+	if (mo < PD_m)
+		notIncludingHalfspacesList[mo] = -1;
+}
+
 inline void MovingOnPolytope(PT_vector_T startPoint, PT_vector_T directionVector, PT_vector_T finishPoint, double epsMoving) {
 	double leftBound = 0;
 	double rightBound = PP_DBL_MAX;
@@ -486,60 +510,27 @@ inline void MovingOnPolytope(PT_vector_T startPoint, PT_vector_T directionVector
 
 inline void MovingToPolytope(PT_vector_T startPoint, PT_vector_T directionVector, PT_vector_T finishPoint, double epsMoving) {
 	double leftBound = 0;
-	double rightBound = PP_DBL_MAX;
-	double factor = 1;
-	double delta;
-	static int outerHalspace_i[PP_MM];	// Index of out half-spaces
-	int mo;								// Number of out half-spaces
-	bool pointInsideCone;
+	double rightBound = 1;
+	double norm_d = Vector_Norm(directionVector);
+	PT_vector_T unit_d;
+	static int outerHalspaceList[PP_MM];	// Index of out half-spaces
 
-	assert(Vector_Norm(directionVector) >= PP_EPS_ZERO);
+	assert(norm_d >= PP_EPS_ZERO);
+	Vector_DivideByNumber(directionVector, norm_d, unit_d);
+	MakeListOfNotIncludingHalfspaces(startPoint, outerHalspaceList, epsMoving);
 
-	mo = 0;
-	for (int i = 0; i < PD_m; i++)
-		if (!PointBelongsHalfspace_i(startPoint, i, PP_EPS_POINT_IN_HALFSPACE)) {
-			outerHalspace_i[mo] = i;
-			mo++;
-		}
-
-	delta = factor / 2;
-
-	while (rightBound - leftBound >= PP_EPS_ZERO && delta > 0) {
-		Shift(startPoint, directionVector, factor, finishPoint);
-
-		pointInsideCone = true;
-		for (int i = 0; i < mo; i++)
-			if (PointBelongsHalfspace_i(finishPoint, outerHalspace_i[i], PP_EPS_POINT_IN_HALFSPACE)) {
-				pointInsideCone = false;
-				break;
-			}
-		if (pointInsideCone) {
-			leftBound = factor;
-			delta *= 2;
-			factor += delta;
-		}
-		else {
-			rightBound = factor;
-			delta /= 2;
-			factor -= delta;
-			assert(factor > 0);
-		}
-	}
-
-	Shift(startPoint, directionVector, factor, finishPoint);
-	delta = epsMoving;
 	do {
-		pointInsideCone = false;
-		for (int i = 0; i < mo; i++)
-			if (!PointBelongsHalfspace_i(finishPoint, outerHalspace_i[i], epsMoving)) {
-				pointInsideCone = true;
-				factor -= delta;
-				delta *= 2;
-				assert(factor > 0);
-				Shift(startPoint, directionVector, factor, finishPoint);
-				break;
-			}
-	} while (pointInsideCone && delta > 0 && delta > 0);
+		rightBound *= 2;
+		Shift(startPoint, unit_d, rightBound, finishPoint);
+	} while (PointBelongsOuterCone(finishPoint, outerHalspaceList, epsMoving));
+
+	while (rightBound - leftBound >= epsMoving) {
+		Shift(startPoint, unit_d, leftBound / 2 + rightBound / 2, finishPoint);
+		if (PointBelongsOuterCone(finishPoint, outerHalspaceList, epsMoving))
+			leftBound = leftBound / 2 + rightBound / 2;
+		else
+			rightBound = leftBound / 2 + rightBound / 2;
+	}
 }
 
 static void MTX_Conversion() { // Transformation to inequalities & dimensionality reduction
@@ -1306,6 +1297,13 @@ inline bool PointBelongsPolytope(PT_vector_T x, double eps) { // If the point be
 	return true;
 }
 
+inline bool PointBelongsOuterCone(PT_vector_T x, int* notIncludingHalfspacesList, double eps) { // If the point belongs to the outer cone with prescigion of eps
+	for (int i = 0; i < PD_m && notIncludingHalfspacesList[i] >= 0; i++)
+		if (PointBelongsHalfspace_i(x, i, eps))
+			return false;
+	return true;
+}
+
 inline void PointHomothety(PT_vector_T x, PT_vector_T center, double ratio) { // https://en.wikipedia.org/wiki/Homothety
 	if (ratio == 1)
 		return;
@@ -1343,6 +1341,42 @@ inline void Print_Inequalities() {
 			cout << setw(PP_SETW) << PD_A[i][j];
 		cout << "\t<=" << setw(PP_SETW) << PD_b[i] << endl;
 	}
+}
+
+inline void Print_HalfspacesIncludingPoint(PT_vector_T x, double eps) {
+	bool comma = false;
+
+	cout << "{";
+
+	for (int i = 0; i < PD_m; i++) {
+		if (PointBelongsHalfspace_i(x, i, eps)) {
+			if (comma)
+				cout << ", ";
+			else
+				comma = true;
+			cout << i;
+		}
+	}
+
+	cout << "}";
+}
+
+inline void Print_HalfspacesOutOfPoint(PT_vector_T x, double eps) {
+	bool comma = false;
+
+	cout << "{";
+
+	for (int i = 0; i < PD_m; i++) {
+		if (!PointBelongsHalfspace_i(x, i, eps)) {
+			if (comma)
+				cout << ", ";
+			else
+				comma = true;
+			cout << i;
+		}
+	}
+
+	cout << "}";
 }
 
 inline void Print_HyperplanesIncludingPoint(PT_vector_T x, double eps) {
@@ -1482,6 +1516,10 @@ inline void Vector_Round(PT_vector_T x, double eps) {
 	}
 }
 
+inline void Vector_SetValue(PT_vector_T x, double v) {  // x = (v,...,v)
+	for (int j = 0; j < PD_n; j++) x[j] = v;
+}
+
 inline void Vector_Subtraction(PT_vector_T x, PT_vector_T y, PT_vector_T z) {  // z = x - y
 	for (int j = 0; j < PD_n; j++)
 		z[j] = x[j] - y[j];
@@ -1491,6 +1529,7 @@ inline void Vector_Zeroing(PT_vector_T x) {  // x = 0
 	for (int j = 0; j < PD_n; j++) x[j] = 0;
 }
 }
+
 //---------------------------------- Private Functions -------------------------
 namespace PF {
 	using namespace SF;
@@ -1510,36 +1549,42 @@ namespace PF {
 	inline void CalculateNumberOfEdges(int n, int mh, int* me) {
 		if (mh == n) {
 			*me = mh;
+#ifdef PP_DEBUG
 			if (*me > PP_KK) {
-				if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-					cout << "Parameter PP_KK = " << PP_KK << " must be greater than or equal to " << *me << "\n";
-				abort();
+				cout << "\nError in CalculateNumberOfEdges(): Parameter PP_KK = " << PP_KK << " must be greater than or equal to " << *me << "\n";
+				exit(1);
 			}
+#endif // PP_DEBUG
 		}
 		else {
+#ifdef PP_DEBUG
 			if (mh > 62) {
-				if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-					cout << "It is impossible to calculate binomial coefficient for number of including hyperplanes mh = "
+				cout << "\nError in CalculateNumberOfEdges(): It is impossible to calculate binomial coefficient for number of including hyperplanes mh = "
 					<< mh << " > 62" << endl;
-				abort();
+				exit(1);
 			}
+#endif // PP_DEBUG
 
 			unsigned long long long_me = BinomialCoefficient(mh, n - 1);
 
+#ifdef PP_DEBUG
 			if (long_me > PP_KK) {
 				if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
 					cout << "Parameter PP_KK = " << PP_KK << " must be greater than or equal to " << long_me << "\n";
-				abort();
+				exit(1);
 			}
-			*me = (int)long_me;
+#endif // PP_DEBUG
+			* me = (int)long_me;
 		}
 	}
 
 	inline void MakeEdgeList(int* edgeCodeList, int me) {
 		int index;
 
+#ifdef PP_DEBUG
 		if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
 			cout << "List of edges in random order is generated, please wait...\n";
+#endif // PP_DEBUG
 
 		for (int k = 0; k < PP_KK; k++) {
 			edgeCodeList[k] = -1;
@@ -1638,14 +1683,15 @@ namespace PF {
 
 		if (PD_mh < PD_n) {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-				cout << "Starting point u is not vertex with prescision " << PP_EPS_POINT_IN_HALFSPACE << ". Number of including hyperplanes = " << PD_mh
+				cout << "\nError in PreparationForIteration():Starting point u is not vertex with prescision " << PP_EPS_POINT_IN_HALFSPACE << ". Number of including hyperplanes = " << PD_mh
 				<< " < n = " << PD_n << "\n";
 			cout << "PD_u: ";
 			Print_Vector(PD_u);
 			cout << "\tObjF(u) = " << ObjF(PD_u) << endl;
-			cout << "Perhaps you should increase the parameter PP_OBJECTIVE_VECTOR_LENGTH or decrease the parameter PP_EPS_POINT_IN_HALFSPACE.\n";
-			abort();
+			cout << "\nPerhaps you should decrease parameter PP_EPS_POINT_IN_HALFSPACE or increase parameter PP_OBJECTIVE_VECTOR_LENGTH.\n";
+			exit(1);
 		}
+
 		CalculateNumberOfEdges(PD_n, PD_mh, &PD_me);
 		MakeEdgeList(PD_edgeCodeList, PD_me);
 		PD_TWIDDLE_done = false;
@@ -1670,12 +1716,15 @@ namespace PF {
 		if (mh == PD_n)
 			me = (unsigned long long) mh;
 		else {
+
+#ifdef PP_DEBUG
 			if (mh > 62) {
-				if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-					cout << "\nIt is impossible to calculate binomial coefficient for number of including hyperplanes mh = "
+				cout << "\nError in Print_Number_of_edges(): It is impossible to calculate binomial coefficient for number of including hyperplanes mh = "
 					<< mh << " > 62" << endl;
-				abort();
+				exit(1);
 			}
+#endif // PP_DEBUG
+
 			me = BinomialCoefficient(mh, PD_n - 1);
 		}
 		cout << me << endl;
@@ -1694,7 +1743,7 @@ namespace PF {
 			Vector_Copy(w, w_previous);
 
 			for (int i = 0; i < PD_ma; i++) {
-				int ia = PD_index_activeHyperplanes[i];
+				int ia = PD_edgeHyperplanes[i];
 				PT_vector_T p;
 				OrthogonalProjectingVectorOntoHyperplane_i(w, ia, p);
 				Vector_PlusEquals(r, p);

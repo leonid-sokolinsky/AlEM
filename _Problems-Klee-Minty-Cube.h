@@ -19,7 +19,7 @@ This include file is part of Problem-Parameters.h
 #define PP_MAX_PROJECTING_ITER	1E+7	// Maximum acceptable number of iterations in PseudoprojectionOnFace()
 //=============================================================================
 
-/*============================== Klee-Minty5 LP problem ==============================*/
+/*============================== Klee-Minty5 LP problem ==============================*
 // Starting point:	0 ... 0
 // Exact solution:	0 ... 0	3125
 #define PP_PROBLEM_NAME	"Klee-Minty5"
@@ -64,7 +64,7 @@ This include file is part of Problem-Parameters.h
 // New vertex:                    0               0               0               0            3125
 //=============================================================================
 
-/*============================== Klee-Minty6 LP problem ==============================*/
+/*============================== Klee-Minty6 LP problem ==============================*
 // Starting point:	0 ... 0
 // Exact solution:	0 ... 0	15625
 #define PP_PROBLEM_NAME	"Klee-Minty6"
@@ -171,12 +171,12 @@ This include file is part of Problem-Parameters.h
 // New vertex:                    0               0               0               0               0               0           78125
 //=============================================================================
 
-/*============================== Klee-Minty8 LP problem =======================*
+/*============================== Klee-Minty8 LP problem =======================*/
 // Starting point:	0 ... 0
 // Exact solution:	0 ... 0	390625
 // Computed objective value: 389984.9953464441
 // Relative error = 0.00164
-// #define PP_PROBLEM_NAME	"Klee-Minty8"
+#define PP_PROBLEM_NAME	"Klee-Minty8"
 #define PP_D 8			// Space dimension
 #define PP_M PP_D		// Number of equations (number of rows in *.mtx)
 #define PP_N (2*PP_D)	// Number of variables (number of cols in *.mtx)

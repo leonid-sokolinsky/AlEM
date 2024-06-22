@@ -26,7 +26,7 @@ Initial surface points for these problems were calculated using BSF-Apex-Quest.
 #define PP_PROBE_LENGTH				0.1				// Length of probe shift
 //-------------------------------------------------------------------------------
 
-/*============================== simple1 LP problem =============================*/
+/*============================== simple1 LP problem =============================*
 #define PP_PROBLEM_NAME	"simple1"
 #define PP_M 4		// Number of equations (number of rows in *.mtx)
 #define PP_N 7		// Number of variables (number of cols in *.mtx)
@@ -112,7 +112,7 @@ Initial surface points for these problems were calculated using BSF-Apex-Quest.
 #define PP_MAX_OBJ_VALUE 		852.0289179009677
 //------------------------------------------------------------------------------
 
-/*============================== rnd5-100 LP problem ===========================*
+/*============================== rnd5-100 LP problem ===========================*/
 #define PP_PROBLEM_NAME	"rnd5-100"
 #define PP_M 105		// Number of equations (number of rows in *.mtx)
 #define PP_N 110		// Number of variables (number of cols in *.mtx)

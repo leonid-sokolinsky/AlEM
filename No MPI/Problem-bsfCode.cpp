@@ -13,398 +13,411 @@ This source code has been produced with using BSF-skeleton
 #include "Problem-bsfParameters.h"	// BSF-skeleton parameters
 #include "BSF-SkeletonVariables.h"	// Skeleton Variables
 using namespace std;
-using namespace PF;
 using namespace SF;
+using namespace PF;
 
 //---------------------------------- BSF Predefined Problem Functions -----------------------------
 
 void PC_bsf_CopyParameter(PT_bsf_parameter_T parameterIn, PT_bsf_parameter_T* parameterOutP) {
-		Vector_Copy(parameterIn.x, parameterOutP->x);
+	Vector_Copy(parameterIn.x, parameterOutP->x);
+}
+
+void PC_bsf_Init(bool* success) {
+	PD_problemName = PP_PROBLEM_NAME;
+
+	*success = MTX_Load__Problem();
+	if (*success == false)
+		return;
+
+	*success = MTX_LoadPoint(PD_u, PP_MTX_POSTFIX_U0);
+	if (*success == false)
+		return;
+
+	MakeColumnOfNorms(PD_A, PD_norm_a);
+
+	if (!PointBelongsPolytope(PD_u, PP_EPS_ZERO)) {
+		if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
+			cout << "Starting point does not belong to the feasible polytope with precision PP_EPS_ZERO = "
+			<< PP_EPS_ZERO << "!!!\n";
+		*success = false;
+		return;
+	}
+	PD_iterNo = 0;
+	Vector_MakeLike(PD_c, 1, PD_e_c);
+	PreparationForIteration(PD_u);
+}
+
+void PC_bsf_IterOutput(PT_bsf_reduceElem_T* reduceResult, int reduceCounter, PT_bsf_parameter_T parameter,
+	double elapsedTime, int nextJob) {
+
+	cout << "# " << BSF_sv_iterCounter << "\tTime " << round(elapsedTime);
+	cout << "\tx =";
+	Print_Vector(parameter.x);
+	cout << "\tF(x) = " << setw(PP_SETW) << ObjF(parameter.x);
+}
+
+void PC_bsf_IterOutput_1(PT_bsf_reduceElem_T_1* reduceResult, int reduceCounter, PT_bsf_parameter_T parameter,
+	double elapsedTime, int nextJob)
+{
+	// Not used
+}
+
+void PC_bsf_IterOutput_2(PT_bsf_reduceElem_T_2* reduceResult, int reduceCounter, PT_bsf_parameter_T parameter,
+	double elapsedTime, int nextJob)
+{
+	// Not used
+}
+
+void PC_bsf_IterOutput_3(PT_bsf_reduceElem_T_3* reduceResult, int reduceCounter, PT_bsf_parameter_T parameter,
+	double elapsedTime, int nextJob)
+{
+	// Not used
+}
+
+void PC_bsf_JobDispatcher(PT_bsf_parameter_T* parameter, int* job, bool* toExit, double t) {
+	// Not used
+}
+
+void PC_bsf_MainArguments(int argc, char* argv[]) {
+	// Not used
+}
+
+void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int* success) {
+	int edgeCode = *mapElem->edgeCode;
+	PT_vector_T u;		// current surface point
+	PT_vector_T v;		// v = u + PD_objVector (objVector = PP_OBJECTIVE_VECTOR_LENGTH*e_c)
+	PT_vector_T w;		// pseudiprojection of v
+	double objF_w = -PP_DBL_MAX; // F(w)
+
+	if (edgeCode == -1) {
+		Vector_Zeroing((*reduceElem).d);
+		reduceElem->objF_p = -PP_DBL_MAX;
+		reduceElem->edgeCode = -1;
+		return;
 	}
 
-	void PC_bsf_Init(bool* success) {
-		PD_problemName = PP_PROBLEM_NAME;
+	/*DEBUG PC_bsf_MapF**
+#ifdef PP_DEBUG
+	cout << "------------------------------------ Map(" << PF_MAP_LIST_INDEX << ") ------------------------------------" << endl;
+#endif // PP_DEBUG /**/
 
-		*success = MTX_Load__Problem();
-		if (*success == false)
-			return;
+// Condition for breakpoint: PD_iterNo == 2 && (BSF_sv_addressOffset + BSF_sv_numberInSublist == 2)
+	Vector_Copy(BSF_sv_parameter.x, u);
+	double objF_u = ObjF(u);
+	reduceElem->edgeCode = edgeCode;
 
-		*success = MTX_LoadPoint(PD_u, PP_MTX_POSTFIX_U0);
-		if (*success == false)
-			return;
+	TWIDDLE_CodeToSubset(edgeCode, PD_index_includingHyperplanes, PD_edgeHyperplanes, PD_mh, PD_ma);
 
-		MakeColumnOfNorms(PD_A, PD_norm_a);
-
-		if (!PointBelongsPolytope(PD_u, PP_EPS_ZERO)) {
-			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-				cout << "Starting point does not belong to the feasible polytope with precision PP_EPS_ZERO = "
-				<< PP_EPS_ZERO << "!!!\n";
-			*success = false;
-			return;
-		}
-		PD_iterNo = 0;
-		Vector_MakeLike(PD_c, 1, PD_e_c);
-		PreparationForIteration(PD_u);
-	}
-
-	void PC_bsf_IterOutput(PT_bsf_reduceElem_T* reduceResult, int reduceCounter, PT_bsf_parameter_T parameter,
-		double elapsedTime, int nextJob) {
-
-		cout << "# " << BSF_sv_iterCounter << "\tTime " << round(elapsedTime);
-		cout << "\tx =";
-		Print_Vector(parameter.x);
-		cout << "\tF(x) = " << setw(PP_SETW) << ObjF(parameter.x);
-	}
-
-	void PC_bsf_IterOutput_1(PT_bsf_reduceElem_T_1* reduceResult, int reduceCounter, PT_bsf_parameter_T parameter,
-		double elapsedTime, int nextJob)
-	{
-		// Not used
-	}
-
-	void PC_bsf_IterOutput_2(PT_bsf_reduceElem_T_2* reduceResult, int reduceCounter, PT_bsf_parameter_T parameter,
-		double elapsedTime, int nextJob)
-	{
-		// Not used
-	}
-
-	void PC_bsf_IterOutput_3(PT_bsf_reduceElem_T_3* reduceResult, int reduceCounter, PT_bsf_parameter_T parameter,
-		double elapsedTime, int nextJob)
-	{
-		// Not used
-	}
-
-	void PC_bsf_JobDispatcher(PT_bsf_parameter_T* parameter, int* job, bool* exit, double t) {
-		// Not used
-	}
-
-	void PC_bsf_MainArguments(int argc, char* argv[]) {
-		// Not used
-	}
-
-	void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int* success) {
-		int edgeCode = *mapElem->edgeCode;
-		PT_vector_T u;		// current surface point
-		PT_vector_T v;		// v = u + PD_objVector (objVector = PP_OBJECTIVE_VECTOR_LENGTH*e_c)
-		PT_vector_T w;		// pseudiprojection of v
-		double objF_w = -PP_DBL_MAX; // F(w)
-
-		if (edgeCode == -1) {
-			Vector_Zeroing((*reduceElem).d);
-			reduceElem->objF_p = -PP_DBL_MAX;
-			reduceElem->edgeCode = -1;
-			return;
-		}
-
-		/*DEBUG PC_bsf_MapF**
+	/*DEBUG PC_bsf_MapF**
 	#ifdef PP_DEBUG
-		cout << "------------------------------------ Map(" << MAP_LIST_INDEX << ") ------------------------------------" << endl;
+		cout << "Edge hyperplanes: {";
+		for (int i = 0; i < PD_ma - 1; i++) {
+			cout << PD_edgeHyperplanes[i] << ", ";
+		}
+		cout << PD_edgeHyperplanes[PD_ma - 1] << "}.\n";
 	#endif // PP_DEBUG /**/
 
-	// Condition for breakpoint: PD_iterNo == 2 && (BSF_sv_addressOffset + BSF_sv_numberInSublist == 2)
-		Vector_Copy(BSF_sv_parameter.x, u);
-		double objF_u = ObjF(u);
-		reduceElem->edgeCode = edgeCode;
+	Vector_MultiplyByNumber(PD_e_c, PP_OBJECTIVE_VECTOR_LENGTH, PD_objVector);
 
-		TWIDDLE_CodeToSubset(edgeCode, PD_index_includingHyperplanes, PD_index_activeHyperplanes, PD_mh, PD_ma);
+	Vector_Addition(u, PD_objVector, v);
 
+	PseudoprojectionOnEdge(v, w, PP_EPS_PROJECTION_ROUND, success);
+	if (!*success) {
+		cout << "\n\nProcess " << BSF_sv_mpiRank
+			<< ". Error in PC_bsf_MapF: Exceeded the maximum number of iterations when calculating pseudoprojection (PP_MAX_PROJECTING_ITER = "
+			<< PP_MAX_PROJECTING_ITER << "). It is impossible to calculate Map function for element "
+			<< BSF_sv_addressOffset + BSF_sv_numberInSublist << "!\n Perhaps you should decrease parameter PP_EPS_PROJECTION_ROUND.";
+		return;
+	}
+
+	Vector_Round(w, PP_EPS_PROJECTION_ROUND * 10);
+
+	objF_w = ObjF(w);
+
+	Vector_Subtraction(w, u, (*reduceElem).d);
+
+	double norm_d = Vector_Norm((*reduceElem).d);
+	if (norm_d < PP_EPS_ZERO) {
 		/*DEBUG PC_bsf_MapF**
 		#ifdef PP_DEBUG
-			cout << "Edge code: " << edgeCode << ".\tHyperplanes: {";
-			for (int i = 0; i < PD_ma - 1; i++) {
-				cout << PD_index_activeHyperplanes[i] << ", ";
-			}
-			cout << PD_index_activeHyperplanes[PD_ma - 1] << "}.\n";
+				cout << "\t\t\t\t\t\t\t\t\t\t\t\t\t||d|| = ||w-u|| < PP_EPS_ZERO ===>>> movement is impossible.\n";
 		#endif // PP_DEBUG /**/
+		Vector_Zeroing((*reduceElem).d);
+		reduceElem->objF_p = objF_u;
+		return;
+	}
 
-		Vector_MultiplyByNumber(PD_e_c, PP_OBJECTIVE_VECTOR_LENGTH, PD_objVector);
+	Vector_MultiplyEquals((*reduceElem).d, PP_PROBE_LENGTH / norm_d);
+	Vector_Round((*reduceElem).d, PP_EPS_PROJECTION_ROUND);
 
-		Vector_Addition(u, PD_objVector, v);
+	PT_vector_T p;
+	Vector_Addition(u, (*reduceElem).d, p);
 
-		PseudoprojectionOnEdge(v, w, PP_EPS_PROJECTION_ROUND, success);
-		if (!*success) {
-			cout << "\n\nProcess " << BSF_sv_mpiRank
-				<< ". Error in PC_bsf_MapF: Exceeded the maximum number of iterations when calculating pseudoprojection (PP_MAX_PROJECTING_ITER = "
-				<< PP_MAX_PROJECTING_ITER << "). It is impossible to calculate Map function for element "
-				<< BSF_sv_addressOffset + BSF_sv_numberInSublist << "!\n Perhaps you should decrease parameter PP_EPS_PROJECTION_ROUND.";
-			return;
-		}
-
-		Vector_Round(w, PP_EPS_PROJECTION_ROUND * 10);
-
-		objF_w = ObjF(w);
-
-		Vector_Subtraction(w, u, (*reduceElem).d);
-
-		double norm_d = Vector_Norm((*reduceElem).d);
-		if (norm_d < PP_EPS_ZERO) {
-			/*DEBUG PC_bsf_MapF**
-			#ifdef PP_DEBUG
-					cout << "\t\t\t\t\t\t\t\t\t\t\t\t\t||d|| = ||w-u|| < PP_EPS_ZERO ===>>> movement is impossible.\n";
-			#endif // PP_DEBUG /**/
-			Vector_Zeroing((*reduceElem).d);
-			reduceElem->objF_p = objF_u;
-			return;
-		}
-
-		Vector_MultiplyEquals((*reduceElem).d, PP_PROBE_LENGTH / norm_d);
-		Vector_Round((*reduceElem).d, PP_EPS_PROJECTION_ROUND);
-
-		PT_vector_T p;
-		Vector_Addition(u, (*reduceElem).d, p);
-
-		if (!PointBelongsPolytope(p, PP_EPS_POINT_IN_HALFSPACE)) {
-			/*DEBUG PC_bsf_MapF**
-			#ifdef PP_DEBUG
-					cout << "Shifted point p = ";
-					Print_Vector(p);
-					cout << "\tnot in feasible polytope ===>>> movement is impossible." << endl;
-			#endif // PP_DEBUG /**/
-			Vector_Zeroing((*reduceElem).d);
-			reduceElem->objF_p = objF_u;
-			return;
-		}
-
-		reduceElem->objF_p = ObjF(p);
-
-		if (RelativeError(objF_u, reduceElem->objF_p) < PP_EPS_ZERO) {
-			/*DEBUG PC_bsf_MapF**
-			#ifdef PP_DEBUG
-					cout << "u =\t    ";
-					Print_Vector(u);
-					cout << "\tF(u) = " << setw(PP_SETW) << objF_u << endl;
-					cout << "|F(u1)-F(u2)|/|F(u1)| = " << RelativeError(objF_u, reduceElem->objF_p) << " < PP_EPS_ZERO = " << PP_EPS_ZERO << " ===>>> movement is impossible.\n";
-			#endif // PP_DEBUG /**/
-
-			Vector_Zeroing((*reduceElem).d);
-			reduceElem->objF_p = objF_u;
-			return;
-		}
-
-		if (reduceElem->objF_p < objF_u) {
-			/*DEBUG PC_bsf_MapF**
-			#ifdef PP_DEBUG
-					cout << "u =\t    ";
-					Print_Vector(u);
-					cout << "\tF(w) = " << setw(PP_SETW) << reduceElem->objF_p << " < F(u) = " << objF_u << " ===>>> movement is impossible.\n";
-			#endif // PP_DEBUG /**/
-			Vector_Zeroing((*reduceElem).d);
-			reduceElem->objF_p = objF_u;
-			return;
-		}
-
+	if (!PointBelongsPolytope(p, PP_EPS_POINT_IN_HALFSPACE)) {
 		/*DEBUG PC_bsf_MapF**
 		#ifdef PP_DEBUG
-			cout << "d = ";
-			Print_Vector((*reduceElem).d);
-			cout << endl;
-			cout << "Shifted point p = ";
-			Print_Vector(p);
-			cout << "\tF(p) ="
-				<< setw(PP_SETW) << reduceElem->objF_p << "\t\t---> Movement is possible." << endl;
+				cout << "Shifted point p = ";
+				Print_Vector(p);
+				cout << "\tnot in feasible polytope ===>>> movement is impossible." << endl;
 		#endif // PP_DEBUG /**/
-	} // end PC_bsf_MapF
-
-	void PC_bsf_MapF_1(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T_1* reduceElem, int* success) {
-		// Not used
+		Vector_Zeroing((*reduceElem).d);
+		reduceElem->objF_p = objF_u;
+		return;
 	}
 
-	void PC_bsf_MapF_2(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T_2* reduceElem, int* success) {
-		// Not used
+	reduceElem->objF_p = ObjF(p);
+
+	if (RelativeError(objF_u, reduceElem->objF_p) < PP_EPS_ZERO) {
+		/*DEBUG PC_bsf_MapF**
+		#ifdef PP_DEBUG
+				cout << "u =\t    ";
+				Print_Vector(u);
+				cout << "\tF(u) = " << setw(PP_SETW) << objF_u << endl;
+				cout << "|F(u1)-F(u2)|/|F(u1)| = " << RelativeError(objF_u, reduceElem->objF_p) << " < PP_EPS_ZERO = " << PP_EPS_ZERO << " ===>>> movement is impossible.\n";
+		#endif // PP_DEBUG /**/
+
+		Vector_Zeroing((*reduceElem).d);
+		reduceElem->objF_p = objF_u;
+		return;
 	}
 
-	void PC_bsf_MapF_3(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T_3* reduceElem, int* success) {
-		// Not used
+	if (reduceElem->objF_p < objF_u) {
+		/*DEBUG PC_bsf_MapF**
+		#ifdef PP_DEBUG
+				cout << "u =\t    ";
+				Print_Vector(u);
+				cout << "\tF(w) = " << setw(PP_SETW) << reduceElem->objF_p << " < F(u) = " << objF_u << " ===>>> movement is impossible.\n";
+		#endif // PP_DEBUG /**/
+		Vector_Zeroing((*reduceElem).d);
+		reduceElem->objF_p = objF_u;
+		return;
 	}
 
-	void PC_bsf_MapInit(PT_bsf_parameter_T parameter) {
-		PreparationForIteration(parameter.x);
-	}
+	/*DEBUG PC_bsf_MapF**
+	#ifdef PP_DEBUG
+		cout << "d = ";
+		Print_Vector((*reduceElem).d);
+		cout << endl;
+		cout << "Shifted point p = ";
+		Print_Vector(p);
+		cout << "\tF(p) ="
+			<< setw(PP_SETW) << reduceElem->objF_p << "\t\t---> Movement is possible." << endl;
+	#endif // PP_DEBUG /**/
+} // end PC_bsf_MapF
 
-	void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
-		cout << "=================================================== EMM ====================================================" << endl;
-		cout << "Problem name: " << PD_problemName << endl;
-		cout << "No MPI" << endl;
-#ifdef PP_BOMP
-#ifdef PP_BNUM_THREADS
-		cout << "Number of Threads: " << PP_BNUM_THREADS << endl;
+void PC_bsf_MapF_1(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T_1* reduceElem, int* success) {
+	// Not used
+}
+
+void PC_bsf_MapF_2(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T_2* reduceElem, int* success) {
+	// Not used
+}
+
+void PC_bsf_MapF_3(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T_3* reduceElem, int* success) {
+	// Not used
+}
+
+void PC_bsf_MapInit(PT_bsf_parameter_T parameter) {
+	PreparationForIteration(parameter.x);
+}
+
+void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
+	cout << "=================================================== " << PP_METHOD_NAME << "====================================================" << endl;
+	cout << "Problem name: " << PD_problemName << endl;
+
+#ifdef PP_NO_MPI
+	cout << "No MPI" << endl;
 #else
-		cout << "Number of Threads: " << omp_get_num_procs() << endl;
+	cout << "Number of Workers: " << BSF_sv_numOfWorkers << endl;
+#endif // PP_NO_MPI
+
+#ifdef PP_BSF_OMP
+#ifdef PP_BNUM_THREADS
+	cout << "Number of Threads: " << PP_BNUM_THREADS << endl;
+#else
+	cout << "Number of Threads: " << omp_get_num_procs() << endl;
 #endif // PP_BNUM_THREADS
 #else
-		cout << "OpenMP is turned off!" << endl;
-#endif // PP_BOMP
+	cout << "OpenMP is turned off!" << endl;
+#endif // PP_BSF_OMP
 
 #ifdef PP_BFRAGMENTED_MAP_LIST
-		cout << "Map List is Fragmented" << endl;
+	cout << "Map List is Fragmented" << endl;
 #else
-		cout << "Map List is not Fragmented" << endl;
+	cout << "Map List is not Fragmented" << endl;
 #endif
 
 #ifdef PP_SIMPLE_CONVERSION
-		cout << "Conversion mode: simple (with preservation of free variables)" << endl;
+	cout << "Conversion mode: simple (with preservation of free variables)" << endl;
 #else
-		cout << "Conversion mode: full (with elimination of free variables)" << endl;
+	cout << "Conversion mode: full (with elimination of free variables)" << endl;
 #endif
 
-		cout << "Before conversion: m =\t" << PP_M << "\tn = " << PP_N << endl;
-		cout << "After conversion:  m =\t" << PD_m << "\tn = " << PD_n << endl;
-		cout << "PP_EPS_ZERO\t\t\t" << PP_EPS_ZERO << endl;
-		cout << "PP_EPS_POINT_IN_HALFSPACE\t" << PP_EPS_POINT_IN_HALFSPACE << endl;
-		cout << "PP_EPS_MOVING_ON_POLYTOPE\t" << PP_EPS_MOVING_ON_POLYTOPE << endl;
-		cout << "PP_EPS_PROJECTION_ROUND\t\t" << PP_EPS_PROJECTION_ROUND << endl;
-		cout << "PP_OBJECTIVE_VECTOR_LENGTH\t" << PP_OBJECTIVE_VECTOR_LENGTH << endl;
-		cout << "PP_PROBE_LENGTH\t\t\t" << PP_PROBE_LENGTH << endl;
-		cout << "--------------- Data ---------------\n";
+	cout << "Before conversion: m =\t" << PP_M << "\tn = " << PP_N << endl;
+	cout << "After conversion:  m =\t" << PD_m << "\tn = " << PD_n << endl;
+	cout << "PP_EPS_ZERO\t\t\t" << PP_EPS_ZERO << endl;
+	cout << "PP_EPS_POINT_IN_HALFSPACE\t" << PP_EPS_POINT_IN_HALFSPACE << endl;
+	cout << "PP_EPS_MOVING_ON_POLYTOPE\t" << PP_EPS_MOVING_ON_POLYTOPE << endl;
+	cout << "PP_EPS_PROJECTION_ROUND\t\t" << PP_EPS_PROJECTION_ROUND << endl;
+	cout << "PP_OBJECTIVE_VECTOR_LENGTH\t" << PP_OBJECTIVE_VECTOR_LENGTH << endl;
+	cout << "PP_PROBE_LENGTH\t\t\t" << PP_PROBE_LENGTH << endl;
+	cout << "--------------- Data ---------------\n";
 #ifdef PP_MATRIX_OUTPUT
-		cout << "------- Matrix PD_A & Column PD_b -------" << endl;
-		Print_Inequalities();
+	cout << "------- Matrix PD_A & Column PD_b -------" << endl;
+	Print_Inequalities();
 #endif // PP_MATRIX_OUTPUT
-		cout << "Obj Function:\t";
-		Print_Vector(PD_c);
-		cout << endl;
-		cout << "u0 =\t\t";
-		Print_Vector(PD_u); cout << "\tF(x) = " << setw(PP_SETW) << ObjF(PD_u) << endl;
+	cout << "Obj Function:\t";
+	Print_Vector(PD_c);
+	cout << endl;
+	cout << "u0 =\t\t";
+	Print_Vector(PD_u); cout << "\tF(x) = " << setw(PP_SETW) << ObjF(PD_u) << endl;
 
 #ifdef PP_DEBUG
-		if (!PointBelongsPolytope(PD_u, PP_EPS_POINT_IN_HALFSPACE))
-			cout << "u0 is outside feasible polytope!!!\n";
-		else
-			cout << "u0 is belongs feasible polytope.\n";
-		cout << "Including hyperplanes:\t"; Print_HyperplanesIncludingPoint(PD_u, PP_EPS_POINT_IN_HALFSPACE); cout << endl;
-		cout << "Including edges:\t"; Print_Number_of_edges(PD_u);
+	if (!PointBelongsPolytope(PD_u, PP_EPS_POINT_IN_HALFSPACE))
+		cout << "u0 is outside feasible polytope!!!\n";
+	else
+		cout << "u0 is belongs feasible polytope.\n";
+	cout << "Including hyperplanes:\t"; Print_HyperplanesIncludingPoint(PD_u, PP_EPS_POINT_IN_HALFSPACE); cout << endl;
+	cout << "Including edges:\t"; Print_Number_of_edges(PD_u);
 #endif // PP_DEBUG
-	}
+}
 
-	void PC_bsf_ProblemOutput(PT_bsf_reduceElem_T* reduceResult, int reduceCounter, PT_bsf_parameter_T parameter, double t) {
-		cout << setprecision(PP_SETW / 2);
+void PC_bsf_ProblemOutput(PT_bsf_reduceElem_T* reduceResult, int reduceCounter, PT_bsf_parameter_T parameter, double t) {
+	cout << setprecision(PP_SETW / 2);
 
-		PD_objF_u = ObjF(PD_u);
+	PD_objF_u = ObjF(PD_u);
 
-		cout << "================================================" << endl;
-		cout << "// Elapsed time: " << t << endl;
-		cout << "// Number of iterations: " << PD_iterNo << endl;
-		cout << "// Computed objective value: " << setprecision(16) << PD_objF_u << endl;
-		cout << "// Maximal objective value:  " << PP_MAX_OBJ_VALUE << endl;
-		cout << "// Relative error = " << setprecision(3) << RelativeError(PP_MAX_OBJ_VALUE, PD_objF_u) << setprecision(PP_SETW / 2) << endl;
-		cout << "================================================" << endl;
+	cout << "================================================" << endl;
+	cout << "// Elapsed time: " << t << endl;
+	cout << "// Number of iterations: " << PD_iterNo << endl;
+	cout << "// Computed objective value: " << setprecision(16) << PD_objF_u << endl;
+	cout << "// Maximal objective value:  " << PP_MAX_OBJ_VALUE << endl;
+	cout << "// Relative error = " << setprecision(3) << RelativeError(PP_MAX_OBJ_VALUE, PD_objF_u) << setprecision(PP_SETW / 2) << endl;
+	cout << "================================================" << endl;
 
 #ifdef PP_SAVE_RESULT
-		if (MTX_SavePoint(PD_u, PP_MTX_POSTFIX_SO))
-			cout << "Calculated solution point is saved into file *.so" << endl;
+	if (MTX_SavePoint(PD_u, PP_MTX_POSTFIX_SO))
+		cout << "Calculated solution point is saved into file *.so" << endl;
 #endif // PP_SAVE_RESULT
 
-		cout << "Solution point:\t";
-		Print_Vector(PD_u);	cout << endl;
+	cout << "Solution point:\t";
+	Print_Vector(PD_u);	cout << endl;
 #ifdef PP_DEBUG
-		cout << "Distance to polytope: " << Distance_PointToPolytope(PD_u) << endl;
+	cout << "Distance to polytope: " << Distance_PointToPolytope(PD_u) << endl;
 #endif // PP_DEBUG
 
-	} // end PC_bsf_ProblemOutput
+} // end PC_bsf_ProblemOutput
 
-	void PC_bsf_ProblemOutput_1(PT_bsf_reduceElem_T_1* reduceResult, int reduceCounter, PT_bsf_parameter_T parameter, double t) {
-		// Not used
+void PC_bsf_ProblemOutput_1(PT_bsf_reduceElem_T_1* reduceResult, int reduceCounter, PT_bsf_parameter_T parameter, double t) {
+	// Not used
+}
+
+void PC_bsf_ProblemOutput_2(PT_bsf_reduceElem_T_2* reduceResult, int reduceCounter, PT_bsf_parameter_T parameter, double t) {
+	// Not used
+}
+
+void PC_bsf_ProblemOutput_3(PT_bsf_reduceElem_T_3* reduceResult, int reduceCounter, PT_bsf_parameter_T parameter, double t) {
+	// Not used
+}
+
+void PC_bsf_ProcessResults(PT_bsf_reduceElem_T* reduceResult, int reduceCounter, PT_bsf_parameter_T* parameter, int* nextJob, bool* toExit) {
+	PT_vector_T u_moved;
+	double shiftLength;
+
+	if (Vector_Norm(reduceResult->d) < PP_EPS_ZERO) {
+		*toExit = true;
+		return;
 	}
 
-	void PC_bsf_ProblemOutput_2(PT_bsf_reduceElem_T_2* reduceResult, int reduceCounter, PT_bsf_parameter_T parameter, double t) {
-		// Not used
-	}
-
-	void PC_bsf_ProblemOutput_3(PT_bsf_reduceElem_T_3* reduceResult, int reduceCounter, PT_bsf_parameter_T parameter, double t) {
-		// Not used
-	}
-
-	void PC_bsf_ProcessResults(PT_bsf_reduceElem_T* reduceResult, int reduceCounter, PT_bsf_parameter_T* parameter, int* nextJob, bool* exit) {
-		PT_vector_T u_moved;
-		double shiftLength;
-
-		if (Vector_Norm(reduceResult->d) < PP_EPS_ZERO) {
-			*exit = true;
-			return;
-		}
-
-		MovingOnPolytope(PD_u, reduceResult->d, u_moved, PP_EPS_MOVING_ON_POLYTOPE);
-		shiftLength = Distance_PointToPoint(PD_u, u_moved);
+	MovingOnPolytope(PD_u, reduceResult->d, u_moved, PP_EPS_MOVING_ON_POLYTOPE);
+	shiftLength = Distance_PointToPoint(PD_u, u_moved);
 
 #ifdef PP_DEBUG
-		cout << "_________________________________________________ " << PD_iterNo << " _____________________________________________________" << endl;
-		cout << "Vertex:\t";
-		Print_Vector(PD_u); cout << "\tF(x) = " << PD_objF_u << endl;
-		cout << "Vertex hyperplanes:\t"; Print_HyperplanesIncludingPoint(PD_u, PP_EPS_POINT_IN_HALFSPACE); cout << endl;
-		PD_objF_u = ObjF(PD_u);
-		cout << "Edge hyperplanes:\t{";
-		for (int i = 0; i < PD_ma - 1; i++)
-			cout << PD_index_activeHyperplanes[i] << ", ";
-		cout << PD_index_activeHyperplanes[PD_ma - 1]
-			<< "}\t\t\t\t\tShift = " << shiftLength << endl;
+	if (shiftLength < PP_EPS_ZERO) {
+		cout << "\nError in MovingOnPolytope(): Shift length < PP_EPS_ZERO! Possible you should increase PP_EPS_MOVING_ON_POLYTOPE or decrease PP_EPS_ZERO.\n";
+		exit(1);
+	}
 #endif // PP_DEBUG
 
-		Vector_Copy(u_moved, PD_u);
-		Vector_Copy(u_moved, parameter->x);
-		PD_iterNo++;
-	}
+#ifdef PP_DEBUG
+	cout << "_________________________________________________ " << PD_iterNo << " _____________________________________________________" << endl;
+	cout << "Vertex:\t";
+	Print_Vector(PD_u); cout << "\tF(x) = " << PD_objF_u << endl;
+	cout << "Vertex hyperplanes:\t"; Print_HyperplanesIncludingPoint(PD_u, PP_EPS_POINT_IN_HALFSPACE); cout << endl;
+	PD_objF_u = ObjF(PD_u);
+	cout << "Edge hyperplanes:\t{";
+	for (int i = 0; i < PD_ma - 1; i++)
+		cout << PD_edgeHyperplanes[i] << ", ";
+	cout << PD_edgeHyperplanes[PD_ma - 1]
+		<< "}\t\t\t\t\tShift = " << shiftLength << endl;
+#endif // PP_DEBUG
 
-	void PC_bsf_ProcessResults_1(PT_bsf_reduceElem_T_1* reduceResult, int reduceCounter, PT_bsf_parameter_T* parameter, int* nextJob, bool* exit) {
-		// Not used
-	}
+	Vector_Copy(u_moved, PD_u);
+	Vector_Copy(u_moved, parameter->x);
+	PD_iterNo++;
+}
 
-	void PC_bsf_ProcessResults_2(PT_bsf_reduceElem_T_2* reduceResult, int reduceCounter, PT_bsf_parameter_T* parameter, int* nextJob, bool* exit) {
-		// Not used
-	}
+void PC_bsf_ProcessResults_1(PT_bsf_reduceElem_T_1* reduceResult, int reduceCounter, PT_bsf_parameter_T* parameter, int* nextJob, bool* toExit) {
+	// Not used
+}
 
-	void PC_bsf_ProcessResults_3(PT_bsf_reduceElem_T_3* reduceResult, int reduceCounter, PT_bsf_parameter_T* parameter, int* nextJob, bool* exit) {
-		// Not used
-	}
+void PC_bsf_ProcessResults_2(PT_bsf_reduceElem_T_2* reduceResult, int reduceCounter, PT_bsf_parameter_T* parameter, int* nextJob, bool* toExit) {
+	// Not used
+}
 
-	void PC_bsf_ReduceF(PT_bsf_reduceElem_T* x, PT_bsf_reduceElem_T* y, PT_bsf_reduceElem_T* z) { // z = x + y
-		if (x->objF_p > y->objF_p) {
-			z->objF_p = x->objF_p;
-			for (int j = 0; j < PD_n; j++)
-				(*z).d[j] = (*x).d[j];
-			z->edgeCode = x->edgeCode;
-		}
-		else {
-			z->objF_p = y->objF_p;
-			for (int j = 0; j < PD_n; j++)
-				(*z).d[j] = (*y).d[j];
-			z->edgeCode = y->edgeCode;
-		}
-	}
+void PC_bsf_ProcessResults_3(PT_bsf_reduceElem_T_3* reduceResult, int reduceCounter, PT_bsf_parameter_T* parameter, int* nextJob, bool* toExit) {
+	// Not used
+}
 
-	void PC_bsf_ReduceF_1(PT_bsf_reduceElem_T_1* x, PT_bsf_reduceElem_T_1* y, PT_bsf_reduceElem_T_1* z) {
-		// Not used
+void PC_bsf_ReduceF(PT_bsf_reduceElem_T* x, PT_bsf_reduceElem_T* y, PT_bsf_reduceElem_T* z) { // z = x + y
+	if (x->objF_p > y->objF_p) {
+		z->objF_p = x->objF_p;
+		for (int j = 0; j < PD_n; j++)
+			(*z).d[j] = (*x).d[j];
+		z->edgeCode = x->edgeCode;
 	}
-
-	void PC_bsf_ReduceF_2(PT_bsf_reduceElem_T_2* x, PT_bsf_reduceElem_T_2* y, PT_bsf_reduceElem_T_2* z) {
-		// Not used
+	else {
+		z->objF_p = y->objF_p;
+		for (int j = 0; j < PD_n; j++)
+			(*z).d[j] = (*y).d[j];
+		z->edgeCode = y->edgeCode;
 	}
+}
 
-	void PC_bsf_ReduceF_3(PT_bsf_reduceElem_T_3* x, PT_bsf_reduceElem_T_3* y, PT_bsf_reduceElem_T_3* z) {
-		// Not used
-	}
+void PC_bsf_ReduceF_1(PT_bsf_reduceElem_T_1* x, PT_bsf_reduceElem_T_1* y, PT_bsf_reduceElem_T_1* z) {
+	// Not used
+}
 
-	void PC_bsf_SetInitParameter(PT_bsf_parameter_T* parameter) {
-		Vector_Copy(PD_u, parameter->x);
-	}
+void PC_bsf_ReduceF_2(PT_bsf_reduceElem_T_2* x, PT_bsf_reduceElem_T_2* y, PT_bsf_reduceElem_T_2* z) {
+	// Not used
+}
 
-	void PC_bsf_SetListSize(int* listSize) {
-		*listSize = PP_KK;
-	}
+void PC_bsf_ReduceF_3(PT_bsf_reduceElem_T_3* x, PT_bsf_reduceElem_T_3* y, PT_bsf_reduceElem_T_3* z) {
+	// Not used
+}
 
-	void PC_bsf_SetMapListElem(PT_bsf_mapElem_T* elem, int i) {
-		elem->edgeCode = &(PD_edgeCodeList[i]);
-	}
+void PC_bsf_SetInitParameter(PT_bsf_parameter_T* parameter) {
+	Vector_Copy(PD_u, parameter->x);
+}
 
-	//----------------------- Assigning Values to BSF-skeleton Variables (Do not modify!) -----------------------
-	void PC_bsfAssignAddressOffset(int value) { BSF_sv_addressOffset = value; }
-	void PC_bsfAssignIterCounter(int value) { BSF_sv_iterCounter = value; }
-	void PC_bsfAssignJobCase(int value) { BSF_sv_jobCase = value; }
-	void PC_bsfAssignMpiMaster(int value) { BSF_sv_mpiMaster = value; }
-	void PC_bsfAssignMpiRank(int value) { BSF_sv_mpiRank = value; }
-	void PC_bsfAssignNumberInSublist(int value) { BSF_sv_numberInSublist = value; }
-	void PC_bsfAssignNumOfWorkers(int value) { BSF_sv_numOfWorkers = value; }
-	void PC_bsfAssignParameter(PT_bsf_parameter_T parameter) { PC_bsf_CopyParameter(parameter, &BSF_sv_parameter); }
-	void PC_bsfAssignSublistLength(int value) { BSF_sv_sublistLength = value; }
+void PC_bsf_SetListSize(int* listSize) {
+	*listSize = PP_KK;
+}
+
+void PC_bsf_SetMapListElem(PT_bsf_mapElem_T* elem, int i) {
+	elem->edgeCode = &(PD_edgeCodeList[i]);
+}
+
+//----------------------- Assigning Values to BSF-skeleton Variables (Do not modify!) -----------------------
+void PC_bsfAssignAddressOffset(int value) { BSF_sv_addressOffset = value; }
+void PC_bsfAssignIterCounter(int value) { BSF_sv_iterCounter = value; }
+void PC_bsfAssignJobCase(int value) { BSF_sv_jobCase = value; }
+void PC_bsfAssignMpiMaster(int value) { BSF_sv_mpiMaster = value; }
+void PC_bsfAssignMpiRank(int value) { BSF_sv_mpiRank = value; }
+void PC_bsfAssignNumberInSublist(int value) { BSF_sv_numberInSublist = value; }
+void PC_bsfAssignNumOfWorkers(int value) { BSF_sv_numOfWorkers = value; }
+void PC_bsfAssignParameter(PT_bsf_parameter_T parameter) { PC_bsf_CopyParameter(parameter, &BSF_sv_parameter); }
+void PC_bsfAssignSublistLength(int value) { BSF_sv_sublistLength = value; }
 
 //---------------------------------- Shared Functions -------------------------
 namespace SF {
@@ -451,6 +464,17 @@ namespace SF {
 			norm_a[i] = Vector_Norm(A[i]);
 	}
 
+	inline void MakeListOfNotIncludingHalfspaces(PT_vector_T x, int* notIncludingHalfspacesList, double eps) {
+		int mo = 0;
+		for (int i = 0; i < PD_m; i++)
+			if (!PointBelongsHalfspace_i(x, i, eps)) {
+				notIncludingHalfspacesList[mo] = i;
+				mo++;
+			}
+		if (mo < PD_m)
+			notIncludingHalfspacesList[mo] = -1;
+	}
+
 	inline void MovingOnPolytope(PT_vector_T startPoint, PT_vector_T directionVector, PT_vector_T finishPoint, double epsMoving) {
 		double leftBound = 0;
 		double rightBound = PP_DBL_MAX;
@@ -486,60 +510,27 @@ namespace SF {
 
 	inline void MovingToPolytope(PT_vector_T startPoint, PT_vector_T directionVector, PT_vector_T finishPoint, double epsMoving) {
 		double leftBound = 0;
-		double rightBound = PP_DBL_MAX;
-		double factor = 1;
-		double delta;
-		static int outerHalspace_i[PP_MM];	// Index of out half-spaces
-		int mo;								// Number of out half-spaces
-		bool pointInsideCone;
+		double rightBound = 1;
+		double norm_d = Vector_Norm(directionVector);
+		PT_vector_T unit_d;
+		static int outerHalspaceList[PP_MM];	// Index of out half-spaces
 
-		assert(Vector_Norm(directionVector) >= PP_EPS_ZERO);
+		assert(norm_d >= PP_EPS_ZERO);
+		Vector_DivideByNumber(directionVector, norm_d, unit_d);
+		MakeListOfNotIncludingHalfspaces(startPoint, outerHalspaceList, epsMoving);
 
-		mo = 0;
-		for (int i = 0; i < PD_m; i++)
-			if (!PointBelongsHalfspace_i(startPoint, i, PP_EPS_POINT_IN_HALFSPACE)) {
-				outerHalspace_i[mo] = i;
-				mo++;
-			}
-
-		delta = factor / 2;
-
-		while (rightBound - leftBound >= PP_EPS_ZERO && delta > 0) {
-			Shift(startPoint, directionVector, factor, finishPoint);
-
-			pointInsideCone = true;
-			for (int i = 0; i < mo; i++)
-				if (PointBelongsHalfspace_i(finishPoint, outerHalspace_i[i], PP_EPS_POINT_IN_HALFSPACE)) {
-					pointInsideCone = false;
-					break;
-				}
-			if (pointInsideCone) {
-				leftBound = factor;
-				delta *= 2;
-				factor += delta;
-			}
-			else {
-				rightBound = factor;
-				delta /= 2;
-				factor -= delta;
-				assert(factor > 0);
-			}
-		}
-
-		Shift(startPoint, directionVector, factor, finishPoint);
-		delta = epsMoving;
 		do {
-			pointInsideCone = false;
-			for (int i = 0; i < mo; i++)
-				if (!PointBelongsHalfspace_i(finishPoint, outerHalspace_i[i], epsMoving)) {
-					pointInsideCone = true;
-					factor -= delta;
-					delta *= 2;
-					assert(factor > 0);
-					Shift(startPoint, directionVector, factor, finishPoint);
-					break;
-				}
-		} while (pointInsideCone && delta > 0 && delta > 0);
+			rightBound *= 2;
+			Shift(startPoint, unit_d, rightBound, finishPoint);
+		} while (PointBelongsOuterCone(finishPoint, outerHalspaceList, epsMoving));
+
+		while (rightBound - leftBound >= epsMoving) {
+			Shift(startPoint, unit_d, leftBound / 2 + rightBound / 2, finishPoint);
+			if (PointBelongsOuterCone(finishPoint, outerHalspaceList, epsMoving))
+				leftBound = leftBound / 2 + rightBound / 2;
+			else
+				rightBound = leftBound / 2 + rightBound / 2;
+		}
 	}
 
 	static void MTX_Conversion() { // Transformation to inequalities & dimensionality reduction
@@ -1306,6 +1297,13 @@ namespace SF {
 		return true;
 	}
 
+	inline bool PointBelongsOuterCone(PT_vector_T x, int* notIncludingHalfspacesList, double eps) { // If the point belongs to the outer cone with prescigion of eps
+		for (int i = 0; i < PD_m && notIncludingHalfspacesList[i] >= 0; i++)
+			if (PointBelongsHalfspace_i(x, i, eps))
+				return false;
+		return true;
+	}
+
 	inline void PointHomothety(PT_vector_T x, PT_vector_T center, double ratio) { // https://en.wikipedia.org/wiki/Homothety
 		if (ratio == 1)
 			return;
@@ -1343,6 +1341,42 @@ namespace SF {
 				cout << setw(PP_SETW) << PD_A[i][j];
 			cout << "\t<=" << setw(PP_SETW) << PD_b[i] << endl;
 		}
+	}
+
+	inline void Print_HalfspacesIncludingPoint(PT_vector_T x, double eps) {
+		bool comma = false;
+
+		cout << "{";
+
+		for (int i = 0; i < PD_m; i++) {
+			if (PointBelongsHalfspace_i(x, i, eps)) {
+				if (comma)
+					cout << ", ";
+				else
+					comma = true;
+				cout << i;
+			}
+		}
+
+		cout << "}";
+	}
+
+	inline void Print_HalfspacesOutOfPoint(PT_vector_T x, double eps) {
+		bool comma = false;
+
+		cout << "{";
+
+		for (int i = 0; i < PD_m; i++) {
+			if (!PointBelongsHalfspace_i(x, i, eps)) {
+				if (comma)
+					cout << ", ";
+				else
+					comma = true;
+				cout << i;
+			}
+		}
+
+		cout << "}";
 	}
 
 	inline void Print_HyperplanesIncludingPoint(PT_vector_T x, double eps) {
@@ -1482,6 +1516,10 @@ namespace SF {
 		}
 	}
 
+	inline void Vector_SetValue(PT_vector_T x, double v) {  // x = (v,...,v)
+		for (int j = 0; j < PD_n; j++) x[j] = v;
+	}
+
 	inline void Vector_Subtraction(PT_vector_T x, PT_vector_T y, PT_vector_T z) {  // z = x - y
 		for (int j = 0; j < PD_n; j++)
 			z[j] = x[j] - y[j];
@@ -1491,6 +1529,7 @@ namespace SF {
 		for (int j = 0; j < PD_n; j++) x[j] = 0;
 	}
 }
+
 //---------------------------------- Private Functions -------------------------
 namespace PF {
 	using namespace SF;
@@ -1510,36 +1549,42 @@ namespace PF {
 	inline void CalculateNumberOfEdges(int n, int mh, int* me) {
 		if (mh == n) {
 			*me = mh;
+#ifdef PP_DEBUG
 			if (*me > PP_KK) {
-				if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-					cout << "Parameter PP_KK = " << PP_KK << " must be greater than or equal to " << *me << "\n";
-				abort();
+				cout << "\nError in CalculateNumberOfEdges(): Parameter PP_KK = " << PP_KK << " must be greater than or equal to " << *me << "\n";
+				exit(1);
 			}
+#endif // PP_DEBUG
 		}
 		else {
+#ifdef PP_DEBUG
 			if (mh > 62) {
-				if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-					cout << "It is impossible to calculate binomial coefficient for number of including hyperplanes mh = "
+				cout << "\nError in CalculateNumberOfEdges(): It is impossible to calculate binomial coefficient for number of including hyperplanes mh = "
 					<< mh << " > 62" << endl;
-				abort();
+				exit(1);
 			}
+#endif // PP_DEBUG
 
 			unsigned long long long_me = BinomialCoefficient(mh, n - 1);
 
+#ifdef PP_DEBUG
 			if (long_me > PP_KK) {
 				if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
 					cout << "Parameter PP_KK = " << PP_KK << " must be greater than or equal to " << long_me << "\n";
-				abort();
+				exit(1);
 			}
-			*me = (int)long_me;
+#endif // PP_DEBUG
+			* me = (int)long_me;
 		}
 	}
 
 	inline void MakeEdgeList(int* edgeCodeList, int me) {
 		int index;
 
+#ifdef PP_DEBUG
 		if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
 			cout << "List of edges in random order is generated, please wait...\n";
+#endif // PP_DEBUG
 
 		for (int k = 0; k < PP_KK; k++) {
 			edgeCodeList[k] = -1;
@@ -1638,14 +1683,15 @@ namespace PF {
 
 		if (PD_mh < PD_n) {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-				cout << "Starting point u is not vertex with prescision " << PP_EPS_POINT_IN_HALFSPACE << ". Number of including hyperplanes = " << PD_mh
+				cout << "\nError in PreparationForIteration():Starting point u is not vertex with prescision " << PP_EPS_POINT_IN_HALFSPACE << ". Number of including hyperplanes = " << PD_mh
 				<< " < n = " << PD_n << "\n";
 			cout << "PD_u: ";
 			Print_Vector(PD_u);
 			cout << "\tObjF(u) = " << ObjF(PD_u) << endl;
-			cout << "Perhaps you should increase the parameter PP_OBJECTIVE_VECTOR_LENGTH or decrease the parameter PP_EPS_POINT_IN_HALFSPACE.\n";
-			abort();
+			cout << "\nPerhaps you should decrease parameter PP_EPS_POINT_IN_HALFSPACE or increase parameter PP_OBJECTIVE_VECTOR_LENGTH.\n";
+			exit(1);
 		}
+
 		CalculateNumberOfEdges(PD_n, PD_mh, &PD_me);
 		MakeEdgeList(PD_edgeCodeList, PD_me);
 		PD_TWIDDLE_done = false;
@@ -1670,12 +1716,15 @@ namespace PF {
 		if (mh == PD_n)
 			me = (unsigned long long) mh;
 		else {
+
+#ifdef PP_DEBUG
 			if (mh > 62) {
-				if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-					cout << "\nIt is impossible to calculate binomial coefficient for number of including hyperplanes mh = "
+				cout << "\nError in Print_Number_of_edges(): It is impossible to calculate binomial coefficient for number of including hyperplanes mh = "
 					<< mh << " > 62" << endl;
-				abort();
+				exit(1);
 			}
+#endif // PP_DEBUG
+
 			me = BinomialCoefficient(mh, PD_n - 1);
 		}
 		cout << me << endl;
@@ -1694,7 +1743,7 @@ namespace PF {
 			Vector_Copy(w, w_previous);
 
 			for (int i = 0; i < PD_ma; i++) {
-				int ia = PD_index_activeHyperplanes[i];
+				int ia = PD_edgeHyperplanes[i];
 				PT_vector_T p;
 				OrthogonalProjectingVectorOntoHyperplane_i(w, ia, p);
 				Vector_PlusEquals(r, p);

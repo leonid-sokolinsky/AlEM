@@ -35,7 +35,7 @@ static PT_column_T PD_norm_a;		// Column of norms of matrix rows
 static PT_vector_T PD_objVector;	// Used for pseudoprojecting
 static int PD_index_includingHyperplanes[PP_MM];	// Index of hyperplanes that include surface point u
 static int PD_edgeCodeList[PP_KK];					// Edge codes
-static int PD_index_activeHyperplanes[PP_N - 1];	// Index of hyperplanes used for pseudoprojection
+static int PD_edgeHyperplanes[PP_N - 1];	// Index of hyperplanes used for pseudoprojection
 static int PD_TWIDDLE_p[PP_MM + 2];					// Auxiliary array for TWIDDLE algorithm
 //========================== Input/Output ====================================
 static string PD_problemName;

@@ -21,7 +21,7 @@ This source code has been produced with using BSF-skeleton
 #include "_Problems15-1.h"
 #define PP_PATH "D:/YandexDisk/_private/Programming/Set-of-LP-Problems/Rnd-LP/"
 
-/**
+/**/
 #include "_Problems20-1.h"
 #define PP_PATH "D:/YandexDisk/_private/Programming/Set-of-LP-Problems/Rnd-LP/"
 
@@ -29,16 +29,19 @@ This source code has been produced with using BSF-skeleton
 #include "_Problems-Klee-Minty-Cube.h"
 #define PP_PATH "D:/YandexDisk/_private/Programming/Set-of-LP-Problems/Klee-Minty-Cube/"
 
-/**/
+/**
 #include "_Problems-Miscellaneous.h"
 #define PP_PATH "D:/YandexDisk/_private/Programming/Set-of-LP-Problems/Miscellaneous-LP/"
 
 /*---------------------------------------------------------------------*/
 
+#define PP_METHOD_NAME "AlEM"
+
 //-------------------------- Compilation Modes -----------------------
 #define PP_DEBUG
 //#define PP_MATRIX_OUTPUT
 #define PP_SAVE_RESULT
+#define PP_MPI
 //#define PP_PATH "Problems/"
 
 //================================ Problem Paramrters ===========================
