@@ -47,6 +47,10 @@ void PC_bsf_Init(bool* success) {
 	PreparationForIteration(PD_u);
 }
 
+void PC_bsf_IterInit(PT_bsf_parameter_T parameter) {
+	PreparationForIteration(parameter.x);
+}
+
 void PC_bsf_IterOutput(PT_bsf_reduceElem_T* reduceResult, int reduceCounter, PT_bsf_parameter_T parameter,
 	double elapsedTime, int nextJob) {
 
@@ -106,7 +110,7 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 	double objF_u = ObjF(u);
 	reduceElem->edgeCode = edgeCode;
 
-	TWIDDLE_CodeToSubset(edgeCode, PD_index_includingHyperplanes, PD_edgeHyperplanes, PD_mh, PD_ma);
+	TWIDDLE_CodeToSubset(edgeCode, PD_pointHyperplanes, PD_edgeHyperplanes, PD_mh, PD_ma);
 
 /*DEBUG PC_bsf_MapF** 
 #ifdef PP_DEBUG
@@ -215,10 +219,6 @@ void PC_bsf_MapF_2(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T_2* reduceElem,
 
 void PC_bsf_MapF_3(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T_3* reduceElem, int* success) {
 	// Not used
-}
-
-void PC_bsf_MapInit(PT_bsf_parameter_T parameter) {
-	PreparationForIteration(parameter.x);
 }
 
 void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
@@ -340,6 +340,7 @@ void PC_bsf_ProcessResults(PT_bsf_reduceElem_T* reduceResult, int reduceCounter,
 #endif // PP_DEBUG
 
 #ifdef PP_DEBUG
+	TWIDDLE_CodeToSubset(reduceResult->edgeCode, PD_pointHyperplanes, PD_edgeHyperplanes, PD_mh, PD_ma);
 	cout << "_________________________________________________ " << PD_iterNo << " _____________________________________________________" << endl;
 	cout << "Vertex:\t";
 	Print_Vector(PD_u); cout << "\tF(x) = " << PD_objF_u << endl;
@@ -1678,7 +1679,7 @@ namespace PF {
 	}
 
 	inline void PreparationForIteration(PT_vector_T u) {
-		MakeHyperplaneList(u, PD_index_includingHyperplanes, &PD_mh, PP_EPS_POINT_IN_HALFSPACE);
+		MakeHyperplaneList(u, PD_pointHyperplanes, &PD_mh, PP_EPS_POINT_IN_HALFSPACE);
 		assert(PD_mh <= PP_MM);
 
 		if (PD_mh < PD_n) {

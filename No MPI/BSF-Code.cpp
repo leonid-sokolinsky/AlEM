@@ -249,7 +249,7 @@ static bool BC_WorkerMap() { // Performs the Map function
 	PC_bsfAssignSublistLength(BD_listSize);
 	PC_bsfAssignAddressOffset(0);
 	PC_bsfAssignParameter(BD_order.parameter);
-	PC_bsf_MapInit(BD_order.parameter);
+	PC_bsf_IterInit(BD_order.parameter);
 #ifdef PP_BSF_OMP
 #ifdef PP_BNUM_THREADS
 #pragma omp parallel for num_threads(PP_BNUM_THREADS)
