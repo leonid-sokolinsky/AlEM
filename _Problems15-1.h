@@ -1,9 +1,9 @@
 /*==============================================================================
 Project: LiFe - New Linear Programming Solvers
-Theme: Edge movement method (MPI)
+Theme: AlEM - Along Edges Movement method (MPI)
 Module: Problems15-1.h (LP problems of dimension 15 with 1 randome inequality)
 Prefix: PP
-Authors: Nikolay A. Olkhovsky & Leonid B. Sokolinsky
+Authors: Alexander E. Zhulev & Leonid B. Sokolinsky
 This include file is part of Problem-Parameters.h
 LP problems were obtained using BSF-LPP-Generator.
 Initial surface points for these problems were calculated using BSF-Apex-Quest.

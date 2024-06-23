@@ -1,6 +1,6 @@
 /*==============================================================================
 Project: LiFe - New Linear Programming Solvers
-Theme: AlEM method - Along Edges Movement (No MPI)
+Theme: AlEM - Along Edges Movement method (No MPI)
 Module: Problem-Data.h (Problem Data)
 Prefix: PD
 Authors: Alexander E. Zhulev & Leonid B. Sokolinsky

@@ -1,6 +1,6 @@
 /*==============================================================================
 Project: LiFe - New Linear Programming Solvers
-Theme: AlEM method - Along Edges Movement (MPI)
+Theme: AlEM - Along Edges Movement method (MPI)
 Module: BSF-Types.h (Problem Independent Types)
 Prefix: BT
 Authors: Alexander E. Zhulev & Leonid B. Sokolinsky 

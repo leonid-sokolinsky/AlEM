@@ -1,6 +1,6 @@
 /*==============================================================================
 Project: LiFe - New Linear Programming Solvers
-Theme: AlEM method - Along Edges Movement (MPI)
+Theme: AlEM - Along Edges Movement method (MPI)
 Module: BSF-SceletonVariables.h (Skeleton Variables)
 Prefix: BSF_sv
 Authors: Alexander E. Zhulev & Leonid B. Sokolinsky
