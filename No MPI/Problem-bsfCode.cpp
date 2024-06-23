@@ -1,6 +1,6 @@
 ﻿/*==============================================================================
 Project: LiFe - New Linear Programming Solvers
-Theme: AlEM - Along Edges Movement method (No MPI)
+Theme: AlEM - Along Edges Movement Method (No MPI)
 Module: Problem-bsfCode.cpp (Implementation of Problem Code)
 Prefix:	PC_bsf	- BSF Predefined Problem Functions
 		SF		- Shared Functionc
@@ -106,7 +106,7 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 	double objF_u = ObjF(u);
 	reduceElem->edgeCode = edgeCode;
 
-	TWIDDLE_CodeToSubset(edgeCode, PD_index_includingHyperplanes, PD_edgeHyperplanes, PD_mh, PD_ma);
+	TWIDDLE_CodeToSubset(edgeCode, PD_pointHyperplanes, PD_edgeHyperplanes, PD_mh, PD_ma);
 
 	/*DEBUG PC_bsf_MapF**
 	#ifdef PP_DEBUG
@@ -241,7 +241,7 @@ void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
 	cout << "OpenMP is turned off!" << endl;
 #endif // PP_BSF_OMP
 
-#ifdef PP_BFRAGMENTED_MAP_LIST
+#ifdef PP_BSF_FRAGMENTED_MAP_LIST
 	cout << "Map List is Fragmented" << endl;
 #else
 	cout << "Map List is not Fragmented" << endl;
@@ -285,14 +285,12 @@ void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
 void PC_bsf_ProblemOutput(PT_bsf_reduceElem_T* reduceResult, int reduceCounter, PT_bsf_parameter_T parameter, double t) {
 	cout << setprecision(PP_SETW / 2);
 
-	PD_objF_u = ObjF(PD_u);
-
 	cout << "================================================" << endl;
 	cout << "// Elapsed time: " << t << endl;
 	cout << "// Number of iterations: " << PD_iterNo << endl;
-	cout << "// Computed objective value: " << setprecision(16) << PD_objF_u << endl;
+	cout << "// Computed objective value: " << setprecision(16) << ObjF(PD_u) << endl;
 	cout << "// Maximal objective value:  " << PP_MAX_OBJ_VALUE << endl;
-	cout << "// Relative error = " << setprecision(3) << RelativeError(PP_MAX_OBJ_VALUE, PD_objF_u) << setprecision(PP_SETW / 2) << endl;
+	cout << "// Relative error = " << setprecision(3) << RelativeError(PP_MAX_OBJ_VALUE, ObjF(PD_u)) << setprecision(PP_SETW / 2) << endl;
 	cout << "================================================" << endl;
 
 #ifdef PP_SAVE_RESULT
@@ -342,9 +340,8 @@ void PC_bsf_ProcessResults(PT_bsf_reduceElem_T* reduceResult, int reduceCounter,
 #ifdef PP_DEBUG
 	cout << "_________________________________________________ " << PD_iterNo << " _____________________________________________________" << endl;
 	cout << "Vertex:\t";
-	Print_Vector(PD_u); cout << "\tF(x) = " << PD_objF_u << endl;
+	Print_Vector(PD_u); cout << "\tF(x) = " << ObjF(PD_u) << endl;
 	cout << "Vertex hyperplanes:\t"; Print_HyperplanesIncludingPoint(PD_u, PP_EPS_POINT_IN_HALFSPACE); cout << endl;
-	PD_objF_u = ObjF(PD_u);
 	cout << "Edge hyperplanes:\t{";
 	for (int i = 0; i < PD_ma - 1; i++)
 		cout << PD_edgeHyperplanes[i] << ", ";
@@ -405,7 +402,7 @@ void PC_bsf_SetListSize(int* listSize) {
 }
 
 void PC_bsf_SetMapListElem(PT_bsf_mapElem_T* elem, int i) {
-	elem->edgeCode = &(PD_edgeCodeList[i]);
+	elem->edgeCode = &(PD_edgeCodes[i]);
 }
 
 //----------------------- Assigning Values to BSF-skeleton Variables (Do not modify!) -----------------------
@@ -473,6 +470,16 @@ namespace SF {
 			}
 		if (mo < PD_m)
 			notIncludingHalfspacesList[mo] = -1;
+	}
+
+	inline void MakePointHyperplaneList(PT_vector_T u, int* pointHyperplaneList, int* mh, double eps) {
+		*mh = 0;
+		for (int i = 0; i < PD_m; i++) {
+			if (PointBelongsHyperplane_i(u, i, eps)) {
+				pointHyperplaneList[*mh] = i;
+				(*mh)++;
+			}
+		}
 	}
 
 	inline void MovingOnPolytope(PT_vector_T startPoint, PT_vector_T directionVector, PT_vector_T finishPoint, double epsMoving) {
@@ -1667,18 +1674,8 @@ namespace PF {
 		}
 	}
 
-	inline void MakeHyperplaneList(PT_vector_T u, int* index_includingHyperplanes, int* mh, double eps) {
-		*mh = 0;
-		for (int i = 0; i < PD_m; i++) {
-			if (PointBelongsHyperplane_i(u, i, eps)) {
-				index_includingHyperplanes[*mh] = i;
-				(*mh)++;
-			}
-		}
-	}
-
 	inline void PreparationForIteration(PT_vector_T u) {
-		MakeHyperplaneList(u, PD_index_includingHyperplanes, &PD_mh, PP_EPS_POINT_IN_HALFSPACE);
+		MakePointHyperplaneList(u, PD_pointHyperplanes, &PD_mh, PP_EPS_POINT_IN_HALFSPACE);
 		assert(PD_mh <= PP_MM);
 
 		if (PD_mh < PD_n) {
@@ -1693,14 +1690,11 @@ namespace PF {
 		}
 
 		CalculateNumberOfEdges(PD_n, PD_mh, &PD_me);
-		MakeEdgeList(PD_edgeCodeList, PD_me);
+		MakeEdgeList(PD_edgeCodes, PD_me);
 		PD_TWIDDLE_done = false;
 		PD_TWIDDLE_nextEdgeI = 0;
 		TWIDDLE_Make_p(PD_TWIDDLE_p, PD_mh, PD_n - 1);
 		PD_ma = PD_n - 1;
-
-		PD_objF_u = ObjF(PD_u);
-		PD_objF_initialValue = PD_objF_u;
 	}
 
 	inline void Print_Number_of_edges(PT_vector_T x) {

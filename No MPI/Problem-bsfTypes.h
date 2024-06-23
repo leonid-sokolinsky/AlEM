@@ -1,6 +1,6 @@
 /*==============================================================================
 Project: LiFe - New Linear Programming Solvers
-Theme: AlEM - Along Edges Movement method (No MPI)
+Theme: AlEM - Along Edges Movement Method (No MPI)
 Module: Problem-bsfTypes.h (Predefined BSF Problem Types)
 Prefix: PT_bsf
 Authors: Alexander E. Zhulev & Leonid B. Sokolinsky

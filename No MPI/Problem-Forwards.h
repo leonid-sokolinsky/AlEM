@@ -1,6 +1,6 @@
 /*==============================================================================
 Project: LiFe - New Linear Programming Solvers
-Theme: AlEM - Along Edges Movement method (No MPI)
+Theme: AlEM - Along Edges Movement Method (No MPI)
 Module: Problem-Forwards.h (Problem Function Forwards)
 Authors: Alexander E. Zhulev & Leonid B. Sokolinsky
 This source code has been produced with using BSF-skeleton
@@ -12,7 +12,6 @@ namespace PF {
 	unsigned long long BinomialCoefficient(int n, int k);
 	void	CalculateNumberOfEdges(int n, int mh, int* me);
 	void	MakeEdgeList(int* edgeCodeList, int me);
-	void	MakeHyperplaneList(PT_vector_T u, int* index_includingHyperplanes, int* mh, double eps);
 	void	PreparationForIteration(PT_vector_T u);
 	void	Print_Number_of_edges(PT_vector_T x);
 	void	PseudoprojectionOnEdge(PT_vector_T v, PT_vector_T w, double eps, int* success);
@@ -28,6 +27,7 @@ namespace SF {
 	double	Distance_PointToPolytope(PT_vector_T x);
 	void	MakeColumnOfNorms(PT_matrix_T A, PT_column_T norm_a);
 	void	MakeListOfNotIncludingHalfspaces(PT_vector_T x, int* notIncludingHalfspacesList, double eps);
+	void	MakePointHyperplaneList(PT_vector_T u, int* pointHyperplaneList, int* mh, double eps);
 	void	MovingOnPolytope(PT_vector_T startPoint, PT_vector_T directionVector, PT_vector_T finishPoint, double epsMoving);
 	void	MovingToPolytope(PT_vector_T startPoint, PT_vector_T directionVector, PT_vector_T finishPoint, double epsMoving);
 	void	MTX_Conversion();

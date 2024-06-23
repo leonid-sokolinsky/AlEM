@@ -1,6 +1,6 @@
 /*==============================================================================
 Project: LiFe - New Linear Programming Solvers
-Theme: AlEM - Along Edges Movement method (No MPI)
+Theme: AlEM - Along Edges Movement Method (No MPI)
 Module: BSF-Data.h (Problem Independent Variables & Data Structures)
 Prefix: BD
 Authors: Alexander E. Zhulev & Leonid B. Sokolinsky 
