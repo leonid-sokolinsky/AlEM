@@ -31,7 +31,7 @@ Initial surface points for these problems were calculated using BSF-Apex-Quest.
 #define PP_START_SHIFT_LENGTH	100
 //-------------------------------------------------------------------------------
 
-/*============================== rnd10-0 LP problem ==============================*
+/*============================== rnd10-0 LP problem ==============================*/
 // Exact solution:	100  200  200  200  200  200  200  200  200  200
 #define PP_PROBLEM_NAME	"rnd10-0"
 #define PP_MAX_OBJ_VALUE		10900			
@@ -62,7 +62,7 @@ Initial surface points for these problems were calculated using BSF-Apex-Quest.
 #define PP_MAX_OBJ_VALUE 10248.35536348673
 //-------------------------------------------------------------------------------
 
-/*============================== rnd10-1-6 LP problem ============================*/
+/*============================== rnd10-1-6 LP problem ============================*
 #define PP_PROBLEM_NAME	"rnd10-1-6"
 #define PP_MAX_OBJ_VALUE 10022.93578020069
 //-------------------------------------------------------------------------------

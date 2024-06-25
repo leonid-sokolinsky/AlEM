@@ -241,7 +241,7 @@ void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
 	cout << "OpenMP is turned off!" << endl;
 #endif // PP_BSF_OMP
 
-#ifdef PP_BFRAGMENTED_MAP_LIST
+#ifdef PP_BSF_FRAGMENTED_MAP_LIST
 	cout << "Map List is Fragmented" << endl;
 #else
 	cout << "Map List is not Fragmented" << endl;
@@ -285,14 +285,12 @@ void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
 void PC_bsf_ProblemOutput(PT_bsf_reduceElem_T* reduceResult, int reduceCounter, PT_bsf_parameter_T parameter, double t) {
 	cout << setprecision(PP_SETW / 2);
 
-	PD_objF_u = ObjF(PD_u);
-
 	cout << "================================================" << endl;
 	cout << "// Elapsed time: " << t << endl;
 	cout << "// Number of iterations: " << PD_iterNo << endl;
-	cout << "// Computed objective value: " << setprecision(16) << PD_objF_u << endl;
+	cout << "// Computed objective value: " << setprecision(16) << ObjF(PD_u) << endl;
 	cout << "// Maximal objective value:  " << PP_MAX_OBJ_VALUE << endl;
-	cout << "// Relative error = " << setprecision(3) << RelativeError(PP_MAX_OBJ_VALUE, PD_objF_u) << setprecision(PP_SETW / 2) << endl;
+	cout << "// Relative error = " << setprecision(3) << RelativeError(PP_MAX_OBJ_VALUE, ObjF(PD_u)) << setprecision(PP_SETW / 2) << endl;
 	cout << "================================================" << endl;
 
 #ifdef PP_SAVE_RESULT
@@ -343,9 +341,8 @@ void PC_bsf_ProcessResults(PT_bsf_reduceElem_T* reduceResult, int reduceCounter,
 	TWIDDLE_CodeToSubset(reduceResult->edgeCode, PD_pointHyperplanes, PD_edgeHyperplanes, PD_mh, PD_ma);
 	cout << "_________________________________________________ " << PD_iterNo << " _____________________________________________________" << endl;
 	cout << "Vertex:\t";
-	Print_Vector(PD_u); cout << "\tF(x) = " << PD_objF_u << endl;
+	Print_Vector(PD_u); cout << "\tF(x) = " << ObjF(PD_u) << endl;
 	cout << "Vertex hyperplanes:\t"; Print_HyperplanesIncludingPoint(PD_u, PP_EPS_POINT_IN_HALFSPACE); cout << endl;
-	PD_objF_u = ObjF(PD_u);
 	cout << "Edge hyperplanes:\t{";
 	for (int i = 0; i < PD_ma - 1; i++)
 		cout << PD_edgeHyperplanes[i] << ", ";
@@ -406,7 +403,7 @@ void PC_bsf_SetListSize(int* listSize) {
 }
 
 void PC_bsf_SetMapListElem(PT_bsf_mapElem_T* elem, int i) {
-	elem->edgeCode = &(PD_edgeCodeList[i]);
+	elem->edgeCode = &(PD_edgeCodes[i]);
 }
 
 //----------------------- Assigning Values to BSF-skeleton Variables (Do not modify!) -----------------------
@@ -474,6 +471,16 @@ inline void MakeListOfNotIncludingHalfspaces(PT_vector_T x, int* notIncludingHal
 		}
 	if (mo < PD_m)
 		notIncludingHalfspacesList[mo] = -1;
+}
+
+inline void MakePointHyperplaneList(PT_vector_T u, int* pointHyperplaneList, int* mh, double eps) {
+	*mh = 0;
+	for (int i = 0; i < PD_m; i++) {
+		if (PointBelongsHyperplane_i(u, i, eps)) {
+			pointHyperplaneList[*mh] = i;
+			(*mh)++;
+		}
+	}
 }
 
 inline void MovingOnPolytope(PT_vector_T startPoint, PT_vector_T directionVector, PT_vector_T finishPoint, double epsMoving) {
@@ -1591,8 +1598,8 @@ namespace PF {
 			edgeCodeList[k] = -1;
 		}
 
-		if (PP_KK <= RAND_MAX) {
-			for (int k = 1; k <= me; k++) {
+		if (PP_KK <= (RAND_MAX + 1)) {
+			for (int k = 0; k < me; k++) {
 				index = rand() % PP_KK;
 				if (edgeCodeList[index] == -1)
 					edgeCodeList[index] = 0;
@@ -1616,22 +1623,22 @@ namespace PF {
 			return;
 		}
 
-		assert(PP_KK % RAND_MAX == 0);
+		assert(PP_KK % (RAND_MAX + 1) == 0);
 		assert(me <= PP_KK);
 
-		int segmentCount = PP_KK / RAND_MAX;
-		int segment_me = me / segmentCount;
+		int segmentCount = PP_KK / (RAND_MAX + 1); // RAND_MAX = 32767;
+		int segment_me = me / (segmentCount - 1);
 		int remainder_me = me % segmentCount;
 
-		for (int l = 0; l < segmentCount; l++) {
-			for (int k = 1 + l * segment_me; k <= (l + 1) * segment_me; k++) {
-				index = rand() + l * RAND_MAX;
+		for (int l = 0; l < segmentCount - 1; l++) {
+			for (int k = l * segment_me; k < (l + 1) * segment_me; k++) {
+				index = rand() + l * (RAND_MAX + 1);
 				if (edgeCodeList[index] == -1)
 					edgeCodeList[index] = 0;
 				else {
-					for (int ki = 1; ki < RAND_MAX; ki++) {
-						if (edgeCodeList[(index + ki) % RAND_MAX] == -1) {
-							edgeCodeList[(index + ki) % RAND_MAX] = 0;
+					for (int ki = 1; ki < (RAND_MAX + 1); ki++) {
+						if (edgeCodeList[l * (RAND_MAX + 1) + (index + ki) % (RAND_MAX + 1)] == -1) {
+							edgeCodeList[l * (RAND_MAX + 1) + (index + ki) % (RAND_MAX + 1)] = 0;
 							break;
 						}
 					}
@@ -1641,17 +1648,18 @@ namespace PF {
 
 		if (remainder_me != 0) {
 
-			assert(1 + segmentCount * segment_me <= me);
-			assert(segmentCount * RAND_MAX + 1 == PP_KK);
+			assert(false); // You need to test the rest part of the code
 
-			for (int k = 1 + segmentCount * segment_me; k <= me; k++) {
-				index = rand() + segmentCount * RAND_MAX;
+			assert(1 + (segmentCount - 1) * segment_me <= me);
+
+			for (int k = (segmentCount - 1) * segment_me; k < me; k++) {
+				index = rand() + (segmentCount - 1) * (RAND_MAX + 1);
 				if (edgeCodeList[index] == -1)
 					edgeCodeList[index] = 0;
 				else {
-					for (int ki = 1; ki < RAND_MAX; ki++) {
-						if (edgeCodeList[(index + ki) % RAND_MAX] == -1) {
-							edgeCodeList[(index + ki) % RAND_MAX] = 0;
+					for (int ki = 1; ki < (RAND_MAX + 1); ki++) {
+						if (edgeCodeList[(segmentCount - 1) * (RAND_MAX + 1) + (index + ki) % (RAND_MAX + 1)] == -1) {
+							edgeCodeList[(segmentCount - 1) * (RAND_MAX + 1) + (index + ki) % (RAND_MAX + 1)] = 0;
 							break;
 						}
 					}
@@ -1668,18 +1676,8 @@ namespace PF {
 		}
 	}
 
-	inline void MakeHyperplaneList(PT_vector_T u, int* index_includingHyperplanes, int* mh, double eps) {
-		*mh = 0;
-		for (int i = 0; i < PD_m; i++) {
-			if (PointBelongsHyperplane_i(u, i, eps)) {
-				index_includingHyperplanes[*mh] = i;
-				(*mh)++;
-			}
-		}
-	}
-
 	inline void PreparationForIteration(PT_vector_T u) {
-		MakeHyperplaneList(u, PD_pointHyperplanes, &PD_mh, PP_EPS_POINT_IN_HALFSPACE);
+		MakePointHyperplaneList(u, PD_pointHyperplanes, &PD_mh, PP_EPS_POINT_IN_HALFSPACE);
 		assert(PD_mh <= PP_MM);
 
 		if (PD_mh < PD_n) {
@@ -1694,14 +1692,11 @@ namespace PF {
 		}
 
 		CalculateNumberOfEdges(PD_n, PD_mh, &PD_me);
-		MakeEdgeList(PD_edgeCodeList, PD_me);
+		MakeEdgeList(PD_edgeCodes, PD_me);
 		PD_TWIDDLE_done = false;
 		PD_TWIDDLE_nextEdgeI = 0;
 		TWIDDLE_Make_p(PD_TWIDDLE_p, PD_mh, PD_n - 1);
 		PD_ma = PD_n - 1;
-
-		PD_objF_u = ObjF(PD_u);
-		PD_objF_initialValue = PD_objF_u;
 	}
 
 	inline void Print_Number_of_edges(PT_vector_T x) {

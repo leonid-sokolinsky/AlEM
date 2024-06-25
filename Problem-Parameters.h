@@ -13,12 +13,16 @@ This source code has been produced with using BSF-skeleton
 #include "_Problems05-1.h"
 #define PP_PATH "D:/YandexDisk/_private/Programming/Set-of-LP-Problems/Rnd-LP/"
 
-/**/
+/**
 #include "_Problems10-1.h"
 #define PP_PATH "D:/YandexDisk/_private/Programming/Set-of-LP-Problems/Rnd-LP/"
 
 /**
 #include "_Problems15-1.h"
+#define PP_PATH "D:/YandexDisk/_private/Programming/Set-of-LP-Problems/Rnd-LP/"
+
+/**/
+#include "_Problems16.24-0.h"
 #define PP_PATH "D:/YandexDisk/_private/Programming/Set-of-LP-Problems/Rnd-LP/"
 
 /**
