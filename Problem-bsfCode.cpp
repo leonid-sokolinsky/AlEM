@@ -1589,16 +1589,11 @@ namespace PF {
 	inline void MakeEdgeList(int* edgeCodeList, int me) {
 		int index;
 
-#ifdef PP_DEBUG
-		if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-			cout << "List of edges in random order is generated, please wait...\n";
-#endif // PP_DEBUG
-
 		for (int k = 0; k < PP_KK; k++) {
 			edgeCodeList[k] = -1;
 		}
 
-		if (PP_KK <= (RAND_MAX + 1)) {
+		if (PP_KK <= (PP_RND_MAX + 1)) {
 			for (int k = 0; k < me; k++) {
 				index = rand() % PP_KK;
 				if (edgeCodeList[index] == -1)
@@ -1626,19 +1621,19 @@ namespace PF {
 		assert(PP_KK % (RAND_MAX + 1) == 0);
 		assert(me <= PP_KK);
 
-		int segmentCount = PP_KK / (RAND_MAX + 1); // RAND_MAX = 32767;
+		int segmentCount = PP_KK / (PP_RND_MAX + 1);
 		int segment_me = me / (segmentCount - 1);
 		int remainder_me = me % segmentCount;
 
 		for (int l = 0; l < segmentCount - 1; l++) {
 			for (int k = l * segment_me; k < (l + 1) * segment_me; k++) {
-				index = rand() + l * (RAND_MAX + 1);
+				index = rand() % (PP_RND_MAX + 1) + l * (PP_RND_MAX + 1);
 				if (edgeCodeList[index] == -1)
 					edgeCodeList[index] = 0;
 				else {
-					for (int ki = 1; ki < (RAND_MAX + 1); ki++) {
-						if (edgeCodeList[l * (RAND_MAX + 1) + (index + ki) % (RAND_MAX + 1)] == -1) {
-							edgeCodeList[l * (RAND_MAX + 1) + (index + ki) % (RAND_MAX + 1)] = 0;
+					for (int ki = 1; ki < (PP_RND_MAX + 1); ki++) {
+						if (edgeCodeList[l * (PP_RND_MAX + 1) + (index + ki) % (PP_RND_MAX + 1)] == -1) {
+							edgeCodeList[l * (PP_RND_MAX + 1) + (index + ki) % (PP_RND_MAX + 1)] = 0;
 							break;
 						}
 					}
@@ -1648,18 +1643,18 @@ namespace PF {
 
 		if (remainder_me != 0) {
 
-			assert(false); // You need to test the rest part of the code
+			assert(false); // You need to test the rest part of the function code
 
 			assert(1 + (segmentCount - 1) * segment_me <= me);
 
 			for (int k = (segmentCount - 1) * segment_me; k < me; k++) {
-				index = rand() + (segmentCount - 1) * (RAND_MAX + 1);
+				index = rand() % (PP_RND_MAX + 1) + (segmentCount - 1) * (PP_RND_MAX + 1);
 				if (edgeCodeList[index] == -1)
 					edgeCodeList[index] = 0;
 				else {
-					for (int ki = 1; ki < (RAND_MAX + 1); ki++) {
-						if (edgeCodeList[(segmentCount - 1) * (RAND_MAX + 1) + (index + ki) % (RAND_MAX + 1)] == -1) {
-							edgeCodeList[(segmentCount - 1) * (RAND_MAX + 1) + (index + ki) % (RAND_MAX + 1)] = 0;
+					for (int ki = 1; ki < (PP_RND_MAX + 1); ki++) {
+						if (edgeCodeList[(segmentCount - 1) * (PP_RND_MAX + 1) + (index + ki) % (PP_RND_MAX + 1)] == -1) {
+							edgeCodeList[(segmentCount - 1) * (PP_RND_MAX + 1) + (index + ki) % (PP_RND_MAX + 1)] = 0;
 							break;
 						}
 					}

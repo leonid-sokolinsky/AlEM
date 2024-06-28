@@ -72,7 +72,16 @@ Initial surface points for these problems were calculated using BSF-Apex-Quest.
 #define PP_MAX_OBJ_VALUE 41900
 //-----------------------------------------------------------------------------
 
-/*============================== rnd24-0 LP problem =========================*/
+/*============================== rnd22-0 LP problem =========================*/
+// Solution:	100  200  ...  200
+#define PP_PROBLEM_NAME	"rnd22-0"
+#define PP_KK	22		// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
+#define PP_M	23		// Number of equations (number of rows in *.mtx)
+#define PP_N	45		// Number of variables (number of cols in *.mtx)
+#define PP_MAX_OBJ_VALUE 50500
+//-----------------------------------------------------------------------------
+
+/*============================== rnd24-0 LP problem =========================*
 // Solution:	100  200  ...  200
 #define PP_PROBLEM_NAME	"rnd24-0"
 #define PP_KK	24		// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
