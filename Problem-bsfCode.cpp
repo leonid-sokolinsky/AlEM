@@ -222,7 +222,7 @@ void PC_bsf_MapF_3(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T_3* reduceElem,
 }
 
 void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
-	cout << "=================================================== " << PP_METHOD_NAME << "====================================================" << endl;
+	cout << "=================================================== " << PP_METHOD_NAME << " ====================================================" << endl;
 	cout << "Problem name: " << PD_problemName << endl;
 
 #ifdef PP_NO_MPI
