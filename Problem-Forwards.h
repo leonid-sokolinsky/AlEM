@@ -14,7 +14,6 @@ namespace PF {
 	void	MakeEdgeList(int* edgeCodeList, int me);
 	void	PreparationForIteration(PT_vector_T u);
 	void	Print_Number_of_edges(PT_vector_T x);
-	void	PseudoprojectionOnEdge(PT_vector_T v, PT_vector_T w, double eps, int* success);
 	void	TWIDDLE(int* x, int* y, int* z, int p[PP_N + 2], bool* done);
 	void	TWIDDLE_CodeToSubset(int code, int a[PP_MM], int c[PP_N - 1], int n, int m);
 	void	TWIDDLE_Make_p(int p[PP_MM + 2], int n, int m);
@@ -25,6 +24,8 @@ namespace SF {
 	double	Distance_PointToHyperplane_i(PT_vector_T x, int i);
 	double	Distance_PointToPoint(PT_vector_T x, PT_vector_T y);
 	double	Distance_PointToPolytope(PT_vector_T x);
+	double	DistanceSQR_PointToPoint(PT_vector_T x, PT_vector_T y);
+	void	JumpingOnPolytope(PT_vector_T startPoint, PT_vector_T directionVector, PT_vector_T finishPoint, double eps);
 	void	MakeColumnOfNorms(PT_matrix_T A, PT_column_T norm_a);
 	void	MakeListOfNotIncludingHalfspaces(PT_vector_T x, int* notIncludingHalfspacesList, double eps);
 	void	MakePointHyperplaneList(PT_vector_T u, int* pointHyperplaneList, int* mh, double eps);
@@ -52,12 +53,14 @@ namespace SF {
 	bool	PointBelongsPolytope(PT_vector_T x, double eps);
 	void	PointHomothety(PT_vector_T x, PT_vector_T center, double ratio);
 	bool	PointInsideHalfspace_i(PT_vector_T x, int i, double eps);
+	int		PointLocation_i(PT_vector_T x, int i, double eps, double* a_DoT_x_MinuS_b);
 	void	PolytopeHomothety(PT_vector_T center, double ratio);
 	void	Print_Inequalities();
 	void	Print_HalfspacesIncludingPoint(PT_vector_T x, double eps);
 	void	Print_HalfspacesOutOfPoint(PT_vector_T x, double eps);
 	void	Print_HyperplanesIncludingPoint(PT_vector_T x, double eps);
 	void	Print_Vector(PT_vector_T x);
+	void	PseudoprojectionOnFlat(int* flatHyperplanes, int m_flat, PT_vector_T v, double eps, int maxProjectingIter, PT_vector_T w, int* success);
 	double	RelativeError(double trueValue, double calculatedValue);
 	void	Shift(PT_vector_T point, PT_vector_T shiftVector, double factor, PT_vector_T shiftedPoint);
 	void	Vector_Addition(PT_vector_T x, PT_vector_T y, PT_vector_T z);
