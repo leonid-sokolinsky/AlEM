@@ -15,7 +15,7 @@ This source code has been produced with using BSF-skeleton
 #include "_Problems05-1.h"
 #define PP_PATH "D:/YandexDisk/_private/Programming/Set-of-LP-Problems/Rnd-LP/"
 
-/**/
+/**
 #include "_Problems10-1.h"
 #define PP_PATH "D:/YandexDisk/_private/Programming/Set-of-LP-Problems/Rnd-LP/"
 
@@ -31,7 +31,7 @@ This source code has been produced with using BSF-skeleton
 #include "_Problems20-1.h"
 #define PP_PATH "D:/YandexDisk/_private/Programming/Set-of-LP-Problems/Rnd-LP/"
 
-/**
+/**/
 #include "_Problems-Klee-Minty-Cube.h"
 #define PP_PATH "D:/YandexDisk/_private/Programming/Set-of-LP-Problems/Klee-Minty-Cube/"
 
@@ -52,7 +52,7 @@ This source code has been produced with using BSF-skeleton
 //================================ Problem Paramrters ===========================
 #define PP_MM							(2*PP_M+2*PP_N)	// Maximal number of inequalities
 #define PP_MAX_ITER_COUNT				10000000000		// Maximal count of iterations
-#define PP_MAX_PSEUDOPROJECTING_ITER	10000000		// Maximum acceptable number of iterations in SF::PseudoprojectionOnFlat()
+#define PP_MAX_PSEUDOPROJECTING_ITER	100000000		// Maximum acceptable number of iterations in SF::PseudoprojectionOnFlat()
 #define PP_DBL_MAX						1E+308			// Highest value
 #define PP_RND_MAX						32767			// This is necessary for compatibility with different compilers
 //-------------------------- Input/Outpoot Parameters ---------------------------

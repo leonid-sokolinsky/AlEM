@@ -1,6 +1,6 @@
 /*==============================================================================
 Project: LiFe - New Linear Programming Solvers
-Theme: AlEM - Along Edges Movement Method (MPI)
+Theme: AlEM - Along Edges Movement method (MPI)
 Module: Problems15-1.h (LP problems of dimension 15 with 1 randome inequality)
 Prefix: PP
 Authors: Alexander E. Zhulev & Leonid B. Sokolinsky

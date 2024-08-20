@@ -63,7 +63,7 @@ This include file is part of Problem-Parameters.h
 // New vertex:                    0               0               0               0            3125
 //=============================================================================
 
-/*============================== Klee-Minty6 LP problem ==============================*
+/*============================== Klee-Minty6 LP problem ==============================*/
 // Starting point:	0 ... 0
 // Exact solution:	0 ... 0	15625
 #define PP_PROBLEM_NAME	"Klee-Minty6"
@@ -170,7 +170,7 @@ This include file is part of Problem-Parameters.h
 // New vertex:                    0               0               0               0               0               0           78125
 //=============================================================================
 
-/*============================== Klee-Minty8 LP problem =======================*/
+/*============================== Klee-Minty8 LP problem =======================*
 // Starting point:	0 ... 0
 // Exact solution:	0 ... 0	390625
 // Computed objective value: 389984.9953464441

@@ -1,6 +1,6 @@
 /*==============================================================================
 Project: LiFe - New Linear Programming Solvers
-Theme: AlEM - Along Edges Movement Method (No MPI)
+Theme: AlEM - Along Edges Movement method (No MPI)
 Module: Problem-Parameters.h (Problem Parameters)
 Prefix: PP
 Authors: Alexander E. Zhulev & Leonid B. Sokolinsky
@@ -41,11 +41,11 @@ This source code has been produced with using BSF-skeleton
 
 /*---------------------------------------------------------------------*/
 
-#define PP_METHOD_NAME "AlEM"
+#define PP_METHOD_NAME "AlEM (no MPI)"
 
 //-------------------------- Compilation Modes -----------------------
 #define PP_DEBUG
-#define PP_MATRIX_OUTPUT
+//#define PP_MATRIX_OUTPUT
 //#define PP_SAVE_RESULT
 #define PP_NO_MPI
 

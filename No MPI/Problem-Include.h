@@ -1,6 +1,6 @@
 /*==============================================================================
 Project: LiFe - New Linear Programming Solvers
-Theme: AlEM - Along Edges Movement Method (No MPI)
+Theme: AlEM - Along Edges Movement method (No MPI)
 Module: Problem-Include.h ("Includ" Files of the Problem)
 Authors: Alexander E. Zhulev & Leonid B. Sokolinsky
 This source code has been produced with using BSF-skeleton
