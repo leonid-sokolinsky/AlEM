@@ -91,6 +91,7 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 	int edgeCode = *mapElem->edgeCode;
 	double* u_cur = BSF_sv_parameter.u_cur;	// Current vertex
 	double* u_nex = reduceElem->u_nex;		// Next vertex
+	double norm_d;
 	PT_vector_T v;	// v = u + PD_objVector (||PD_objVector|| = PP_OBJECTIVE_VECTOR_LENGTH)
 	PT_vector_T w;	// pseudiprojection of v
 	PT_vector_T d;	// direction vector
@@ -131,13 +132,16 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 	Vector_Round(w, PP_EPS_PROJECTION_ROUND * 10);
 	Vector_Subtraction(w, u_cur, d);
 
-	double norm_d = Vector_Norm(d);
+	norm_d = Vector_Norm(d);
 	if (norm_d < PP_EPS_ZERO) {
 		/*DEBUG PC_bsf_MapF**
 		#ifdef PP_DEBUG
 				cout << "\t\t\t\t\t\t\t\t\t\t\t\t\t||d|| = ||w - u_cur|| < PP_EPS_ZERO ===>>> movement is impossible.\n";
 		#endif // PP_DEBUG /**/
 		reduceElem->objF_nex = -PP_INFINITY;
+#ifdef PP_GRADIENT
+		reduceElem->objF_grd = -PP_INFINITY;
+#endif // PP_GRADIENT
 		return;
 	}
 
@@ -149,6 +153,9 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 		cout << "\t\t\t\t\t\t\t\t\t\t\t\t\t||u_nex - u_cur|| < PP_EPS_ZERO ===>>> movement is impossible.\n";
 		#endif // PP_DEBUG /**/
 		reduceElem->objF_nex = -PP_INFINITY;
+#ifdef PP_GRADIENT
+		reduceElem->objF_grd = -PP_INFINITY;
+#endif // PP_GRADIENT
 		return;
 	}
 
@@ -160,18 +167,29 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 				cout << "\tnot in feasible polytope ===>>> movement is impossible." << endl;
 		#endif // PP_DEBUG /**/
 		reduceElem->objF_nex = -PP_INFINITY;
+#ifdef PP_GRADIENT
+		reduceElem->objF_grd = -PP_INFINITY;
+#endif // PP_GRADIENT
 		return;
 	}
 
-
 	reduceElem->objF_nex = ObjF(u_nex);
+
+#ifdef PP_GRADIENT
+	PT_vector_T u_grd;
+	Shift(u_cur, d, 1 / norm_d, u_grd);
+	reduceElem->objF_grd = ObjF(u_grd);
+#endif // PP_GRADIENT
 
 	/*DEBUG PC_bsf_MapF**
 	#ifdef PP_DEBUG
 		cout << "u_nex = ";
 		Print_Vector(u_nex);
-		cout << "\tF(u_nex) ="
-			<< setw(PP_SETW) << reduceElem->objF_nex << "\t\t---> Movement is possible." << endl;
+	#ifdef PP_GRADIENT
+	cout << "\tF(u_grd) =" << setw(PP_SETW) << reduceElem->objF_grd << "\t\t---> Movement is possible." << endl;
+	#else
+	cout << "\tF(u_nex) =" << setw(PP_SETW) << reduceElem->objF_nex << "\t\t---> Movement is possible." << endl;
+	#endif // PP_GRADIENT
 	#endif // PP_DEBUG /**/
 } // end PC_bsf_MapF
 
@@ -217,7 +235,13 @@ void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
 	cout << "Conversion mode: simple (with preservation of free variables)" << endl;
 #else
 	cout << "Conversion mode: full (with elimination of free variables)" << endl;
-#endif
+#endif // PP_SIMPLE_CONVERSION
+
+#ifdef PP_GRADIENT
+	cout << "Optimization: the best gradient" << endl;
+#else
+	cout << "Optimization: the best vertex" << endl;
+#endif // PP_GRADIENT
 
 	cout << "Before conversion: m =\t" << PP_M << "\tn = " << PP_N << endl;
 	cout << "After conversion:  m =\t" << PD_m << "\tn = " << PD_n << endl;
@@ -330,6 +354,20 @@ void PC_bsf_ProcessResults_3(PT_bsf_reduceElem_T_3* reduceResult, int reduceCoun
 }
 
 void PC_bsf_ReduceF(PT_bsf_reduceElem_T* x, PT_bsf_reduceElem_T* y, PT_bsf_reduceElem_T* z) { // z = x + y
+#ifdef PP_GRADIENT
+	if (x->objF_grd > y->objF_grd) {
+		z->objF_grd = x->objF_grd;
+		z->objF_nex = x->objF_nex;
+		for (int j = 0; j < PD_n; j++)
+			(*z).u_nex[j] = (*x).u_nex[j];
+	}
+	else {
+		z->objF_grd = y->objF_grd;
+		z->objF_nex = y->objF_nex;
+		for (int j = 0; j < PD_n; j++)
+			(*z).u_nex[j] = (*y).u_nex[j];
+	}
+#else
 	if (x->objF_nex > y->objF_nex) {
 		z->objF_nex = x->objF_nex;
 		for (int j = 0; j < PD_n; j++)
@@ -340,6 +378,7 @@ void PC_bsf_ReduceF(PT_bsf_reduceElem_T* x, PT_bsf_reduceElem_T* y, PT_bsf_reduc
 		for (int j = 0; j < PD_n; j++)
 			(*z).u_nex[j] = (*y).u_nex[j];
 	}
+#endif // PP_GRADIENT
 }
 
 void PC_bsf_ReduceF_1(PT_bsf_reduceElem_T_1* x, PT_bsf_reduceElem_T_1* y, PT_bsf_reduceElem_T_1* z) {

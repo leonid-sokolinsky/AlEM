@@ -47,7 +47,7 @@ This source code has been produced with using BSF-skeleton
 #define PP_DEBUG
 //#define PP_MATRIX_OUTPUT
 //#define PP_SAVE_RESULT
-#define PP_NO_MPI
+//#define PP_GRADIENT
 
 //================================ Problem Paramrters ===========================
 #define PP_MM							(2*PP_M+2*PP_N)	// Maximal number of inequalities
