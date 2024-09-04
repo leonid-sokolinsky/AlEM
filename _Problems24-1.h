@@ -1,7 +1,7 @@
 /*==============================================================================
-Project: LiFe
-Theme: Edge movement method (No MPI)
-Module: Problems24-1.h (LP problems of dimension 24 with 1 randome inequality)
+Project: LiFe - New Linear Programming Solvers
+Theme: AlEM - Along Edges Movement method
+Module: _Problems24-1.h (LP problems of dimension 24 with 1 random inequality)
 Prefix: PP
 Authors: Alexander E. Zhulev & Leonid B. Sokolinsky
 This include file is part of Problem-Parameters.h

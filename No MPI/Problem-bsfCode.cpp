@@ -46,6 +46,7 @@ void PC_bsf_Init(bool* success) {
 	Vector_MakeLike(PD_c, PP_OBJECTIVE_VECTOR_LENGTH, PD_objVector);
 	PD_objF_cur = ObjF(PD_u_cur);
 	PreparationForIteration(PD_u_cur);
+	PD_ma = PD_n - 1;
 }
 
 void PC_bsf_IterInit(PT_bsf_parameter_T parameter) {
@@ -1820,7 +1821,6 @@ namespace PF {
 		PD_TWIDDLE_done = false;
 		PD_TWIDDLE_nextEdgeI = 0;
 		TWIDDLE_Make_p(PD_TWIDDLE_p, PD_mh, PD_n - 1);
-		PD_ma = PD_n - 1;
 	}
 
 	static inline void Print_Number_of_edges(PT_vector_T x) {

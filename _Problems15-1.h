@@ -1,7 +1,7 @@
 /*==============================================================================
 Project: LiFe - New Linear Programming Solvers
-Theme: AlEM - Along Edges Movement method (MPI)
-Module: Problems15-1.h (LP problems of dimension 15 with 1 randome inequality)
+Theme: AlEM - Along Edges Movement method
+Module: _Problems15-1.h (LP problems of dimension 15 with 1 random inequality)
 Prefix: PP
 Authors: Alexander E. Zhulev & Leonid B. Sokolinsky
 This include file is part of Problem-Parameters.h
