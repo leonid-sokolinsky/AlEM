@@ -19,7 +19,6 @@ Initial surface points for these problems were calculated using BSF-Apex-Quest.
 //-----------------------------------------------------------------------
 #define PP_EPS_ZERO					1E-9				// Accuracy for comparison with zero
 #define PP_EPS_POINT_IN_HALFSPACE	1E-8				// Precision for point to be in halfspace
-//#define PP_EPS_MOVING_ON_POLYTOPE	(PP_EPS_ZERO/100)	// Precision for moving on polytope (affects Shift = 0)
 #define PP_EPS_PROJECTION_ROUND		PP_EPS_ZERO			// Precision of rounding pseudoprojecting vectors
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+9				// Length of Objective Vector
 //-------------------------------------------------------------------------------

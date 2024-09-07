@@ -532,97 +532,6 @@ namespace SF {
 		}
 	}
 
-	static inline void MovingOnPolytope(PT_vector_T startPoint, PT_vector_T directionVector, PT_vector_T finishPoint, double epsMoving) {
-		double leftBound = 0;
-		double rightBound = PP_DBL_MAX;
-		double factor = 1;
-		double delta;
-
-		assert(Vector_Norm(directionVector) >= PP_EPS_ZERO);
-
-		delta = factor / 2;
-
-		while (rightBound - leftBound >= PP_EPS_ZERO && delta > 0) {
-			Shift(startPoint, directionVector, factor, finishPoint);
-			if (PointBelongsPolytope(finishPoint, PP_EPS_POINT_IN_HALFSPACE)) {
-				leftBound = factor;
-				delta *= 2;
-				factor += delta;
-			}
-			else {
-				rightBound = factor;
-				delta /= 2;
-				factor -= delta;
-			}
-		}
-
-		Shift(startPoint, directionVector, factor, finishPoint);
-		delta = epsMoving;
-		while (!PointBelongsPolytope(finishPoint, epsMoving) && delta > 0) {
-			factor -= delta;
-			delta *= 2;
-			Shift(startPoint, directionVector, factor, finishPoint);
-		}
-	}
-
-	static inline void MovingToPolytope(PT_vector_T startPoint, PT_vector_T directionVector, PT_vector_T finishPoint, double epsMoving) {
-		double leftBound = 0;
-		double rightBound = PP_DBL_MAX;
-		double factor = 1;
-		double delta;
-		static int outerHalspace_i[PP_MM];	// Index of out half-spaces
-		int mo;								// Number of out half-spaces
-		bool pointInsideCone;
-
-		assert(Vector_Norm(directionVector) >= PP_EPS_ZERO);
-
-		mo = 0;
-		for (int i = 0; i < PD_m; i++)
-			if (!PointBelongsHalfspace_i(startPoint, i, PP_EPS_POINT_IN_HALFSPACE)) {
-				outerHalspace_i[mo] = i;
-				mo++;
-			}
-
-		delta = factor / 2;
-
-		while (rightBound - leftBound >= PP_EPS_ZERO && delta > 0) {
-			Shift(startPoint, directionVector, factor, finishPoint);
-
-			pointInsideCone = true;
-			for (int i = 0; i < mo; i++)
-				if (PointBelongsHalfspace_i(finishPoint, outerHalspace_i[i], PP_EPS_POINT_IN_HALFSPACE)) {
-					pointInsideCone = false;
-					break;
-				}
-			if (pointInsideCone) {
-				leftBound = factor;
-				delta *= 2;
-				factor += delta;
-			}
-			else {
-				rightBound = factor;
-				delta /= 2;
-				factor -= delta;
-				assert(factor > 0);
-			}
-		}
-
-		Shift(startPoint, directionVector, factor, finishPoint);
-		delta = epsMoving;
-		do {
-			pointInsideCone = false;
-			for (int i = 0; i < mo; i++)
-				if (!PointBelongsHalfspace_i(finishPoint, outerHalspace_i[i], epsMoving)) {
-					pointInsideCone = true;
-					factor -= delta;
-					delta *= 2;
-					assert(factor > 0);
-					Shift(startPoint, directionVector, factor, finishPoint);
-					break;
-				}
-		} while (pointInsideCone && delta > 0);
-	}
-
 	static void MTX_Conversion() { // Transformation to inequalities & dimensionality reduction
 		int m_equation = PD_m;
 		int m_inequality;
@@ -1672,7 +1581,7 @@ namespace SF {
 namespace PF {
 	using namespace SF;
 
-	static inline unsigned long long BinomialCoefficient(int n, int k) {
+	static inline unsigned long long BinomialCoefficient(int n, int k) { // https://habr.com/ru/articles/274689/
 		unsigned long long res = 1;
 		if (k > n / 2) k = n - k;
 		if (k == 1)  return n;

@@ -69,7 +69,7 @@ This source code has been produced with using BSF-skeleton
 #define PP_MTX_POSTFIX_SO	"_so.mtx"	// Solution point
 #define PP_MTX_POSTFIX_U0	"_u0.mtx"	// Starting point
 //-------------------------- Jobs  -----------------------
-#define PP_JOB_GET_BEST_DIRECTION	0 
+// Not used.
 //------------- Locations -------------
 #define PP_DEGENERATE_INEQUALITY	0
 #define PP_ON_HYPERPLANE			1
