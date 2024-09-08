@@ -268,7 +268,7 @@ void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
 	else
 		cout << "u0 belongs to feasible polytope.\n";
 	cout << "Including hyperplanes:\t"; Print_HyperplanesIncludingPoint(PD_u_cur, PP_EPS_POINT_IN_HALFSPACE); cout << endl;
-	cout << "Including edges:\t"; Print_Number_of_edges(PD_u_cur);
+	cout << "Number of edges:\t"; Print_Number_of_edges(PD_u_cur);
 #endif // PP_DEBUG
 }
 
