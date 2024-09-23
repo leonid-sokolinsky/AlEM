@@ -13,31 +13,35 @@ This source code has been produced with using BSF-skeleton
 
 /**
 #include "_Problems05-1.h"
-#define PP_PATH "D:/YandexDisk/_private/Programming/Set-of-LP-Problems/Rnd-LP/"
+#define PP_PATH "../../Set-of-LP-Problems/Rnd-LP/"
 
 /**
 #include "_Problems10-1.h"
-#define PP_PATH "D:/YandexDisk/_private/Programming/Set-of-LP-Problems/Rnd-LP/"
+#define PP_PATH "../../Set-of-LP-Problems/Rnd-LP/"
 
 /**
 #include "_Problems15-1.h"
-#define PP_PATH "D:/YandexDisk/_private/Programming/Set-of-LP-Problems/Rnd-LP/"
+#define PP_PATH "../../Set-of-LP-Problems/Rnd-LP/"
 
 /**
 #include "_Problems16.24-0.h"
-#define PP_PATH "D:/YandexDisk/_private/Programming/Set-of-LP-Problems/Rnd-LP/"
+#define PP_PATH "../../Set-of-LP-Problems/Rnd-LP/"
 
 /**
 #include "_Problems20-1.h"
-#define PP_PATH "D:/YandexDisk/_private/Programming/Set-of-LP-Problems/Rnd-LP/"
+#define PP_PATH "../../Set-of-LP-Problems/Rnd-LP/"
+
+/**
+#include "_Problems-Klee-Minty-Cube.h"
+#define PP_PATH "../../Set-of-LP-Problems/Klee-Minty-Cube/"
 
 /**/
-#include "_Problems-Klee-Minty-Cube.h"
-#define PP_PATH "D:/YandexDisk/_private/Programming/Set-of-LP-Problems/Klee-Minty-Cube/"
+#include "_Problems-NetLib-LP.h"
+#define PP_PATH "../../Set-of-LP-Problems/NetLib-LP/"
 
 /**
 #include "_Problems-Miscellaneous.h"
-#define PP_PATH "D:/YandexDisk/_private/Programming/Set-of-LP-Problems/Miscellaneous-LP/"
+#define PP_PATH "../../Set-of-LP-Problems/Miscellaneous-LP/"
 
 /*---------------------------------------------------------------------*/
 
@@ -47,7 +51,7 @@ This source code has been produced with using BSF-skeleton
 #define PP_DEBUG
 //#define PP_MATRIX_OUTPUT
 //#define PP_SAVE_RESULT
-//#define PP_GRADIENT
+#define PP_GRADIENT
 
 //================================ Problem Paramrters ===========================
 #define PP_MM							(2*PP_M+2*PP_N)	// Maximal number of inequalities
@@ -55,6 +59,7 @@ This source code has been produced with using BSF-skeleton
 #define PP_MAX_PSEUDOPROJECTING_ITER	100000000		// Maximum acceptable number of iterations in SF::PseudoprojectionOnFlat()
 #define PP_DBL_MAX						1E+308			// Highest value
 #define PP_RND_MAX						32767			// This is necessary for compatibility with different compilers
+#define PP_INT_MAX						2147483647
 //-------------------------- Input/Outpoot Parameters ---------------------------
 #define PP_OUTPUT_LIMIT	30	// Number of Elements to output
 #define PP_SETW 16
@@ -68,6 +73,11 @@ This source code has been produced with using BSF-skeleton
 #define PP_MTX_POSTFIX_LO	"_lo.mtx"
 #define PP_MTX_POSTFIX_SO	"_so.mtx"	// Solution point
 #define PP_MTX_POSTFIX_U0	"_u0.mtx"	// Starting point
+//------------------------- MPS format ----------------
+#define PP_MPS_PREFIX		"lp_"
+#define PP_MPS_EXTENSION	".mps"
+#define PP_MAX_NUMBER_OF_ROWS	(PP_M+2)
+#define PP_MAX_NUMBER_OF_COLS	(PP_N*(PP_M+1)+1)
 //-------------------------- Jobs  -----------------------
 // Not used.
 //------------- Locations -------------
