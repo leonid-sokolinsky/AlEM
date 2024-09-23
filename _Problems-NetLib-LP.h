@@ -38,7 +38,8 @@ LP problems were obtained using BSF-LPP-Generator.
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+7			// Length of Objective Vector
 #define PP_PROBE_LENGTH				0.001			// Length of probe shift
 #define PP_REAL_TIME				500				// This parameter limits the calculation time (compilator limit: 2 147 483 647)
-#define PP_KK						2047			// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
+#define PP_KK						20000	// Maximal number of edges that include surface point (compilator limit:	2 147 483 647)
+
 //--------------------------------------------------------------------------
 
 /*============================== beaconfd LP problem ==================*
