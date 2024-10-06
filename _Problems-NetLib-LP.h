@@ -26,7 +26,7 @@ LP problems were obtained using BSF-LPP-Generator.
 #define PP_REAL_TIME				100				// This parameter limits the calculation time (compilator limit: 2 147 483 647)
 //--------------------------------------------------------------------------
 
-/*============================== afiro LP problem ==================*/
+/*============================== afiro LP problem ==================*
 #define PP_PROBLEM_NAME	"afiro"
 #define PP_M 27		// Number of equations (number of rows in *.mtx)
 #define PP_N 51		// Number of variables (number of cols in *.mtx)
@@ -38,8 +38,7 @@ LP problems were obtained using BSF-LPP-Generator.
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+7			// Length of Objective Vector
 #define PP_PROBE_LENGTH				0.001			// Length of probe shift
 #define PP_REAL_TIME				500				// This parameter limits the calculation time (compilator limit: 2 147 483 647)
-#define PP_KK						20000	// Maximal number of edges that include surface point (compilator limit:	2 147 483 647)
-
+#define PP_KK						28048800	// Maximal number of edges that include surface point (compilator limit:	2 147 483 647)
 //--------------------------------------------------------------------------
 
 /*============================== beaconfd LP problem ==================*
@@ -130,35 +129,43 @@ LP problems were obtained using BSF-LPP-Generator.
 #define PP_EPS_COS					1E-2	// Precision for cos == 1
 #define PP_EPS_MOVING				(PP_EPS_ZERO/100)	// Precision for mooving
 #define PP_EPS_POINT_INSIDE_CONE	(PP_EPS_ZERO/100)	// Precision for point to be inside cone
-//-------------------------------------------------------------------------/**/
+//--------------------------------------------------------------------------
 
-/*============================== sc50a LP problem ==============================*
-// Distance to polytope: 9.98581046916478632388689e-08
+/*============================== sc50a LP problem ==========================*/
+// Number of equations: 20
+// Subspace dimension: 28
 #define PP_PROBLEM_NAME		"sc50a"
-#define PP_M 50	// Number of equations (number of rows in *.mtx)
-#define PP_N 78	// Number of variables (number of cols in *.mtx)
+#define PP_M 98	// Number of constraints
+#define PP_N 48	// Number of variables
+#define PP_MAX_OBJ_VALUE 64.575077058564509026860413914575	// Exact maximum value of objective function
 //--------------------------------------------------------------------------
-#define PP_EPS_ZERO					1E-9	// Accuracy for comparison with zero
-#define PP_EPS_POINT_IN_HALFSPACE	PP_EPS_ZERO		// Precision for point to be in halfspace
-#define PP_EPS_ON_HYPERPLANE		1E-7	// Accuracy of belonging to hyperplane
-#define PP_EPS_COS					1E-3	// Precision for cos == 1
-#define PP_EPS_MOVING				(PP_EPS_ZERO/100)	// Precision for mooving
-#define PP_EPS_POINT_INSIDE_CONE	(PP_EPS_ZERO/100)	// Precision for point to be inside cone
-//----------------------------------------------------------------------------/**/
+#define PP_EPS_ZERO					1E-9			// Precision for comparison with zero
+#define PP_EPS_POINT_IN_HALFSPACE	(PP_EPS_ZERO*10)// Precision for MakeHyperplaneList()
+#define PP_EPS_PROJECTION_ROUND		PP_EPS_ZERO		// Precision of rounding vector r
+#define PP_OBJECTIVE_VECTOR_LENGTH	1			// Length of Objective Vector
+#define PP_PROBE_LENGTH				0.001			// Length of probe shift
+#define PP_REAL_TIME				500				// This parameter limits the calculation time (compilator limit: 2 147 483 647)
+#define PP_KK						1107568			// Maximal number of edges that include surface point (compilator limit:	2 147 483 647)
+//--------------------------------------------------------------------------
 
-/*============================== sc50b LP problem ==============================*
-// Distance to polytope: 9.95749256169206670294823e-08
+/*============================== sc50b LP problem ==========================*
+// Number of equations: 20
+// Subspace dimension: 28
 #define PP_PROBLEM_NAME		"sc50b"
-#define PP_M 50		// Number of equations (number of rows in *.mtx)
-#define PP_N 78	// Number of variables (number of cols in *.mtx)
+#define PP_M 98	// Number of constraints
+#define PP_N 48		// Number of variables
+#define PP_MAX_OBJ_VALUE 70	// Exact maximum value of objective function
 //--------------------------------------------------------------------------
-#define PP_EPS_ZERO					1E-9	// Accuracy for comparison with zero
-#define PP_EPS_POINT_IN_HALFSPACE	PP_EPS_ZERO		// Precision for point to be in halfspace
-#define PP_EPS_ON_HYPERPLANE		1E-7	// Accuracy of belonging to polytope
-#define PP_EPS_COS					1E-2	// Precision for cos == 1
-#define PP_EPS_MOVING				(PP_EPS_ZERO/100)	// Precision for mooving
-#define PP_EPS_POINT_INSIDE_CONE	(PP_EPS_ZERO/100)	// Precision for point to be inside cone
-//----------------------------------------------------------------------------/**/
+#define PP_EPS_ZERO					1E-9			// Precision for comparison with zero
+#define PP_EPS_POINT_IN_HALFSPACE	(PP_EPS_ZERO*10)// Precision for MakeHyperplaneList()
+#define PP_EPS_PROJECTION_ROUND		PP_EPS_ZERO		// Precision of rounding vector r
+#define PP_OBJECTIVE_VECTOR_LENGTH	1E+7			// Length of Objective Vector
+#define PP_PROBE_LENGTH				0.001			// Length of probe shift
+#define PP_REAL_TIME				500				// This parameter limits the calculation time (compilator limit: 2 147 483 647)
+#define PP_KK						110			// Maximal number of edges that include surface point (compilator limit:	2 147 483 647)
+//--------------------------------------------------------------------------
+// Parameter PP_KK = 110 must be greater than or equal to 157890968768078210
+//--------------------------------------------------------------------------
 
 /*============================== sc105 LP problem ==============================*
 // Distance to polytope: 9.96588878084987247957247e-08

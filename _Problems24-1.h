@@ -15,7 +15,7 @@ Initial surface points for these problems were calculated using BSF-Apex-Quest.
 #define PP_EPS_P_PROJ_ON_EDGE			1E-12	// Precision for calculating pseudoprojection onto edge
 #define PP_EPS_P_PROJ_ON_POLYTOPE		1E-9	// Precision for calculating pseudoprojection onto edge
 #define PP_OBJECTIVE_VECTOR_LENGTH		100000	// Starting length of Objective Vector
-#define PP_EPS_MAKE_H_PLANE_LIST		1E-5	// Precision for MakePointHyperplaneList()
+#define PP_EPS_MAKE_H_PLANE_LIST		1E-5	// Precision for MakeNeHyperplaneList()
 #define PP_MAX_B_NO_CORRECT				200		// Maximum b that does not require correction
 #define PP_RND_EPS_POINT_IN_POLYTOPE	1E-6	// Precision for random inequality in PointInPolytope()
 #define PP_PROBE_LENGTH					1		// length of probe shift

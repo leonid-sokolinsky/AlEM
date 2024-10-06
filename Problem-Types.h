@@ -12,7 +12,7 @@ This source code has been produced with using BSF-skeleton
 //=========================== Problem Types =========================
 typedef double PT_matrix_T[PP_MM][PP_N];
 typedef double PT_vector_T[PP_N];
-typedef double	PT_column_T[PP_MM];
+typedef double PT_column_T[PP_MM];
 
 typedef char PT_MPS_name_T[9];
 
@@ -30,6 +30,11 @@ struct PT_MPS_column_T {
 };
 
 struct PT_MPS_upBound_T {
+	int varIndex;
+	double value;
+};
+
+struct PT_MPS_fxVariable_T {
 	int varIndex;
 	double value;
 };

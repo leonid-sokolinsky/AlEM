@@ -9,8 +9,6 @@ Initial surface points for these problems were calculated using BSF-Apex-Quest.
 ==============================================================================*/
 #pragma once
 
-#define PP_MPS_FORMAT
-
 //=========================== problem Parameters ========================
 // PP_OBJECTIVE_VECTOR_LENGTH - direct dependence on dimension PD_n.
 // P_EPS_ZERO - inverse dependence on PP_OBJECTIVE_VECTOR_LENGTH.
@@ -23,20 +21,49 @@ Initial surface points for these problems were calculated using BSF-Apex-Quest.
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+7			// Length of Objective Vector
 #define PP_PROBE_LENGTH				0.001			// Length of probe shift
 #define PP_REAL_TIME				500				// This parameter limits the calculation time (compilator limit: 2 147 483 647)
-#define PP_KK						2047			// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
+#define PP_KK						100			// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
 //-------------------------------------------------------------------------------
 
 /*============================== simpleCube LP problem ==========================*
+#define PP_MPS_FORMAT
 #define PP_PROBLEM_NAME	"simpleCube"
-#define PP_M 3		// Number of equations (number of rows in *.mtx)
-#define PP_N 6		// Number of variables (number of cols in *.mtx)
+#ifdef PP_MPS_FORMAT
+#define PP_M 3		// Number of constrains
+#define PP_N 3		// Number of variables
+#else
+#define PP_M 3	// Number of rows in *.mtx
+#define PP_N 6	// Number of cols in *.mtx
+#endif
 #define PP_MAX_OBJ_VALUE 		60000
+//-------------------------------------------------------------------------------
+
+/*============================== cubeInHyperplane LP problem ===================*
+#define PP_MPS_FORMAT
+#define PP_PROBLEM_NAME	"cubeInHyperplane"
+#define PP_M 4		// Number of constrains
+#define PP_N 4		// Number of variables
+#define PP_MAX_OBJ_VALUE 		30000
+//-------------------------------------------------------------------------------
+
+/*============================== simple1FxVar LP problem =============================*/
+// Simple LP problem & x_1=150
+#define PP_MPS_FORMAT
+#define PP_PROBLEM_NAME	"simple1FxVar"
+#define PP_M 5		// Number of constraints
+#define PP_N 8		// Number of variables
+#define PP_MAX_OBJ_VALUE 52500
 //-------------------------------------------------------------------------------
 
 /*============================== simple1 LP problem =============================*
 #define PP_PROBLEM_NAME	"simple1"
-#define PP_M 4		// Number of equations (number of rows in *.mtx)
-#define PP_N 7		// Number of variables (number of cols in *.mtx)
+#define PP_MPS_FORMAT
+#ifdef PP_MPS_FORMAT
+#define PP_M 7		// Number of constrains
+#define PP_N 3		// Number of variables
+#else
+#define PP_M 4		// Number of rows in *.mtx
+#define PP_N 7		// Nnumber of cols in *.mtx
+#endif
 #define PP_MAX_OBJ_VALUE 		55000
 //-------------------------------------------------------------------------------
 
@@ -51,16 +78,28 @@ Initial surface points for these problems were calculated using BSF-Apex-Quest.
 /*============================== simple2 LP problem =============================*
 // Simple LP problem & x_3=200; x_2>=110; x_0<=190
 #define PP_PROBLEM_NAME	"simple2"
-#define PP_M 5		// Number of equations (number of rows in *.mtx)
-#define PP_N 8		// Number of variables (number of cols in *.mtx)
+#define PP_MPS_FORMAT
+#ifdef PP_MPS_FORMAT
+#define PP_M 10		// Number of constrains
+#define PP_N 4		// Number of variables
+#else
+#define PP_M 5		// Number of rows in *.mtx
+#define PP_N 8		// Nnumber of cols in *.mtx
+#endif
 #define PP_MAX_OBJ_VALUE 		63500
 //-------------------------------------------------------------------------------
 
-/*============================== simple3 LP problem =============================*/
+/*============================== simple3 LP problem =============================*
 #define PP_PROBLEM_NAME	"simple3"
-#define PP_M 6		// Number of equations (number of rows in *.mtx)
-#define PP_N 8		// Number of variables (number of cols in *.mtx)
-#define PP_MAX_OBJ_VALUE 		60000
+#define PP_MPS_FORMAT
+#ifdef PP_MPS_FORMAT
+#define PP_M 11		// Number of constrains
+#define PP_N 5		// Number of variables
+#else
+#define PP_M 6		// Number of rows in *.mtx
+#define PP_N 8		// Nnumber of cols in *.mtx
+#endif
+#define PP_MAX_OBJ_VALUE 		55000
 //-------------------------------------------------------------------------------
 
 /*============================== simple1min LP problem ==========================*

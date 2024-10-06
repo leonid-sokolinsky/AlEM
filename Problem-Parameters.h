@@ -51,13 +51,19 @@ This source code has been produced with using BSF-skeleton
 #define PP_DEBUG
 //#define PP_MATRIX_OUTPUT
 //#define PP_SAVE_RESULT
-#define PP_GRADIENT
+//#define PP_GRADIENT
+//#define MPS_MIN_OF_OBJECTIVE_FUNCTION
 
 //================================ Problem Paramrters ===========================
-#define PP_MM							(2*PP_M+2*PP_N)	// Maximal number of inequalities
+#ifdef PP_MPS_FORMAT
+#define PP_MM							(PP_M+PP_N)		// Maximal number of inequalities
+#else
+#define PP_MM							(PP_M+PP_N)		// Maximal number of inequalities
+#endif // PP_MPS_FORMAT
+
 #define PP_MAX_ITER_COUNT				10000000000		// Maximal count of iterations
 #define PP_MAX_PSEUDOPROJECTING_ITER	100000000		// Maximum acceptable number of iterations in SF::PseudoprojectionOnFlat()
-#define PP_DBL_MAX						1E+308			// Highest value
+#define PP_DBL_MAX						1E+308			// Highest float value
 #define PP_RND_MAX						32767			// This is necessary for compatibility with different compilers
 #define PP_INT_MAX						2147483647
 //-------------------------- Input/Outpoot Parameters ---------------------------
