@@ -17,15 +17,15 @@ Initial surface points for these problems were calculated using BSF-Apex-Quest.
 //						calculating pseudoprojection.
 #define PP_EPS_ZERO					1E-9			// Precision for comparison with zero
 #define PP_EPS_POINT_IN_HALFSPACE	PP_EPS_ZERO		// Precision for MakeHyperplaneList()
+#define PP_EPS_ON_HYPERPLANE		PP_EPS_ZERO		// Accuracy of belonging to hyperplane
 #define PP_EPS_PROJECTION_ROUND		PP_EPS_ZERO		// Precision of rounding vector r
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+7			// Length of Objective Vector
 #define PP_PROBE_LENGTH				0.001			// Length of probe shift
-#define PP_REAL_TIME				500				// This parameter limits the calculation time (compilator limit: 2 147 483 647)
-#define PP_KK						100			// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
+#define PP_KK						100				// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
 //-------------------------------------------------------------------------------
 
 /*============================== simpleCube LP problem ==========================*
-#define PP_MPS_FORMAT
+//#define PP_MPS_FORMAT
 #define PP_PROBLEM_NAME	"simpleCube"
 #ifdef PP_MPS_FORMAT
 #define PP_M 3		// Number of constrains
@@ -45,7 +45,7 @@ Initial surface points for these problems were calculated using BSF-Apex-Quest.
 #define PP_MAX_OBJ_VALUE 		30000
 //-------------------------------------------------------------------------------
 
-/*============================== simple1FxVar LP problem =============================*/
+/*============================== simple1FxVar LP problem =============================*
 // Simple LP problem & x_1=150
 #define PP_MPS_FORMAT
 #define PP_PROBLEM_NAME	"simple1FxVar"
@@ -186,7 +186,7 @@ Initial surface points for these problems were calculated using BSF-Apex-Quest.
 #define PP_MAX_OBJ_VALUE 		852.0289179009729
 //------------------------------------------------------------------------------
 
-/*============================== rnd5-100 LP problem ===========================*
+/*============================== rnd5-100 LP problem ===========================*/
 #define PP_PROBLEM_NAME	"rnd5-100"
 #define PP_M 105		// Number of equations (number of rows in *.mtx)
 #define PP_N 110		// Number of variables (number of cols in *.mtx)

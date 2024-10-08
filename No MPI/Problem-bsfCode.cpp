@@ -23,6 +23,17 @@ void PC_bsf_CopyParameter(PT_bsf_parameter_T parameterIn, PT_bsf_parameter_T* pa
 }
 
 void PC_bsf_Init(bool* success) {
+
+	if (PP_KK > (PP_RND_MAX + 1))
+		if (PP_KK % (PP_RND_MAX + 1) != 0) {
+			int factor = PP_KK / (PP_RND_MAX + 1) + 1;
+			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
+				cout << "PP_KK must be multiple of " << (PP_RND_MAX + 1)
+				<< ". Use PP_KK = " << factor * (PP_RND_MAX + 1) << ".\n";
+			*success = false;
+			return;
+		}
+
 	PD_problemName = PP_PROBLEM_NAME;
 	PD_m = 0;
 	PD_n = 0;
@@ -231,7 +242,7 @@ void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
 
 #ifdef PP_MPS_FORMAT
 	cout << "Input format: MPS" << endl;
-	cout << "m =\t" << PD_m << "\tn = " << PD_n << endl;
+	cout << "m =\t" << PD_m << "\tn = " << PD_n << " (after conversion into standard form)" << endl;
 #else
 	cout << "Input format: MTX (with elimination of free variables)" << endl;
 	cout << "Before elimination: m =\t" << PP_M << "\tn = " << PP_N << endl;
@@ -278,19 +289,17 @@ void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
 #ifdef PP_MATRIX_OUTPUT
 	cout << "------- Matrix PD_A & Column PD_b -------" << endl;
 	Print_Constraints();
+	cout << "Obj Function:\t"; 	Print_Vector(PD_c); cout << endl;
+	cout << "u0 =\t\t"; Print_Vector(PD_u_cur); cout << "\tF(x) = " << setw(PP_SETW) << ObjF(PD_u_cur) << endl;
 #endif // PP_MATRIX_OUTPUT
-	cout << "Obj Function:\t";
-	Print_Vector(PD_c);
-	cout << endl;
-	cout << "u0 =\t\t";
-	Print_Vector(PD_u_cur); cout << "\tF(x) = " << setw(PP_SETW) << ObjF(PD_u_cur) << endl;
 
 #ifdef PP_DEBUG
 	if (!PointBelongsPolytope(PD_u_cur, PP_EPS_POINT_IN_HALFSPACE))
 		cout << "u0 is outside feasible polytope!!!\n";
 	else
 		cout << "u0 belongs to feasible polytope.\n";
-	cout << "Including hyperplanes:\t"; Print_HyperplanesIncludingPoint(PD_u_cur, PP_EPS_POINT_IN_HALFSPACE); cout << endl;
+	// cout << "Including hyperplanes:\t"; Print_HyperplanesIncludingPoint(PD_u_cur, PP_EPS_POINT_IN_HALFSPACE); cout << endl;
+	cout << "// Number of inequality hyperplanes including u0: " << Number_IncludingNeHyperplanes(PD_u_cur, PP_EPS_ON_HYPERPLANE) << endl;
 	cout << "Number of edges:\t"; Print_Number_of_edges(PD_u_cur);
 #endif // PP_DEBUG
 }
@@ -311,9 +320,8 @@ void PC_bsf_ProblemOutput(PT_bsf_reduceElem_T* reduceResult, int reduceCounter, 
 		cout << "Calculated solution point is saved into file *.so" << endl;
 #endif // PP_SAVE_RESULT
 
-	cout << "Solution point:\t";
-	Print_Vector(PD_u_cur);	cout << endl;
 #ifdef PP_DEBUG
+	// cout << "Solution point:\t"; Print_Vector(PD_u_cur);	cout << endl;
 	cout << "Distance to polytope: " << Distance_PointToPolytope(PD_u_cur) << endl;
 #endif // PP_DEBUG
 
@@ -792,9 +800,21 @@ namespace SF {
 				break;
 			default:
 				if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-					cout << "MPS__ReadRows: error - unpredictable row type " << row[i_row].type << endl;
+					cout << "MPS__MakeProblem error:Unpredictable row type " << row[i_row].type << endl;
 				return false;
 			}
+		}
+
+		if (PD_m != PP_M) {
+			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
+				cout << "MPS__MakeProblem error: Number of constraints in mps-file = " << PD_m << " not equal to PP_M = " << PP_M << ".\n";
+			return false;
+		}
+
+		if (PD_n != PP_N) {
+			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
+				cout << "MPS__MakeProblem error: Number of variables in mps-file = " << PD_n << " not equal to PP_M = " << PP_N << ".\n";
+			return false;
 		}
 
 		for (int j = 0; j < PD_n; j++) { // Adding lower bounds
@@ -1581,13 +1601,13 @@ namespace SF {
 
 		if (noc != PP_N) {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-				cout << "Invalid input data: PP_N must be = " << noc << "\n";
+				cout << "MTX_Load_A error: PP_N must be = " << noc << "\n";
 			return false;
 		}
 
 		if (nor != PP_M) {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-				cout << "Invalid input data: PP_M must be = " << nor << "\n";
+				cout << "MTX_Load_A error:  PP_M must be = " << nor << "\n";
 			return false;
 		}
 
@@ -2009,10 +2029,12 @@ namespace SF {
 		fsetpos(stream, &pos);
 	}
 
-	static inline int Number_IncludingHyperplanes(PT_vector_T x, double eps) {
+	static inline int Number_IncludingNeHyperplanes(PT_vector_T x, double eps) {
 		int number = 0;
 
 		for (int i = 0; i < PD_m; i++) {
+			if (PD_isEquation[i])
+				continue;
 			if (PointBelongsHyperplane_i(x, i, eps))
 				number++;
 		}
@@ -2320,6 +2342,13 @@ namespace SF {
 		} while (distSQR >= eps_distSQR);
 	}
 
+	static inline int rand_i(void) { // Returns random non-negative integer less than PP_INT_MAX
+		unsigned int randomValue;
+		rand_s(&randomValue);
+		randomValue = randomValue % PP_INT_MAX;
+		return (int)randomValue;
+	}
+
 	static inline double RelativeError(double trueValue, double calculatedValue) {
 		if (fabs(trueValue) >= PP_EPS_ZERO)
 			return fabs(calculatedValue - trueValue) / fabs(trueValue);
@@ -2491,70 +2520,17 @@ namespace PF {
 			edgeCodeList[k] = -1;
 		}
 
-		if (PP_KK <= (PP_RND_MAX + 1)) {
-			for (int k = 0; k < me; k++) {
-				index = rand() % PP_KK;
-				if (edgeCodeList[index] == -1)
-					edgeCodeList[index] = 0;
-				else {
-					for (int ki = 1; ki < PP_KK; ki++) {
-						if (edgeCodeList[(index + ki) % PP_KK] == -1) {
-							edgeCodeList[(index + ki) % PP_KK] = 0;
-							break;
-						}
-					}
-				}
-			}
+		assert(PP_KK <= PP_RND_MAX);
 
-			index = 0;
-			for (int k = 0; k < PP_KK; k++) {
-				if (edgeCodeList[k] == 0) {
-					edgeCodeList[k] = index;
-					index++;
-				}
-			}
-			return;
-		}
-
-		assert(PP_KK % (RAND_MAX + 1) == 0);
-		assert(me <= PP_KK);
-
-		int segmentCount = PP_KK / (PP_RND_MAX + 1);
-		int segment_me = me / (segmentCount - 1);
-		int remainder_me = me % segmentCount;
-
-		for (int l = 0; l < segmentCount - 1; l++) {
-			for (int k = l * segment_me; k < (l + 1) * segment_me; k++) {
-				index = rand() % (PP_RND_MAX + 1) + l * (PP_RND_MAX + 1);
-				if (edgeCodeList[index] == -1)
-					edgeCodeList[index] = 0;
-				else {
-					for (int ki = 1; ki < (PP_RND_MAX + 1); ki++) {
-						if (edgeCodeList[l * (PP_RND_MAX + 1) + (index + ki) % (PP_RND_MAX + 1)] == -1) {
-							edgeCodeList[l * (PP_RND_MAX + 1) + (index + ki) % (PP_RND_MAX + 1)] = 0;
-							break;
-						}
-					}
-				}
-			}
-		}
-
-		if (remainder_me != 0) {
-
-			assert(false); // You need to test the rest part of the function code
-
-			assert(1 + (segmentCount - 1) * segment_me <= me);
-
-			for (int k = (segmentCount - 1) * segment_me; k < me; k++) {
-				index = rand() % (PP_RND_MAX + 1) + (segmentCount - 1) * (PP_RND_MAX + 1);
-				if (edgeCodeList[index] == -1)
-					edgeCodeList[index] = 0;
-				else {
-					for (int ki = 1; ki < (PP_RND_MAX + 1); ki++) {
-						if (edgeCodeList[(segmentCount - 1) * (PP_RND_MAX + 1) + (index + ki) % (PP_RND_MAX + 1)] == -1) {
-							edgeCodeList[(segmentCount - 1) * (PP_RND_MAX + 1) + (index + ki) % (PP_RND_MAX + 1)] = 0;
-							break;
-						}
+		for (int k = 0; k < me; k++) {
+			index = rand() % PP_KK;
+			if (edgeCodeList[index] == -1)
+				edgeCodeList[index] = 0;
+			else {
+				for (int ki = 1; ki < PP_KK; ki++) {
+					if (edgeCodeList[(index + ki) % PP_KK] == -1) {
+						edgeCodeList[(index + ki) % PP_KK] = 0;
+						break;
 					}
 				}
 			}
@@ -2567,6 +2543,7 @@ namespace PF {
 				index++;
 			}
 		}
+		return;
 	}
 
 	static inline void PreparationForIteration(PT_vector_T u) {

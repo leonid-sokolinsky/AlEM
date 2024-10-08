@@ -64,7 +64,7 @@ namespace SF {
 	void	MTX_RemoveFreeVariables(void);
 	bool	MTX_SavePoint(PT_vector_T x, string postfix);
 	void	MTX_SkipComments(FILE* stream);
-	int		Number_IncludingHyperplanes(PT_vector_T x, double eps);
+	int		Number_IncludingNeHyperplanes(PT_vector_T x, double eps);
 	double	ObjF(PT_vector_T x);
 	void	ObliqueProjectingVectorOntoHalfspace_i(PT_vector_T z, int i, PT_vector_T g, PT_vector_T o, double eps, int* exitCode);
 	void	OrthogonalProjectingVectorOntoHalfspace_i(PT_vector_T z, int i, PT_vector_T r, double eps, int* exitcode);

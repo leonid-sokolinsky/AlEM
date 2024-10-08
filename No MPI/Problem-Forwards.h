@@ -64,7 +64,7 @@ namespace SF {
 	void	MTX_RemoveFreeVariables(void);
 	bool	MTX_SavePoint(PT_vector_T x, string postfix);
 	void	MTX_SkipComments(FILE* stream);
-	int		Number_IncludingHyperplanes(PT_vector_T x, double eps);
+	int		Number_IncludingNeHyperplanes(PT_vector_T x, double eps);
 	double	ObjF(PT_vector_T x);
 	void	ObliqueProjectingVectorOntoHalfspace_i(PT_vector_T z, int i, PT_vector_T g, PT_vector_T o, double eps, int* exitCode);
 	void	OrthogonalProjectingVectorOntoHalfspace_i(PT_vector_T z, int i, PT_vector_T r, double eps, int* exitcode);
@@ -84,6 +84,7 @@ namespace SF {
 	void	Print_Number_of_edges(PT_vector_T x);
 	void	Print_Vector(PT_vector_T x);
 	void	PseudoprojectionOnFlat(int* flatHyperplanes, int m_flat, PT_vector_T v, double eps, int maxProjectingIter, PT_vector_T w, int* success);
+	int		rand_i(void);
 	double	RelativeError(double trueValue, double calculatedValue);
 	void	Shift(PT_vector_T point, PT_vector_T shiftVector, double factor, PT_vector_T shiftedPoint);
 	void	Vector_Addition(PT_vector_T x, PT_vector_T y, PT_vector_T z);

@@ -35,10 +35,6 @@ This source code has been produced with using BSF-skeleton
 #include "../_Problems-Klee-Minty-Cube.h"
 #define PP_PATH "../../Set-of-LP-Problems/Klee-Minty-Cube/"
 
-/**
-#include "../_Problems-NetLib-LP.h"
-#define PP_PATH "../../Set-of-LP-Problems/NetLib-LP/"
-
 /**/
 #include "../_Problems-Miscellaneous.h"
 #define PP_PATH "../../Set-of-LP-Problems/Miscellaneous-LP/"
@@ -56,9 +52,9 @@ This source code has been produced with using BSF-skeleton
 
 //================================ Problem Paramrters ===========================
 #ifdef PP_MPS_FORMAT
-#define PP_MM							(PP_M+PP_N)		// Maximal number of inequalities
+#define PP_MM							(PP_M+3*PP_N)		// Maximal number of constraints
 #else
-#define PP_MM							(PP_M+PP_N)		// Maximal number of inequalities
+#define PP_MM							(PP_M+2*PP_N)		// Maximal number of constraints
 #endif // PP_MPS_FORMAT
 
 #define PP_MAX_ITER_COUNT				10000000000		// Maximal count of iterations
