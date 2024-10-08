@@ -24,16 +24,6 @@ void PC_bsf_CopyParameter(PT_bsf_parameter_T parameterIn, PT_bsf_parameter_T* pa
 
 void PC_bsf_Init(bool* success) {
 
-	if (PP_KK > (PP_RND_MAX + 1))
-		if (PP_KK % (PP_RND_MAX + 1) != 0) {
-			int factor = PP_KK / (PP_RND_MAX + 1) + 1;
-			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-				cout << "PP_KK must be multiple of " << (PP_RND_MAX + 1)
-				<< ". Use PP_KK = " << factor * (PP_RND_MAX + 1) << ".\n";
-			*success = false;
-			return;
-		}
-
 	PD_problemName = PP_PROBLEM_NAME;
 	PD_m = 0;
 	PD_n = 0;
