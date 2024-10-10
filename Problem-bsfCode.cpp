@@ -815,16 +815,16 @@ namespace SF {
 		PD_m += PD_n;
 
 		for (int j_up = 0; j_up < n_up; j_up++) { // Adding upper bounds
-			PD_A[PD_m + j_up][upBound[j_up].varIndex] = 1;
-			PD_b[PD_m + j_up] = upBound[j_up].value;
+			PD_A[PD_m][upBound[j_up].varIndex] = 1;
+			PD_b[PD_m] = upBound[j_up].value;
 			PD_m++;
 			assert(PD_m <= PP_MM);
 		}
 
 		for (int j_fx = 0; j_fx < n_fx; j_fx++) { // Adding fixed variables
-			PD_A[PD_m + j_fx][fxVariable[j_fx].varIndex] = 1;
-			PD_b[PD_m + j_fx] = fxVariable[j_fx].value;
-			PD_isEquation[PD_m + j_fx] = true;
+			PD_A[PD_m][fxVariable[j_fx].varIndex] = 1;
+			PD_b[PD_m] = fxVariable[j_fx].value;
+			PD_isEquation[PD_m] = true;
 			PD_m++;
 			assert(PD_m <= PP_MM);
 		}
@@ -1079,6 +1079,8 @@ namespace SF {
 	}
 
 	static inline bool MPS_AddEquation(PT_MPS_name_T rowName, double RHS_value, PT_MPS_column_T* column, int n_col) {
+		bool empty = true;
+
 		for (int i_col = 0; i_col < n_col; i_col++)
 			if (MPS_SameNames(column[i_col].rowName, rowName)) {
 				if (!PD_A[PD_m][column[i_col].j] == 0) {
@@ -1088,7 +1090,16 @@ namespace SF {
 					return false;
 				}
 				PD_A[PD_m][column[i_col].j] = column[i_col].value;
+				empty = false;
 			}
+		if (empty) {
+			if (RHS_value != 0) {
+				if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
+					cout << "MPS_AddEquation error: Zero row " << rowName << " has non-zero RHS value.\n";
+				return false;
+			}
+			return true;
+		}
 		PD_b[PD_m] = RHS_value;
 		PD_isEquation[PD_m] = true;
 		PD_m++;
@@ -1097,6 +1108,8 @@ namespace SF {
 	}
 
 	static inline bool MPS_AddInequality_G(PT_MPS_name_T rowName, double RHS_value, PT_MPS_column_T* column, int n_col) {
+		bool empty = true;
+
 		for (int i_col = 0; i_col < n_col; i_col++)
 			if (MPS_SameNames(column[i_col].rowName, rowName)) {
 				if (!PD_A[PD_m][column[i_col].j] == 0) {
@@ -1106,7 +1119,16 @@ namespace SF {
 					return false;
 				}
 				PD_A[PD_m][column[i_col].j] = -column[i_col].value;
+				empty = false;
 			}
+		if (empty) {
+			if (RHS_value != 0) {
+				if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
+					cout << "MPS_AddInequality_G error: Zero row " << rowName << " has non-zero RHS value.\n";
+				return false;
+			}
+			return true;
+		}
 		PD_b[PD_m] = -RHS_value;
 		PD_m++;
 		assert(PD_m < PP_MM);
@@ -1114,6 +1136,8 @@ namespace SF {
 	}
 
 	static inline bool MPS_AddInequality_L(PT_MPS_name_T rowName, double RHS_value, PT_MPS_column_T* column, int n_col) {
+		bool empty = true;
+
 		for (int i_col = 0; i_col < n_col; i_col++)
 			if (MPS_SameNames(column[i_col].rowName, rowName)) {
 				if (!PD_A[PD_m][column[i_col].j] == 0) {
@@ -1123,7 +1147,16 @@ namespace SF {
 					return false;
 				}
 				PD_A[PD_m][column[i_col].j] = column[i_col].value;
+				empty = false;
 			}
+		if (empty) {
+			if (RHS_value != 0) {
+				if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
+					cout << "MPS_AddInequality_L error: Zero row " << rowName << " has non-zero RHS value.\n";
+				return false;
+			}
+			return true;
+		}
 		PD_b[PD_m] = RHS_value;
 		PD_m++;
 		assert(PD_m <= PP_MM);
