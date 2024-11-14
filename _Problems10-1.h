@@ -16,55 +16,53 @@ Initial surface points for these problems were calculated using BSF-Apex-Quest.
 // PP_EPS_PROJECTION_ROUND - inverse dependence on PP_OBJECTIVE_VECTOR_LENGTH. 
 //						This parameter affects terminate condition when 
 //						calculating pseudoprojection.
-//-------------------------------------------------------------------------------
-#define PP_EPS_ZERO					1E-9				// Accuracy for comparison with zero
-#define PP_EPS_POINT_IN_HALFSPACE	PP_EPS_ZERO			// Precision for point to be in halfspace
-//#define PP_EPS_MOVING_ON_POLYTOPE	(PP_EPS_ZERO/100)	// Precision for moving on polytope (affects Shift = 0)
-#define PP_EPS_PROJECTION_ROUND		PP_EPS_ZERO			// Precision of rounding pseudoprojecting vectors
-#define PP_OBJECTIVE_VECTOR_LENGTH	1E+9				// Length of Objective Vector
-//-------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+#define PP_EPS_ZERO					1E-9			// Accuracy for comparison with zero
+#define PP_EPS_POINT_IN_HALFSPACE	(PP_EPS_ZERO*10)// Precision for MakeHyperplaneList()
+#define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*10)// Accuracy of belonging to hyperplane
+#define PP_EPS_PROJECTION_ROUND		PP_EPS_ZERO		// Precision of rounding pseudoprojecting vectors
+#define PP_OBJECTIVE_VECTOR_LENGTH	1E+10			// Length of Objective Vector
+//-----------------------------------------------------------------------------
 #define PP_KK	10		// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
 #define PP_M	11		// Number of equations (number of rows in *.mtx)
 #define PP_N	21		// Number of variables (number of cols in *.mtx)
-
-#define PP_PROBE_LENGTH			1		// Length of probe shift
-#define PP_START_SHIFT_LENGTH	100
-//-------------------------------------------------------------------------------
+#define PP_PROBE_LENGTH			0.001		// Length of probe shift
+//-----------------------------------------------------------------------------
 
 /*============================== rnd10-0 LP problem ==============================*/
 // Exact solution:	100  200  200  200  200  200  200  200  200  200
 #define PP_PROBLEM_NAME	"rnd10-0"
 #define PP_MAX_OBJ_VALUE 10900			
-//-------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 
 /*============================== rnd10-1-1 LP problem ============================*
 #define PP_PROBLEM_NAME	"rnd10-1-1"
 #define PP_MAX_OBJ_VALUE 9551.382889057777
-//-------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 
 /*============================== rnd10-1-2 LP problem ============================*
 #define PP_PROBLEM_NAME	"rnd10-1-2"
 #define PP_MAX_OBJ_VALUE 9123.80496737513
-//-------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 
 /*============================== rnd10-1-3 LP problem ============================*
 #define PP_PROBLEM_NAME	"rnd10-1-3"
 #define PP_MAX_OBJ_VALUE 9960.789316531023
-//-------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 
 /*============================== rnd10-1-4 LP problem ============================*
 #define PP_PROBLEM_NAME	"rnd10-1-4"
 #define PP_MAX_OBJ_VALUE 9440.134567875428
-//-------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 
 /*============================== rnd10-1-5 LP problem ============================*
 #define PP_PROBLEM_NAME	"rnd10-1-5"
 #define PP_MAX_OBJ_VALUE 10248.35536348364
-//-------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 
 /*============================== rnd10-1-6 LP problem ============================*
 #define PP_PROBLEM_NAME	"rnd10-1-6"
 #define PP_MAX_OBJ_VALUE 10022.93578020061
-//-------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 
 /*===============================================================================*/

@@ -24,6 +24,8 @@ namespace SF {
 	double	Distance_PointToPoint(PT_vector_T x, PT_vector_T y);
 	double	Distance_PointToPolytope(PT_vector_T x);
 	double	DistanceSQR_PointToPoint(PT_vector_T x, PT_vector_T y);
+	void	Flat_BIProjection(int* flatHyperplanes, int m_flat, PT_vector_T v, double eps, int maxProjectingIter, PT_vector_T w, int* success);
+	void	Flat_MaxProjection(int* flatHyperplanes, int m_flat, PT_vector_T v, double eps, int maxProjectingIter, PT_vector_T w, int* success);
 	void	JumpingOnPolytope(PT_vector_T startPoint, PT_vector_T directionVector, PT_vector_T finishPoint, double eps);
 	void	MakeColumnOfNorms(PT_matrix_T A, PT_column_T norm_a);
 	void	MakeListOfNotIncludingHalfspaces(PT_vector_T x, int* notIncludingHalfspacesList, double eps);
@@ -83,8 +85,6 @@ namespace SF {
 	void	Print_HyperplanesIncludingPoint(PT_vector_T x, double eps);
 	void	Print_Number_of_edges(PT_vector_T x);
 	void	Print_Vector(PT_vector_T x);
-	void	PseudoprojectionOnFlat(int* flatHyperplanes, int m_flat, PT_vector_T v, double eps, int maxProjectingIter, PT_vector_T w, int* success);
-	int		rand_i(void);
 	double	RelativeError(double trueValue, double calculatedValue);
 	void	Shift(PT_vector_T point, PT_vector_T shiftVector, double factor, PT_vector_T shiftedPoint);
 	void	Vector_Addition(PT_vector_T x, PT_vector_T y, PT_vector_T z);

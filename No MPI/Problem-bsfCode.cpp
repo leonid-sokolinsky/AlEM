@@ -140,7 +140,12 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 	#endif // PP_DEBUG /**/
 
 	Vector_Addition(u_cur, PD_objVector, v);
-	PseudoprojectionOnFlat(PD_edgeAllHyperplanes, (PD_n - 1), v, PP_EPS_PROJECTION_ROUND, PP_MAX_PSEUDOPROJECTING_ITER, w, success);
+
+#ifdef BIPROJECTION
+	Flat_BIProjection(PD_edgeAllHyperplanes, (PD_n - 1), v, PP_EPS_PROJECTION_ROUND, PP_MAX_PSEUDOPROJECTING_ITER, w, success);
+#else
+	Flat_MaxProjection(PD_edgeAllHyperplanes, (PD_n - 1), v, PP_EPS_PROJECTION_ROUND, PP_MAX_PSEUDOPROJECTING_ITER, w, success);
+#endif // BIPROJECTION
 
 	if (!*success) {
 		cout << "\n\nProcess " << BSF_sv_mpiRank
@@ -267,6 +272,12 @@ void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
 	cout << "Optimization: the best vertex" << endl;
 #endif // PP_GRADIENT
 
+#ifdef BIPROJECTION
+	cout << "Pseudoprojection method: BIP" << endl;
+#else
+	cout << "Pseudoprojection method: Max" << endl;
+#endif // BIPROJECTION
+
 	cout << "PP_EPS_ZERO\t\t\t" << PP_EPS_ZERO << endl;
 	cout << "PP_EPS_POINT_IN_HALFSPACE\t" << PP_EPS_POINT_IN_HALFSPACE << endl;
 	cout << "PP_EPS_PROJECTION_ROUND\t\t" << PP_EPS_PROJECTION_ROUND << endl;
@@ -337,24 +348,22 @@ void PC_bsf_ProcessResults(PT_bsf_reduceElem_T* reduceResult, int reduceCounter,
 	}
 
 	if (RelativeError(PD_objF_cur, reduceResult->objF_nex) < PP_EPS_ZERO) {
-		/*DEBUG PC_bsf_ProcessResults*/
+		/*DEBUG PC_bsf_ProcessResults**
 #ifdef PP_DEBUG
-		cout << "u_nex =\t    ";
-		Print_Vector(reduceResult->u_nex);
-		cout << "\tF(u_nex) = " << setw(PP_SETW) << reduceResult->objF_nex << endl;
+		//cout << "u_nex =\t    "; Print_Vector(reduceResult->u_nex); cout << "\t";
+		cout << "F(u_nex) = " << setw(PP_SETW) << reduceResult->objF_nex << endl;
 		cout << "|F(u_cur)-F(u_nex)|/|F(F(u_cur))| = " << RelativeError(PD_objF_cur, reduceResult->objF_nex) << " < PP_EPS_ZERO = " << PP_EPS_ZERO << " ===>>> movement is impossible.\n";
 #endif // PP_DEBUG /**/
 
-		* toExit = true;
+		*toExit = true;
 		return;
 	}
 
-
 #ifdef PP_DEBUG
 	cout << "_________________________________________________ " << PD_iterNo << " _____________________________________________________" << endl;
-	cout << "u_nex:\t";
-	Print_Vector(reduceResult->u_nex); cout << "\tF(u_nex) = " << reduceResult->objF_nex << endl;
-	cout << "u_nex hyperplanes:\t"; Print_HyperplanesIncludingPoint(reduceResult->u_nex, PP_EPS_POINT_IN_HALFSPACE); cout << endl;
+	//cout << "u_nex:\t"; Print_Vector(reduceResult->u_nex);  cout << "\t";
+	cout << "F(u_nex) = " << reduceResult->objF_nex << endl;
+	//cout << "u_nex hyperplanes:\t"; Print_HyperplanesIncludingPoint(reduceResult->u_nex, PP_EPS_POINT_IN_HALFSPACE); cout << endl;
 #endif // PP_DEBUG
 
 	Vector_Copy(reduceResult->u_nex, PD_u_cur);
@@ -494,6 +503,91 @@ namespace SF {
 		PT_vector_T z;
 		Vector_Subtraction(x, y, z);
 		return Vector_NormSquare(z);
+	}
+
+	static inline void Flat_BIProjection(int* flatHyperplanes, int m_flat, PT_vector_T v, double eps, int maxProjectingIter, PT_vector_T w, int* success) {
+		PT_vector_T r;
+		PT_vector_T w_previous;
+		double dist;
+		int iterCount = 0;
+
+		Vector_Copy(v, w);
+		*success = true;
+
+		do {
+			Vector_Zeroing(r);
+			Vector_Copy(w, w_previous);
+
+			for (int i = 0; i < m_flat; i++) {
+				PT_vector_T p;
+				OrthogonalProjectingVectorOntoHyperplane_i(w, flatHyperplanes[i], p);
+				Vector_PlusEquals(r, p);
+			}
+
+			Vector_DivideEquals(r, m_flat);
+			Vector_Round(r, eps);
+			Vector_PlusEquals(w, r);
+
+			iterCount++;
+			if (iterCount > maxProjectingIter) {
+				*success = false;
+				break;
+			}
+			dist = Distance_PointToPoint(w, w_previous);
+		} while (dist >= eps);
+		/*DEBUG PC_bsf_MapF**
+#ifdef PP_DEBUG
+		cout << "Flat_BIProjection: iterCount = " << iterCount << endl;
+#endif // PP_DEBUG /**/
+	}
+
+	static inline void Flat_MaxProjection(int* flatHyperplanes, int m_flat, PT_vector_T v, double eps, int maxProjectingIter, PT_vector_T w, int* success) {
+		PT_vector_T w_previous;
+		PT_vector_T w_max;
+		double dist;
+		double max_dist;
+		int max_i;
+		int iterCount = 0;
+
+		Vector_Copy(v, w);
+		*success = true;
+
+		do {
+			Vector_Copy(w, w_previous);
+
+			max_dist = 0;
+			max_i = -1;
+			for (int i = 0; i < m_flat; i++) {
+				PT_vector_T p;
+				OrthogonalProjectingVectorOntoHyperplane_i(w, flatHyperplanes[i], p);
+				dist = Vector_Norm(p);
+				if (dist >= max_dist + PP_EPS_ZERO) {
+					Vector_Addition(w, p, w_max);
+					max_dist = dist;
+					max_i = i;
+				}
+			}
+
+			if (max_i < 0) {
+				/*DEBUG PC_bsf_MapF**
+#ifdef PP_DEBUG
+				cout << "Flat_MaxProjection: iterCount = " << iterCount << endl;
+#endif // PP_DEBUG /**/
+				return;
+			}
+
+			Vector_Copy(w_max, w);
+			iterCount++;
+			if (iterCount > maxProjectingIter) {
+				*success = false;
+				break;
+			}
+			dist = Distance_PointToPoint(w, w_previous);
+		} while (dist >= eps);
+		/*DEBUG PC_bsf_MapF**
+#ifdef PP_DEBUG
+		cout << "Flat_MaxProjection: iterCount = " << iterCount << endl;
+#endif // PP_DEBUG /**/
 	}
 
 	static inline void JumpingOnPolytope(PT_vector_T startPoint, PT_vector_T directionVector, PT_vector_T finishPoint, double eps) {
@@ -1181,7 +1275,7 @@ namespace SF {
 	}
 
 	static inline void MPS_CopyName(char* name_x, char* name_y) {
-		for (int p = 0; p < 9; p++)
+		for (int p = 0; p < PP_MPS_NAME_LENGTH; p++)
 			name_y[p] = name_x[p];
 	}
 
@@ -1189,6 +1283,10 @@ namespace SF {
 		char ch;
 		fpos_t pos;	// Position in the input stream
 
+		fgetpos(stream, &pos);
+		if (getc(stream) == -1) // EOF
+			return;
+		fsetpos(stream, &pos);
 
 		do {
 			fgetpos(stream, &pos);
@@ -1288,7 +1386,7 @@ namespace SF {
 		char ch;
 		fpos_t pos;	// Position in the input stream
 
-		for (int p = 0; p < 9; p++)
+		for (int p = 0; p < PP_MPS_NAME_LENGTH; p++)
 			name[p] = '\0';
 
 		fgetpos(stream, &pos);
@@ -1323,6 +1421,9 @@ namespace SF {
 		float RHS_value;
 		int rowIndex;
 
+		for (int p = 0; p < PP_MPS_NAME_LENGTH; p++)
+			next_RHS_name[p] = '\0';
+
 		for (int p = 0; p < 4; p++) {
 			ch = getc(stream);
 			if (ch != ' ') {
@@ -1334,8 +1435,11 @@ namespace SF {
 
 		int p = 0;
 		fgetpos(stream, &pos);
-		while (getc(stream) == ' ')
+		while (ch == ' ') {
+			fgetpos(stream, &pos);
+			ch = getc(stream);
 			p++;
+		}
 		fsetpos(stream, &pos);
 
 		if (p > 8)
@@ -1450,7 +1554,7 @@ namespace SF {
 	}
 
 	static inline bool MPS_SameNames(PT_MPS_name_T name_x, PT_MPS_name_T name_y) {
-		for (int p = 0; p < 9; p++) {
+		for (int p = 0; p < PP_MPS_NAME_LENGTH; p++) {
 			if (name_x[p] == '\0' && name_y[p] == '\0')
 				return true;
 			if (name_x[p] != name_y[p])
@@ -2151,8 +2255,9 @@ namespace SF {
 	}
 
 	static inline void OrthogonalProjectingVectorOntoHyperplane_i(PT_vector_T x, int i, PT_vector_T p) {
-		assert(Vector_NormSquare(PD_A[i]));
-		Vector_MultiplyByNumber(PD_A[i], -(Vector_DotProduct(PD_A[i], x) - PD_b[i]) / Vector_NormSquare(PD_A[i]), p);
+		double ns = Vector_NormSquare(PD_A[i]);
+		assert(ns >= PP_EPS_ZERO);
+		Vector_MultiplyByNumber(PD_A[i], -(Vector_DotProduct(PD_A[i], x) - PD_b[i]) / ns, p);
 	}
 
 	static inline bool PointBelongsHalfspace_i(PT_vector_T x, int i, double eps) {
@@ -2314,9 +2419,8 @@ namespace SF {
 		if (mneh == PD_neq)
 			me = (unsigned long long) mneh;
 		else {
-
 			if (mneh > 62) {
-				cout << "Can't calculate binomial coefficient for number of including hyperplanes mneh = "
+				cout << "Warning: Can't calculate binomial coefficient for number of including hyperplanes mneh = "
 					<< mneh << " > 62" << endl;
 				return;
 			}
@@ -2328,45 +2432,6 @@ namespace SF {
 	static inline void Print_Vector(PT_vector_T x) {
 		for (int j = 0; j < PF_MIN(PP_OUTPUT_LIMIT, PD_n); j++) cout << setw(PP_SETW) << x[j];
 		if (PP_OUTPUT_LIMIT < PD_n) cout << "	...";
-	}
-
-	static inline void PseudoprojectionOnFlat(int* flatHyperplanes, int m_flat, PT_vector_T v, double eps, int maxProjectingIter, PT_vector_T w, int* success) {
-		PT_vector_T r;
-		PT_vector_T w_previous;
-		double distSQR;
-		int iterCount = 0;
-		double eps_distSQR = (eps * eps) / 100;
-
-		Vector_Copy(v, w);
-
-		do {
-			Vector_Zeroing(r);
-			Vector_Copy(w, w_previous);
-
-			for (int i = 0; i < m_flat; i++) {
-				PT_vector_T p;
-				OrthogonalProjectingVectorOntoHyperplane_i(w, flatHyperplanes[i], p);
-				Vector_PlusEquals(r, p);
-			}
-
-			Vector_DivideEquals(r, m_flat);
-			Vector_Round(r, eps);
-			Vector_PlusEquals(w, r);
-
-			distSQR = DistanceSQR_PointToPoint(w, w_previous);
-			iterCount++;
-			if (iterCount > maxProjectingIter) {
-				*success = false;
-				break;
-			}
-		} while (distSQR >= eps_distSQR);
-	}
-
-	static inline int rand_i(void) { // Returns random non-negative integer less than PP_INT_MAX
-		unsigned int randomValue;
-		rand_s(&randomValue);
-		randomValue = randomValue % PP_INT_MAX;
-		return (int)randomValue;
 	}
 
 	static inline double RelativeError(double trueValue, double calculatedValue) {

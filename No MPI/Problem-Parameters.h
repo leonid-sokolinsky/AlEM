@@ -20,15 +20,7 @@ This source code has been produced with using BSF-skeleton
 #define PP_PATH "../../Set-of-LP-Problems/Rnd-LP/"
 
 /**
-#include "../_Problems15-1.h"
-#define PP_PATH "../../Set-of-LP-Problems/Rnd-LP/"
-
-/**
-#include "../_Problems16.24-0.h"
-#define PP_PATH "../../Set-of-LP-Problems/Rnd-LP/"
-
-/**
-#include "../_Problems20-1.h"
+#include "_Problems100_1000-0.h"
 #define PP_PATH "../../Set-of-LP-Problems/Rnd-LP/"
 
 /**
@@ -45,10 +37,11 @@ This source code has been produced with using BSF-skeleton
 
 //-------------------------- Compilation Modes -----------------------
 #define PP_DEBUG
-//#define PP_MATRIX_OUTPUT
+#define PP_MATRIX_OUTPUT
 //#define PP_SAVE_RESULT
 //#define PP_GRADIENT
 //#define MPS_MIN_OF_OBJECTIVE_FUNCTION
+//#define BIPROJECTION
 
 //================================ Problem Paramrters ===========================
 #ifdef PP_MPS_FORMAT
@@ -58,10 +51,9 @@ This source code has been produced with using BSF-skeleton
 #endif // PP_MPS_FORMAT
 
 #define PP_MAX_ITER_COUNT				10000000000		// Maximal count of iterations
-#define PP_MAX_PSEUDOPROJECTING_ITER	10000000		// Maximum acceptable number of iterations in SF::PseudoprojectionOnFlat()
+#define PP_MAX_PSEUDOPROJECTING_ITER	100000000		// Maximum acceptable number of iterations in SF::Flat_BIProjection()
 #define PP_DBL_MAX						1E+308			// Highest float value
 #define PP_RND_MAX						32767			// This is necessary for compatibility with different compilers
-#define PP_INT_MAX						2147483647
 //-------------------------- Input/Outpoot Parameters ---------------------------
 #define PP_OUTPUT_LIMIT	30	// Number of Elements to output
 #define PP_SETW 16
@@ -76,9 +68,10 @@ This source code has been produced with using BSF-skeleton
 #define PP_MTX_POSTFIX_SO	"_so.mtx"	// Solution point
 #define PP_MTX_POSTFIX_U0	"_u0.mtx"	// Starting point
 //------------------------- MPS format ----------------
+#define PP_MPS_NAME_LENGTH	9
 #define PP_MPS_PREFIX		"lp_"
 #define PP_MPS_EXTENSION	".mps"
-#define PP_MAX_NUMBER_OF_ROWS	(PP_M+2)
+#define PP_MAX_NUMBER_OF_ROWS	(PP_M+3)
 #define PP_MAX_NUMBER_OF_COLS	(PP_N*(PP_M+1)+1)
 //-------------------------- Jobs  -----------------------
 // Not used.
