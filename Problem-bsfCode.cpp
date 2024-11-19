@@ -1,4 +1,4 @@
-﻿/*==============================================================================
+/*==============================================================================
 Project: LiFe - New Linear Programming Solvers
 Theme: AlEM - Along Edges Movement method (MPI)
 Module: Problem-bsfCode.cpp (Implementation of Problem Code)
@@ -37,6 +37,7 @@ void PC_bsf_Init(bool* success) {
 	if (*success == false)
 		return;
 
+	// Number of constraints being equations
 	PD_meq = 0;
 	for (int i = 0; i < PD_m; i++)
 		if (PD_isEquation[i]) {
@@ -45,8 +46,8 @@ void PC_bsf_Init(bool* success) {
 		}
 	assert(PD_meq < PD_n);
 
-	PD_neq = PD_n - PD_meq;
-
+	PD_neq = PD_n - PD_meq;	// Dimension of the subspace of intersection of equation-hyperplanes
+	
 	*success = MTX_LoadPoint(PD_u_cur, PP_MTX_POSTFIX_U0);
 	if (*success == false)
 		return;
@@ -119,32 +120,34 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 		return;
 	}
 
+	PD_mnep = PD_neq - 1; // Number of inequality-hyperplanes used for pseudoprojection
 	/*DEBUG PC_bsf_MapF**
 	#ifdef PP_DEBUG
 		cout << "------------------------------------ Map(" << PF_MAP_LIST_INDEX << ") ------------------------------------" << endl;
 	#endif // PP_DEBUG /**/
 	// Condition for breakpoint: PD_iterNo == 2 && (BSF_sv_addressOffset + BSF_sv_numberInSublist == 2)
 
-	TWIDDLE_CodeToSubset(edgeCode, PD_pointNeHyperplanes, PD_edgeNeHyperplanes, PD_mneh, PD_neq - 1);
+	TWIDDLE_CodeToSubset(edgeCode, PD_pointNeHyperplanes, PD_edgeNeHyperplanes, PD_mneh, PD_neq - 1,
+		&PD_TWIDDLE_x, &PD_TWIDDLE_y, &PD_TWIDDLE_z, PD_TWIDDLE_p, &PD_TWIDDLE_done, &PD_TWIDDLE_nextEdgeI);
 
-	for (int i = 0; i < PD_neq - 1; i++)
+	for (int i = 0; i < PD_mnep; i++)
 		PD_edgeAllHyperplanes[PD_meq + i] = PD_edgeNeHyperplanes[i];
 
 	/*DEBUG PC_bsf_MapF**
 	#ifdef PP_DEBUG
 			cout << "Edge hyperplanes: {";
-		for (int i = 0; i < (PD_n - 1) - 1; i++) {
+	for (int i = 0; i < PD_meq + PD_mnep - 1; i++) {
 			cout << PD_edgeAllHyperplanes[i] << ", ";
 		}
-		cout << PD_edgeAllHyperplanes[(PD_n - 1) - 1] << "}.\n";
+		cout << PD_edgeAllHyperplanes[PD_meq + PD_mnep - 1] << "}.\n";
 	#endif // PP_DEBUG /**/
 
 	Vector_Addition(u_cur, PD_objVector, v);
 
 #ifdef BIPROJECTION
-	Flat_BIProjection(PD_edgeAllHyperplanes, (PD_n - 1), v, PP_EPS_PROJECTION_ROUND, PP_MAX_PSEUDOPROJECTING_ITER, w, success);
+	Flat_BIProjection(PD_edgeAllHyperplanes, PD_meq + PD_mnep, v, PP_EPS_PROJECTION_ROUND, PP_MAX_PSEUDOPROJECTING_ITER, w, success);
 #else
-	Flat_MaxProjection(PD_edgeAllHyperplanes, (PD_n - 1), v, PP_EPS_PROJECTION_ROUND, PP_MAX_PSEUDOPROJECTING_ITER, w, success);
+	Flat_MaxProjection(PD_edgeAllHyperplanes, PD_meq + PD_mnep, v, PP_EPS_PROJECTION_ROUND, PP_MAX_PSEUDOPROJECTING_ITER, w, success);
 #endif // BIPROJECTION
 
 	if (!*success) {
@@ -283,11 +286,13 @@ void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
 	cout << "PP_EPS_PROJECTION_ROUND\t\t" << PP_EPS_PROJECTION_ROUND << endl;
 	cout << "PP_OBJECTIVE_VECTOR_LENGTH\t" << PP_OBJECTIVE_VECTOR_LENGTH << endl;
 	cout << "--------------- Data ---------------\n";
+	cout << "F(u0) = " << setw(PP_SETW) << ObjF(PD_u_cur) << endl;
+
 #ifdef PP_MATRIX_OUTPUT
 	cout << "------- Matrix PD_A & Column PD_b -------" << endl;
 	Print_Constraints();
 	cout << "Obj Function:\t"; 	Print_Vector(PD_c); cout << endl;
-	cout << "u0 =\t\t"; Print_Vector(PD_u_cur); cout << "\tF(x) = " << setw(PP_SETW) << ObjF(PD_u_cur) << endl;
+	cout << "u0 =\t\t"; Print_Vector(PD_u_cur); cout << endl;
 #endif // PP_MATRIX_OUTPUT
 
 #ifdef PP_DEBUG
@@ -561,7 +566,7 @@ namespace SF {
 			}
 
 			if (max_i < 0) {
-				/*DEBUG PC_bsf_MapF**
+				/*DEBUG Flat_MaxProjection**
 		#ifdef PP_DEBUG
 						cout << "Flat_MaxProjection: iterCount = " << iterCount << endl;
 		#endif // PP_DEBUG /**/
@@ -589,6 +594,7 @@ namespace SF {
 		double* z = startPoint;
 		double* d = directionVector;
 		double a_DoT_d;
+		double norm_a_DoT_norm_d;
 		int location_z;
 		double a_DoT_z_MinuS_b;
 		double minLengthSQR = PP_INFINITY;
@@ -601,17 +607,25 @@ namespace SF {
 			location_z = PointLocation_i(z, i, eps, &a_DoT_z_MinuS_b);
 			assert(location_z != PP_DEGENERATE_INEQUALITY);
 
+			a_DoT_d = Vector_DotProduct(PD_A[i], d);
+			norm_a_DoT_norm_d = a_DoT_d / (PD_norm_a[i] * Vector_Norm(d));
+
 			switch (location_z) {
 			case PP_ON_HYPERPLANE:
-				continue;
-			case PP_OUTSIDE_HALFSPACE:
-				continue;
+				if (fabs(norm_a_DoT_norm_d) < eps)
+					continue;
+				if (norm_a_DoT_norm_d < 0)
+					continue;
+				// norm_a_DoT_norm_d > 0
+				Vector_Copy(startPoint, finishPoint);
+				return;
 			case PP_INSIDE_HALFSPACE:
-				a_DoT_d = Vector_DotProduct(PD_A[i], d); // <a,d>
-
-				if (a_DoT_d < PP_EPS_ZERO)   // <a,d> <= 0
+				if (fabs(norm_a_DoT_norm_d) < eps)
+					continue;
+				if (norm_a_DoT_norm_d < 0)
 					continue;
 
+				// norm_a_DoT_norm_d > 0
 				// Oblique projection vector: o = -(<a,z> - b)d/<a, d>
 				Vector_MultiplyByNumber(d, -a_DoT_z_MinuS_b / a_DoT_d, o);
 				lengthSQR_o = Vector_NormSquare(o);
@@ -2169,46 +2183,41 @@ namespace SF {
 
 	static inline void	ObliqueProjectingVectorOntoHalfspace_i(PT_vector_T z, int i, PT_vector_T d, PT_vector_T o, double eps, int* exitCode) {
 		// Oblique projecting vector o of point z onto Half-space H_i with respect to vector d
-		double a_DoT_g;	// <a,d>
+		double a_DoT_d;	// <a,d>
+		double norm_a_DoT_norm_d; // <a,d>/(||a||*||d||)
 		double a_DoT_z_MinuS_b;	// <a,z> - b
 		double factor;	// (b - <a,z>) / <a,d>
 
-		if (PD_norm_a[i] < PP_EPS_ZERO) {
-			Vector_Zeroing(o);
-			*exitCode = PP_DEGENERATE_INEQUALITY;
+		Vector_Zeroing(o);
+
+		*exitCode = PointLocation_i(z, i, eps, &a_DoT_z_MinuS_b);
+		a_DoT_d = Vector_DotProduct(PD_A[i], d); // <a,d>
+
+		a_DoT_d = Vector_DotProduct(PD_A[i], d);
+		norm_a_DoT_norm_d = a_DoT_d / (PD_norm_a[i] * Vector_Norm(d));
+
+		switch (*exitCode) {
+		case PP_DEGENERATE_INEQUALITY:
+		case PP_ON_HYPERPLANE:
+		case PP_INSIDE_HALFSPACE:
+			Vector_Copy(z, o);
 			return;
+		case PP_OUTSIDE_HALFSPACE:
+			if (fabs(norm_a_DoT_norm_d) < eps) {
+				*exitCode = PP_PARALLEL;
+				Vector_SetValue(o, PP_INFINITY);
+				return;
+			}
+			if (norm_a_DoT_norm_d > 0) {
+				*exitCode = PP_RECESSIVE;
+				Vector_SetValue(o, -PP_INFINITY);
+				return;
+			}
+		default:
+			assert(false);
 		}
 
-		a_DoT_z_MinuS_b = Vector_DotProduct(PD_A[i], z) - PD_b[i]; // <a,z> - b
-
-		if (fabs(a_DoT_z_MinuS_b) / PD_norm_a[i] < PP_EPS_ZERO) { // |<a,z> - b|/||a|| = 0
-			*exitCode = PP_ON_HYPERPLANE;
-			Vector_Zeroing(o);
-			return;
-		}
-
-		if (a_DoT_z_MinuS_b < 0) { // <a,z> - b < 0
-			*exitCode = PP_INSIDE_HALFSPACE;
-			Vector_Zeroing(o);
-			return;
-		}
-
-		a_DoT_g = Vector_DotProduct(PD_A[i], d); // <a,d>
-
-
-		if (fabs(a_DoT_g) < PP_EPS_ZERO) {
-			*exitCode = PP_PARALLEL;
-			Vector_Zeroing(o);
-			return;
-		}
-
-		if (a_DoT_g >= PP_EPS_ZERO) {
-			*exitCode = PP_RECESSIVE;
-			Vector_Zeroing(o);
-			return;
-		}
-
-		factor = a_DoT_z_MinuS_b / a_DoT_g; // (<a,z> - b) / <a,d>
+		factor = a_DoT_z_MinuS_b / a_DoT_d; // (<a,z> - b) / <a,d>
 
 		// Oblique projection vector: o = -(<a,z> - b)d/<a, d> = -factor * d
 		Vector_MultiplyByNumber(d, -factor, o);
@@ -2222,21 +2231,20 @@ namespace SF {
 		double a_DoT_z_MinuS_b = Vector_DotProduct(PD_A[i], z) - PD_b[i]; // <a,z> - b
 		double distance = fabs(a_DoT_z_MinuS_b) / PD_norm_a[i];
 
+		Vector_Zeroing(r);
+
 		if (PD_norm_a[i] < PP_EPS_ZERO) {
-			Vector_Zeroing(r);
 			*exitCode = PP_DEGENERATE_INEQUALITY;
 			return;
 		}
 
 		if (distance < eps) {
-			Vector_Zeroing(r);
 			*exitCode = PP_ON_HYPERPLANE;
 			return;
 		}
 
 		if (!PD_isEquation[i])
 			if (a_DoT_z_MinuS_b < 0) { // <a,z> - b < 0
-				Vector_Zeroing(r);
 				*exitCode = PP_INSIDE_HALFSPACE;
 				return;
 			}
@@ -2314,7 +2322,7 @@ namespace SF {
 
 		*a_DoT_x_MinuS_b = Vector_DotProduct(PD_A[i], x) - PD_b[i];
 
-		if (fabs(*a_DoT_x_MinuS_b) / PD_norm_a[i] < PP_EPS_ZERO)// <a,x> = b
+		if (fabs(*a_DoT_x_MinuS_b) / PD_norm_a[i] < eps)// <a,x> = b
 			return PP_ON_HYPERPLANE;
 
 		if (*a_DoT_x_MinuS_b < 0)								// <a,x> < b
@@ -2434,7 +2442,7 @@ namespace SF {
 	}
 
 	static inline void TWIDDLE // https://doi.org/10.1145/362384.362502
-	(int* x, int* y, int* z, int p[PP_N + 2], bool* done) {
+	(int* x, int* y, int* z, int* p, bool* done) {
 		int i, j, k;
 		j = 0;
 		*done = false;
@@ -2489,25 +2497,25 @@ namespace SF {
 		*y = i;
 	}
 
-	static inline void TWIDDLE_CodeToSubset(int code, int a[PP_MM], int c[PP_N - 1], int n, int m) {
-		if (PD_TWIDDLE_nextEdgeI == 0) {
+	static inline void TWIDDLE_CodeToSubset(int code, int* a, int* c, int n, int m, int* x, int* y, int* z, int* p, bool* done, int* nextI) {
+		if (*nextI == 0) {
 			for (int k = 0; k < m; k++)
 				c[k] = a[n - m + k];
 			if (code == 0) {
-				PD_TWIDDLE_nextEdgeI++;
+				(*nextI)++;
 				return;
 			}
 		}
 
 		do {
-			TWIDDLE(&PD_TWIDDLE_x, &PD_TWIDDLE_y, &PD_TWIDDLE_z, PD_TWIDDLE_p, &PD_TWIDDLE_done);
-			//assert(!PD_TWIDDLE_done);
-			c[PD_TWIDDLE_z - 1] = a[PD_TWIDDLE_x - 1];
-			PD_TWIDDLE_nextEdgeI++;
-		} while (PD_TWIDDLE_nextEdgeI < code);
+			TWIDDLE(x, y, z, p, done);
+			assert(!*done);
+			c[*z - 1] = a[*x - 1];
+			(*nextI)++;
+		} while (*nextI < code);
 	}
 
-	static inline void TWIDDLE_Make_p(int p[PP_MM + 2], int n, int m) {
+	static inline void TWIDDLE_Make_p(int* p, int n, int m) {
 		// p - auxiliary integer array for generating all combinations of m out of n objects.
 		assert(n >= m && m > 0);
 		p[0] = n + 1;
@@ -2723,8 +2731,8 @@ namespace PF {
 			exit(1);
 		}
 
-		CalculateNumberOfEdges(PD_neq, PD_mneh, &PD_med);
-		MakeEdgeList(PD_edgeCodes, PD_med);
+		CalculateNumberOfEdges(PD_neq, PD_mneh, &PD_meu);
+		MakeEdgeList(PD_edgeCodes, PD_meu);
 		PD_TWIDDLE_done = false;
 		PD_TWIDDLE_nextEdgeI = 0;
 		TWIDDLE_Make_p(PD_TWIDDLE_p, PD_mneh, PD_neq - 1);
