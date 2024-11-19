@@ -20,7 +20,6 @@ Initial surface points for these problems were calculated using BSF-Apex-Quest.
 #define PP_EPS_ON_HYPERPLANE		PP_EPS_ZERO		// Accuracy of belonging to hyperplane
 #define PP_EPS_PROJECTION_ROUND		PP_EPS_ZERO		// Precision of rounding vector r
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+7			// Length of Objective Vector
-#define PP_PROBE_LENGTH				0.001			// Length of probe shift
 #define PP_KK						100				// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
 //-----------------------------------------------------------------------------
 
@@ -137,21 +136,21 @@ Initial surface points for these problems were calculated using BSF-Apex-Quest.
 #define PP_MAX_OBJ_VALUE 		3000
 //-----------------------------------------------------------------------------
 
-/*============================== angle04 LP problem =============================*
+/*============================== angle04 LP problem ============================*
 #define PP_PROBLEM_NAME	"angle04"
 #define PP_M 3		// Number of equations (number of rows in *.mtx)
 #define PP_N 7		// Number of variables (number of cols in *.mtx)
 #define PP_MAX_OBJ_VALUE 		3300
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
-/*============================== cone3-0 LP problem =============================*
+/*============================== cone3-0 LP problem ============================*
 #define PP_PROBLEM_NAME	"cone3-0"
 #define PP_M 11		// Number of equations (number of rows in *.mtx)
 #define PP_N 14		// Number of variables (number of cols in *.mtx)
 #define PP_MAX_OBJ_VALUE 		132.5
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
-/*============================== rnd3_3_Olkhovsky56 LP problem ==================*
+/*============================== rnd3_3_Olkhovsky56 LP problem =================*
 #define PP_PROBLEM_NAME	"rnd3_3_Olkhovsky56"
 #define PP_M 6		// Number of equations (number of rows in *.mtx)
 #define PP_N 9		// Number of variables (number of cols in *.mtx)
@@ -190,7 +189,7 @@ Initial surface points for these problems were calculated using BSF-Apex-Quest.
 #define PP_PROBLEM_NAME	"rnd5-100"
 #define PP_M 105		// Number of equations (number of rows in *.mtx)
 #define PP_N 110		// Number of variables (number of cols in *.mtx)
-#define PP_MAX_OBJ_VALUE	1848.437080568196
+#define PP_MAX_OBJ_VALUE	1848.437080568192
 //------------------------------------------------------------------------------
 
 /*==============================================================================*/

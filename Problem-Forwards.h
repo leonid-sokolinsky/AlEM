@@ -12,9 +12,6 @@ namespace PF {
 	void	CalculateNumberOfEdges(int n, int mneh, int* me);
 	void	MakeEdgeList(int* edgeCodeList, int me);
 	void	PreparationForIteration(PT_vector_T u);
-	void	TWIDDLE(int* x, int* y, int* z, int p[PP_N + 2], bool* done);
-	void	TWIDDLE_CodeToSubset(int code, int a[PP_MM], int c[PP_N - 1], int n, int m);
-	void	TWIDDLE_Make_p(int p[PP_MM + 2], int n, int m);
 }
 //====================== Shared Functions ===========================
 namespace SF {
@@ -55,8 +52,8 @@ namespace SF {
 	int		MPS_SearchRowByName(PT_MPS_row_T* row, int n_row, PT_MPS_name_T name);
 	void	MPS_SkipSpaces(FILE* stream);
 	bool	MPS_UniqueRowName(PT_MPS_row_T* rows, int n_row, PT_MPS_name_T name);
-	void	MTX_Conversion();
 	bool	MTX__Load_Problem();
+	void	MTX_Conversion();
 	bool	MTX_Load_A();
 	bool	MTX_Load_b();
 	bool	MTX_Load_c();
@@ -87,6 +84,9 @@ namespace SF {
 	void	Print_Vector(PT_vector_T x);
 	double	RelativeError(double trueValue, double calculatedValue);
 	void	Shift(PT_vector_T point, PT_vector_T shiftVector, double factor, PT_vector_T shiftedPoint);
+	void	TWIDDLE(int* x, int* y, int* z, int p[PP_N + 2], bool* done);
+	void	TWIDDLE_CodeToSubset(int code, int a[PP_MM], int c[PP_N - 1], int n, int m);
+	void	TWIDDLE_Make_p(int p[PP_MM + 2], int n, int m);
 	void	Vector_Addition(PT_vector_T x, PT_vector_T y, PT_vector_T z);
 	void	Vector_Copy(PT_vector_T x, PT_vector_T y);
 	void	Vector_DivideByNumber(PT_vector_T x, double r, PT_vector_T y);

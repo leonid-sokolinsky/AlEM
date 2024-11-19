@@ -282,10 +282,6 @@ void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
 	cout << "PP_EPS_POINT_IN_HALFSPACE\t" << PP_EPS_POINT_IN_HALFSPACE << endl;
 	cout << "PP_EPS_PROJECTION_ROUND\t\t" << PP_EPS_PROJECTION_ROUND << endl;
 	cout << "PP_OBJECTIVE_VECTOR_LENGTH\t" << PP_OBJECTIVE_VECTOR_LENGTH << endl;
-	//
-#ifdef PP_GRADIENT
-	cout << "PP_PROBE_LENGTH\t\t\t" << PP_PROBE_LENGTH << endl;
-#endif // PP_GRADIENT
 	cout << "--------------- Data ---------------\n";
 #ifdef PP_MATRIX_OUTPUT
 	cout << "------- Matrix PD_A & Column PD_b -------" << endl;
@@ -389,25 +385,21 @@ void PC_bsf_ReduceF(PT_bsf_reduceElem_T* x, PT_bsf_reduceElem_T* y, PT_bsf_reduc
 	if (x->objF_grd > y->objF_grd) {
 		z->objF_grd = x->objF_grd;
 		z->objF_nex = x->objF_nex;
-		for (int j = 0; j < PD_n; j++)
-			(*z).u_nex[j] = (*x).u_nex[j];
+		Vector_Copy((*x).u_nex, (*z).u_nex);
 	}
 	else {
 		z->objF_grd = y->objF_grd;
 		z->objF_nex = y->objF_nex;
-		for (int j = 0; j < PD_n; j++)
-			(*z).u_nex[j] = (*y).u_nex[j];
+		Vector_Copy((*y).u_nex, (*z).u_nex);
 	}
 #else
 	if (x->objF_nex > y->objF_nex) {
 		z->objF_nex = x->objF_nex;
-		for (int j = 0; j < PD_n; j++)
-			(*z).u_nex[j] = (*x).u_nex[j];
+		Vector_Copy((*x).u_nex, (*z).u_nex);
 	}
 	else {
 		z->objF_nex = y->objF_nex;
-		for (int j = 0; j < PD_n; j++)
-			(*z).u_nex[j] = (*y).u_nex[j];
+		Vector_Copy((*y).u_nex, (*z).u_nex);
 	}
 #endif // PP_GRADIENT
 }
@@ -2441,6 +2433,91 @@ namespace SF {
 			return fabs(calculatedValue - trueValue);
 	}
 
+	static inline void TWIDDLE // https://doi.org/10.1145/362384.362502
+	(int* x, int* y, int* z, int p[PP_N + 2], bool* done) {
+		int i, j, k;
+		j = 0;
+		*done = false;
+
+		do {
+			j++;
+		} while (p[j] <= 0);
+
+		if (p[j - 1] == 0) {
+			i = j - 1;
+			while (i != 1) {
+				p[i] = -1;
+				i -= 1;
+			}
+			p[j] = 0;
+			p[1] = *x = *z = 1;
+			*y = j;
+			return;
+		}
+
+		if (j > 1)
+			p[j - 1] = 0;
+
+		do {
+			j++;
+		} while (p[j] > 0);
+
+		i = k = j - 1;
+
+		i++;
+		while (p[i] == 0) {
+			p[i] = -1;
+			i++;
+		}
+
+		if (p[i] == -1) {
+			p[i] = *z = p[k];
+			*x = i;
+			*y = k;
+			p[k] = -1;
+			return;
+		}
+
+		if (i == p[0]) {
+			*done = true;
+			return;
+		}
+
+		*z = p[j] = p[i];
+		p[i] = 0;
+		*x = j;
+		*y = i;
+	}
+
+	static inline void TWIDDLE_CodeToSubset(int code, int a[PP_MM], int c[PP_N - 1], int n, int m) {
+		if (PD_TWIDDLE_nextEdgeI == 0) {
+			for (int k = 0; k < m; k++)
+				c[k] = a[n - m + k];
+			if (code == 0) {
+				PD_TWIDDLE_nextEdgeI++;
+				return;
+			}
+		}
+
+		do {
+			TWIDDLE(&PD_TWIDDLE_x, &PD_TWIDDLE_y, &PD_TWIDDLE_z, PD_TWIDDLE_p, &PD_TWIDDLE_done);
+			//assert(!PD_TWIDDLE_done);
+			c[PD_TWIDDLE_z - 1] = a[PD_TWIDDLE_x - 1];
+			PD_TWIDDLE_nextEdgeI++;
+		} while (PD_TWIDDLE_nextEdgeI < code);
+	}
+
+	static inline void TWIDDLE_Make_p(int p[PP_MM + 2], int n, int m) {
+		// p - auxiliary integer array for generating all combinations of m out of n objects.
+		assert(n >= m && m > 0);
+		p[0] = n + 1;
+		p[n + 1] = -2;
+		for (int j = 1; j <= n - m; j++)
+			p[j] = 0;
+		for (int j = n - m + 1; j <= n; j++)
+			p[j] = j - n + m;
+	}
+
 	static inline void Shift(PT_vector_T point, PT_vector_T shiftVector, double factor, PT_vector_T shiftedPoint) {
 		for (int j = 0; j < PD_n; j++)
 			shiftedPoint[j] = point[j] + shiftVector[j] * factor;
@@ -2585,7 +2662,7 @@ namespace PF {
 			}
 #endif // PP_DEBUG
 
-			unsigned long long long_me = BinomialCoefficient(mneh, n - 1);
+			unsigned long long long_me = BinomialCoefficient(mneh, PD_neq - 1);
 
 #ifdef PP_DEBUG
 			if (long_me > PP_KK) {
@@ -2651,90 +2728,5 @@ namespace PF {
 		PD_TWIDDLE_done = false;
 		PD_TWIDDLE_nextEdgeI = 0;
 		TWIDDLE_Make_p(PD_TWIDDLE_p, PD_mneh, PD_neq - 1);
-	}
-
-	static inline void TWIDDLE // https://doi.org/10.1145/362384.362502
-	(int* x, int* y, int* z, int p[PP_N + 2], bool* done) {
-		int i, j, k;
-		j = 0;
-		*done = false;
-
-		do {
-			j++;
-		} while (p[j] <= 0);
-
-		if (p[j - 1] == 0) {
-			i = j - 1;
-			while (i != 1) {
-				p[i] = -1;
-				i -= 1;
-			}
-			p[j] = 0;
-			p[1] = *x = *z = 1;
-			*y = j;
-			return;
-		}
-
-		if (j > 1)
-			p[j - 1] = 0;
-
-		do {
-			j++;
-		} while (p[j] > 0);
-
-		i = k = j - 1;
-
-		i++;
-		while (p[i] == 0) {
-			p[i] = -1;
-			i++;
-		}
-
-		if (p[i] == -1) {
-			p[i] = *z = p[k];
-			*x = i;
-			*y = k;
-			p[k] = -1;
-			return;
-		}
-
-		if (i == p[0]) {
-			*done = true;
-			return;
-		}
-
-		*z = p[j] = p[i];
-		p[i] = 0;
-		*x = j;
-		*y = i;
-	}
-
-	static inline void TWIDDLE_CodeToSubset(int code, int a[PP_MM], int c[PP_N - 1], int n, int m) {
-		if (PD_TWIDDLE_nextEdgeI == 0) {
-			for (int k = 0; k < m; k++)
-				c[k] = a[n - m + k];
-			if (code == 0) {
-				PD_TWIDDLE_nextEdgeI++;
-				return;
-			}
-		}
-
-		do {
-			TWIDDLE(&PD_TWIDDLE_x, &PD_TWIDDLE_y, &PD_TWIDDLE_z, PD_TWIDDLE_p, &PD_TWIDDLE_done);
-			//assert(!PD_TWIDDLE_done);
-			c[PD_TWIDDLE_z - 1] = a[PD_TWIDDLE_x - 1];
-			PD_TWIDDLE_nextEdgeI++;
-		} while (PD_TWIDDLE_nextEdgeI < code);
-	}
-
-	static inline void TWIDDLE_Make_p(int p[PP_MM + 2], int n, int m) {
-		// p - auxiliary integer array for generating all combinations of m out of n objects.
-		assert(n >= m && m > 0);
-		p[0] = n + 1;
-		p[n + 1] = -2;
-		for (int j = 1; j <= n - m; j++)
-			p[j] = 0;
-		for (int j = n - m + 1; j <= n; j++)
-			p[j] = j - n + m;
 	}
 }
