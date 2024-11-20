@@ -41,7 +41,7 @@ void PC_bsf_Init(bool* success) {
 	PD_meq = 0;
 	for (int i = 0; i < PD_m; i++)
 		if (PD_isEquation[i]) {
-			PD_edgeAllHyperplanes[PD_meq] = i;
+			PD_edgeAlHyperplanes[PD_meq] = i;
 			PD_meq++;
 		}
 	assert(PD_meq < PD_n);
@@ -120,34 +120,34 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 		return;
 	}
 
-	PD_mnep = PD_neq - 1; // Number of inequality-hyperplanes used for pseudoprojection
+	PD_mne_p = PD_neq - 1; // Number of inequality-hyperplanes used for pseudoprojection
 	/*DEBUG PC_bsf_MapF**
 	#ifdef PP_DEBUG
 		cout << "------------------------------------ Map(" << PF_MAP_LIST_INDEX << ") ------------------------------------" << endl;
 	#endif // PP_DEBUG /**/
 	// Condition for breakpoint: PD_iterNo == 2 && (BSF_sv_addressOffset + BSF_sv_numberInSublist == 2)
 
-	TWIDDLE_CodeToSubset(edgeCode, PD_pointNeHyperplanes, PD_edgeNeHyperplanes, PD_mneh, PD_neq - 1, 
+	TWIDDLE_CodeToSubset(edgeCode, PD_neHyperplanes_u, PD_edgeNeHyperplanes, PD_mneh_u, PD_neq - 1, 
 		&PD_TWIDDLE_x, &PD_TWIDDLE_y, &PD_TWIDDLE_z, PD_TWIDDLE_p, &PD_TWIDDLE_done, &PD_TWIDDLE_nextEdgeI);
 
-	for (int i = 0; i < PD_mnep; i++)
-		PD_edgeAllHyperplanes[PD_meq + i] = PD_edgeNeHyperplanes[i];
+	for (int i = 0; i < PD_mne_p; i++)
+		PD_edgeAlHyperplanes[PD_meq + i] = PD_edgeNeHyperplanes[i];
 
 	/*DEBUG PC_bsf_MapF**
 	#ifdef PP_DEBUG
 		cout << "Edge hyperplanes: {";
-	for (int i = 0; i < PD_meq + PD_mnep - 1; i++) {
-			cout << PD_edgeAllHyperplanes[i] << ", ";
+	for (int i = 0; i < PD_meq + PD_mne_p - 1; i++) {
+			cout << PD_edgeAlHyperplanes[i] << ", ";
 		}
-		cout << PD_edgeAllHyperplanes[PD_meq + PD_mnep - 1] << "}.\n";
+		cout << PD_edgeAlHyperplanes[PD_meq + PD_mne_p - 1] << "}.";
 	#endif // PP_DEBUG /**/
 
 	Vector_Addition(u_cur, PD_objVector, v);
 
 #ifdef BIPROJECTION
-	Flat_BIProjection(PD_edgeAllHyperplanes, PD_meq + PD_mnep, v, PP_EPS_PROJECTION_ROUND, PP_MAX_PSEUDOPROJECTING_ITER, w, success);
+	Flat_BIProjection(PD_edgeAlHyperplanes, PD_meq + PD_mne_p, v, PP_EPS_PROJECTION_ROUND, PP_MAX_PSEUDOPROJECTING_ITER, w, success);
 #else
-	Flat_MaxProjection(PD_edgeAllHyperplanes, PD_meq + PD_mnep, v, PP_EPS_PROJECTION_ROUND, PP_MAX_PSEUDOPROJECTING_ITER, w, success);
+	Flat_MaxProjection(PD_edgeAlHyperplanes, PD_meq + PD_mne_p, v, PP_EPS_PROJECTION_ROUND, PP_MAX_PSEUDOPROJECTING_ITER, w, success);
 #endif // BIPROJECTION
 
 	if (!*success) {
@@ -193,7 +193,7 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 		#ifdef PP_DEBUG
 				cout << "u_nex = ";
 				Print_Vector(u_nex);
-				cout << "\tnot in feasible polytope ===>>> movement is impossible." << endl;
+				cout << "\t\t\t\t\t\t\t\t\t\t\t\t\tnot in feasible polytope ===>>> movement is impossible." << endl;
 		#endif // PP_DEBUG /**/
 		reduceElem->objF_nex = -PP_INFINITY;
 #ifdef PP_GRADIENT
@@ -657,15 +657,15 @@ namespace SF {
 			notIncludingHalfspacesList[mo] = -1;
 	}
 
-	static inline void MakeNeHyperplaneList(PT_vector_T u, int* pointHyperplaneList, int* mneh, double eps) {
+	static inline void MakeNeHyperplaneList(PT_vector_T u, int* neHyperplanes_u, int* mneh_u, double eps) {
 		// List of hyperplanes that are not equations and include point u.
-		*mneh = 0;
+		*mneh_u = 0;
 		for (int i = 0; i < PD_m; i++) {
 			if (PD_isEquation[i])
 				continue;
 			if (PointBelongsHyperplane_i(u, i, eps)) {
-				pointHyperplaneList[*mneh] = i;
-				(*mneh)++;
+				neHyperplanes_u[*mneh_u] = i;
+				(*mneh_u)++;
 			}
 		}
 	}
@@ -2405,26 +2405,26 @@ namespace SF {
 	}
 
 	static inline void Print_Number_of_edges(PT_vector_T x) {
-		int mneh;
+		int mneh_u;
 		unsigned long long me;
 
-		mneh = 0;
+		mneh_u = 0;
 		for (int i = 0; i < PD_m; i++) {
 			if (PD_isEquation[i])
 				continue;
 			if (PointBelongsHyperplane_i(x, i, PP_EPS_POINT_IN_HALFSPACE))
-				mneh++;
+				mneh_u++;
 		}
 
-		if (mneh == PD_neq)
-			me = (unsigned long long) mneh;
+		if (mneh_u == PD_neq)
+			me = (unsigned long long) mneh_u;
 		else {
-			if (mneh > 62) {
-				cout << "Warning: Can't calculate binomial coefficient for number of including hyperplanes mneh = "
-					<< mneh << " > 62" << endl;
+			if (mneh_u > 62) {
+				cout << "Warning: Can't calculate binomial coefficient for number of including hyperplanes mneh_u = "
+					<< mneh_u << " > 62" << endl;
 				return;
 			}
-			me = BinomialCoefficient(mneh, PD_neq - 1);
+			me = BinomialCoefficient(mneh_u, PD_neq - 1);
 		}
 		cout << me << endl;
 	}
@@ -2651,39 +2651,39 @@ namespace SF {
 namespace PF {
 	using namespace SF;
 
-	static inline void CalculateNumberOfEdges(int n, int mneh, int* me) {
-		if (mneh == n) {
-			*me = mneh;
+	static inline void CalculateNumberOfEdges(int neq, int mneh_u, int* med_u) {
+		if (mneh_u == neq) {
+			*med_u = mneh_u;
 #ifdef PP_DEBUG
-			if (*me > PP_KK) {
-				cout << "\nCalculateNumberOfEdges error: Parameter PP_KK = " << PP_KK << " must be greater than or equal to " << *me << "\n";
+			if (*med_u > PP_KK) {
+				cout << "\nCalculateNumberOfEdges error: Parameter PP_KK = " << PP_KK << " must be greater than or equal to " << *med_u << "\neq";
 				exit(1);
 			}
 #endif // PP_DEBUG
 		}
 		else {
 #ifdef PP_DEBUG
-			if (mneh > 62) {
-				cout << "\nCalculateNumberOfEdges error: It is impossible to calculate binomial coefficient for number of including hyperplanes mneh = "
-					<< mneh << " > 62" << endl;
+			if (mneh_u > 62) {
+				cout << "\nCalculateNumberOfEdges error: It is impossible to calculate binomial coefficient for number of including hyperplanes mneh_u = "
+					<< mneh_u << " > 62" << endl;
 				exit(1);
 			}
 #endif // PP_DEBUG
 
-			unsigned long long long_me = BinomialCoefficient(mneh, PD_neq - 1);
+			unsigned long long long_med_u = BinomialCoefficient(mneh_u, PD_neq - 1);
 
 #ifdef PP_DEBUG
-			if (long_me > PP_KK) {
+			if (long_med_u > PP_KK) {
 				if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-					cout << "Parameter PP_KK = " << PP_KK << " must be greater than or equal to " << long_me << "\n";
+					cout << "Parameter PP_KK = " << PP_KK << " must be greater than or equal to " << long_med_u << "\n";
 				exit(1);
 			}
 #endif // PP_DEBUG
-			* me = (int)long_me;
+			*med_u = (int)long_med_u;
 		}
 	}
 
-	static inline void MakeEdgeList(int* edgeCodeList, int me) {
+	static inline void MakeEdgeList(int* edgeCodeList, int med_u) {
 		int index;
 
 		for (int k = 0; k < PP_KK; k++) {
@@ -2692,7 +2692,7 @@ namespace PF {
 
 		assert(PP_KK <= PP_RND_MAX);
 
-		for (int k = 0; k < me; k++) {
+		for (int k = 0; k < med_u; k++) {
 			index = rand() % PP_KK;
 			if (edgeCodeList[index] == -1)
 				edgeCodeList[index] = 0;
@@ -2717,12 +2717,12 @@ namespace PF {
 	}
 
 	static inline void PreparationForIteration(PT_vector_T u) {
-		MakeNeHyperplaneList(u, PD_pointNeHyperplanes, &PD_mneh, PP_EPS_POINT_IN_HALFSPACE);
-		assert(PD_mneh <= PP_MM);
+		MakeNeHyperplaneList(u, PD_neHyperplanes_u, &PD_mneh_u, PP_EPS_POINT_IN_HALFSPACE);
+        assert(PD_mneh_u <= PP_MM);
 
-		if (PD_mneh < PD_neq) {
+		if (PD_mneh_u < PD_neq) {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-				cout << "\nPreparationForIteration error: Starting point u is not vertex with prescision " << PP_EPS_POINT_IN_HALFSPACE << ". Number of including inequality-hyperplanes = " << PD_mneh
+				cout << "\nPreparationForIteration error: Starting point u is not vertex with prescision " << PP_EPS_POINT_IN_HALFSPACE << ". Number of including inequality-hyperplanes = " << PD_mneh_u
 				<< " < n = " << PD_n << "\n";
 			cout << "PD_u_cur: ";
 			Print_Vector(PD_u_cur);
@@ -2731,10 +2731,10 @@ namespace PF {
 			exit(1);
 		}
 
-		CalculateNumberOfEdges(PD_neq, PD_mneh, &PD_meu);
-		MakeEdgeList(PD_edgeCodes, PD_meu);
+		CalculateNumberOfEdges(PD_neq, PD_mneh_u, &PD_med_u);
+		MakeEdgeList(PD_edgeCodes, PD_med_u);
 		PD_TWIDDLE_done = false;
 		PD_TWIDDLE_nextEdgeI = 0;
-		TWIDDLE_Make_p(PD_TWIDDLE_p, PD_mneh, PD_neq - 1);
+		TWIDDLE_Make_p(PD_TWIDDLE_p, PD_mneh_u, PD_neq - 1);
 	}
 }
