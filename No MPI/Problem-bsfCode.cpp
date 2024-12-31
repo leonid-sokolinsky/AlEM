@@ -48,7 +48,7 @@ void PC_bsf_Init(bool* success) {
 
 	PD_neq = PD_n - PD_meq;	// Dimension of the subspace of intersection of equation-hyperplanes
 
-	*success = MTX_LoadPoint(PD_u_cur, PP_MTX_POSTFIX_U0);
+	*success = MTX_LoadPoint(PD_u_cur, PP_MTX_POSTFIX_V);
 	if (*success == false)
 		return;
 
@@ -145,20 +145,20 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 	Vector_Addition(u_cur, PD_objVector, v);
 
 #ifdef BIPROJECTION
-	Flat_BIProjection(PD_edgeAlHyperplanes, PD_meq + PD_mne_p, v, PP_EPS_PROJECTION_ROUND, PP_MAX_PSEUDOPROJECTING_ITER, w, success);
+	Flat_BipProjection(PD_edgeAlHyperplanes, PD_meq + PD_mne_p, v, PP_EPS_BIPPROJECTION_ROUND, PP_EPS_ZERO, PP_MAX_PSEUDOPROJECTING_ITER, w, success);
 #else
-	Flat_MaxProjection(PD_edgeAlHyperplanes, PD_meq + PD_mne_p, v, PP_EPS_PROJECTION_ROUND, PP_MAX_PSEUDOPROJECTING_ITER, w, success);
+	Flat_MaxProjection(PD_edgeAlHyperplanes, PD_meq + PD_mne_p, v, PP_EPS_MAXPROJECTION_ZERO, PP_EPS_ZERO, PP_MAX_PSEUDOPROJECTING_ITER, w, success);
 #endif // BIPROJECTION
 
 	if (!*success) {
 		cout << "\n\nProcess " << BSF_sv_mpiRank
 			<< ". Error in PC_bsf_MapF: Exceeded the maximum number of iterations when calculating pseudoprojection (PP_MAX_PSEUDOPROJECTING_ITER = "
 			<< PP_MAX_PSEUDOPROJECTING_ITER << "). It is impossible to calculate Map function for element "
-			<< BSF_sv_addressOffset + BSF_sv_numberInSublist << "!\n Perhaps you should decrease parameter PP_EPS_PROJECTION_ROUND.";
+			<< BSF_sv_addressOffset + BSF_sv_numberInSublist << "!\n";
 		return;
 	}
 
-	Vector_Round(w, PP_EPS_PROJECTION_ROUND * 10);
+	Vector_Round(w, PP_EPS_W_ROUND);
 	Vector_Subtraction(w, u_cur, d);
 
 	norm_d = Vector_Norm(d);
@@ -283,7 +283,13 @@ void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
 
 	cout << "PP_EPS_ZERO\t\t\t" << PP_EPS_ZERO << endl;
 	cout << "PP_EPS_POINT_IN_HALFSPACE\t" << PP_EPS_POINT_IN_HALFSPACE << endl;
-	cout << "PP_EPS_PROJECTION_ROUND\t\t" << PP_EPS_PROJECTION_ROUND << endl;
+	cout << "PP_EPS_ON_HYPERPLANE\t\t" << PP_EPS_ON_HYPERPLANE << endl;
+#ifdef BIPROJECTION
+	cout << "PP_EPS_BIPPROJECTION_ROUND\t" << PP_EPS_BIPPROJECTION_ROUND << endl;
+#else
+	cout << "PP_EPS_MAXPROJECTION_ZERO\t" << PP_EPS_MAXPROJECTION_ZERO << endl;
+#endif // BIPROJECTION
+	cout << "PP_EPS_W_ROUND\t\t\t" << PP_EPS_W_ROUND << endl;
 	cout << "PP_OBJECTIVE_VECTOR_LENGTH\t" << PP_OBJECTIVE_VECTOR_LENGTH << endl;
 	cout << "--------------- Data ---------------\n";
 	cout << "F(u0) = " << setw(PP_SETW) << ObjF(PD_u_cur) << endl;
@@ -351,7 +357,7 @@ void PC_bsf_ProcessResults(PT_bsf_reduceElem_T* reduceResult, int reduceCounter,
 	if (RelativeError(PD_objF_cur, reduceResult->objF_nex) < PP_EPS_ZERO) {
 		/*DEBUG PC_bsf_ProcessResults**
 #ifdef PP_DEBUG
-		//cout << "u_nex =\t    "; Print_Vector(reduceResult->u_nex); cout << "\t";
+		cout << "u_nex =\t    "; Print_Vector(reduceResult->u_nex); cout << "\t";
 		cout << "F(u_nex) = " << setw(PP_SETW) << reduceResult->objF_nex << endl;
 		cout << "|F(u_cur)-F(u_nex)|/|F(F(u_cur))| = " << RelativeError(PD_objF_cur, reduceResult->objF_nex) << " < PP_EPS_ZERO = " << PP_EPS_ZERO << " ===>>> movement is impossible.\n";
 #endif // PP_DEBUG /**/
@@ -502,7 +508,7 @@ namespace SF {
 		return Vector_NormSquare(z);
 	}
 
-	static inline void Flat_BIProjection(int* flatHyperplanes, int m_flat, PT_vector_T v, double eps, int maxProjectingIter, PT_vector_T w, int* success) {
+	static inline void Flat_BipProjection(int* flatHyperplanes, int m_flat, PT_vector_T v, double eps_bipprojection_round, double eps_zero, int maxProjectingIter, PT_vector_T w, int* success) {
 		PT_vector_T r;
 		PT_vector_T w_previous;
 		double dist;
@@ -522,7 +528,7 @@ namespace SF {
 			}
 
 			Vector_DivideEquals(r, m_flat);
-			Vector_Round(r, eps);
+			Vector_Round(r, eps_bipprojection_round);
 			Vector_PlusEquals(w, r);
 
 			iterCount++;
@@ -531,14 +537,14 @@ namespace SF {
 				break;
 			}
 			dist = Distance_PointToPoint(w, w_previous);
-		} while (dist >= eps);
+		} while (dist >= eps_zero);
 		/*DEBUG PC_bsf_MapF**
 #ifdef PP_DEBUG
-		cout << "Flat_BIProjection: iterCount = " << iterCount << endl;
+		cout << "Flat_BipProjection: iterCount = " << iterCount << endl;
 #endif // PP_DEBUG /**/
 	}
 
-	static inline void Flat_MaxProjection(int* flatHyperplanes, int m_flat, PT_vector_T v, double eps, int maxProjectingIter, PT_vector_T w, int* success) {
+	static inline void Flat_MaxProjection(int* flatHyperplanes, int m_flat, PT_vector_T v, double eps_maxprojection_zero, double eps_zero, int maxProjectingIter, PT_vector_T w, int* success) {
 		PT_vector_T w_previous;
 		PT_vector_T w_max;
 		double dist;
@@ -558,7 +564,7 @@ namespace SF {
 				PT_vector_T p;
 				OrthogonalProjectingVectorOntoHyperplane_i(w, flatHyperplanes[i], p);
 				dist = Vector_Norm(p);
-				if (dist >= max_dist + PP_EPS_ZERO) {
+				if (dist >= max_dist + eps_maxprojection_zero) {
 					Vector_Addition(w, p, w_max);
 					max_dist = dist;
 					max_i = i;
@@ -580,7 +586,7 @@ namespace SF {
 				break;
 			}
 			dist = Distance_PointToPoint(w, w_previous);
-		} while (dist >= eps);
+		} while (dist >= eps_zero);
 		/*DEBUG PC_bsf_MapF**
 #ifdef PP_DEBUG
 		cout << "Flat_MaxProjection: iterCount = " << iterCount << endl;
@@ -729,7 +735,7 @@ namespace SF {
 	}
 
 	static bool MPS___Load_Problem() {
-		const char* mtxFile;
+		const char* mpsFile;
 		FILE* stream;// Input stream
 		char str[80] = { '\0' };
 		char* chr = str;
@@ -779,12 +785,12 @@ namespace SF {
 		MPS_file += PP_MPS_PREFIX;
 		MPS_file += PD_problemName;
 		MPS_file += PP_MPS_EXTENSION;
-		mtxFile = MPS_file.c_str();
-		stream = fopen(mtxFile, "r+b");
+		mpsFile = MPS_file.c_str();
+		stream = fopen(mpsFile, "r+b");
 
 		if (stream == NULL) {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-				cout << "Failure of opening file '" << mtxFile << "'.\n";
+				cout << "Failure of opening file '" << mpsFile << "'.\n";
 			return false;
 		}
 
@@ -2717,6 +2723,8 @@ namespace PF {
 	}
 
 	static inline void PreparationForIteration(PT_vector_T u) {
+		int med_u;
+
 		MakeNeHyperplaneList(u, PD_neHyperplanes_u, &PD_mneh_u, PP_EPS_POINT_IN_HALFSPACE);
         assert(PD_mneh_u <= PP_MM);
 
@@ -2731,8 +2739,8 @@ namespace PF {
 			exit(1);
 		}
 
-		CalculateNumberOfEdges(PD_neq, PD_mneh_u, &PD_med_u);
-		MakeEdgeList(PD_edgeCodes, PD_med_u);
+		CalculateNumberOfEdges(PD_neq, PD_mneh_u, &med_u);
+		MakeEdgeList(PD_edgeCodes, med_u);
 		PD_TWIDDLE_done = false;
 		PD_TWIDDLE_nextEdgeI = 0;
 		TWIDDLE_Make_p(PD_TWIDDLE_p, PD_mneh_u, PD_neq - 1);

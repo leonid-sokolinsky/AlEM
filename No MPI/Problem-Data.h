@@ -14,7 +14,6 @@ static int PD_meq;					// Number of constraints being equations
 static int PD_n;					// Space dimension
 static int PD_neq;					// Dimension of the subspace of intersection of equation-hyperplanes (PD_n = PD_neq + PD_meq)
 static int PD_mneh_u;				// Number of inequality-hyperplanes that include point u
-static int PD_med_u;				// Number of edges that include point u
 static int PD_mne_p;				// Number of inequality-hyperplanes used for pseudoprojection
 static int PD_iterNo;				// Number of iterations
 static double PD_objF_cur;			// Objective function value in curerent point

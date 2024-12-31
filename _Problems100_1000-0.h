@@ -12,14 +12,14 @@ LP problems were obtained using BSF-LPP-Generator.
 //============================== Problem Parameters ===========================
 // PP_OBJECTIVE_VECTOR_LENGTH - direct dependence on dimension PD_n.
 // P_EPS_ZERO - inverse dependence on PP_OBJECTIVE_VECTOR_LENGTH.
-// PP_EPS_PROJECTION_ROUND - inverse dependence on PP_OBJECTIVE_VECTOR_LENGTH. 
+// PP_EPS_BIPPROJECTION_ROUND - inverse dependence on PP_OBJECTIVE_VECTOR_LENGTH. 
 //						This parameter affects terminate condition when 
 //						calculating pseudoprojection.
 //-----------------------------------------------------------------------------
 #define PP_EPS_ZERO					1E-6			// Accuracy for comparison with zero
 #define PP_EPS_POINT_IN_HALFSPACE	(PP_EPS_ZERO*10)// Precision for MakeHyperplaneList()
 #define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*10)// Accuracy of belonging to hyperplane
-#define PP_EPS_PROJECTION_ROUND		PP_EPS_ZERO		// Precision of rounding vector r
+#define PP_EPS_BIPPROJECTION_ROUND		PP_EPS_ZERO		// Precision of rounding vector r
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+9			// Length of Objective Vector
 //-----------------------------------------------------------------------------
 #define PP_MAX_PROJECTING_ITER		1E+7	// Maximum acceptable number of iterations in PseudoprojectionOnFace()

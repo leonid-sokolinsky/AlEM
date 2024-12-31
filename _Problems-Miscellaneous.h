@@ -12,16 +12,26 @@ Initial surface points for these problems were calculated using BSF-Apex-Quest.
 //=========================== problem Parameters ========================
 // PP_OBJECTIVE_VECTOR_LENGTH - direct dependence on dimension PD_n.
 // P_EPS_ZERO - inverse dependence on PP_OBJECTIVE_VECTOR_LENGTH.
-// PP_EPS_PROJECTION_ROUND - inverse dependence on PP_OBJECTIVE_VECTOR_LENGTH. 
+// PP_EPS_BIPPROJECTION_ROUND - inverse dependence on PP_OBJECTIVE_VECTOR_LENGTH. 
 //						This parameter affects terminate condition when 
 //						calculating pseudoprojection.
 #define PP_EPS_ZERO					1E-9			// Precision for comparison with zero
 #define PP_EPS_POINT_IN_HALFSPACE	PP_EPS_ZERO		// Precision for MakeHyperplaneList()
 #define PP_EPS_ON_HYPERPLANE		PP_EPS_ZERO		// Accuracy of belonging to hyperplane
-#define PP_EPS_PROJECTION_ROUND		PP_EPS_ZERO		// Precision of rounding vector r
+#define PP_EPS_BIPPROJECTION_ROUND	PP_EPS_ZERO		// Precision of rounding vector r
+#define PP_EPS_MAXPROJECTION_ZERO	PP_EPS_ZERO		// Precision to calculate MFP projection
+#define PP_EPS_W_ROUND				(PP_EPS_ZERO*10)// Precision of rounding w vector
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+7			// Length of Objective Vector
 #define PP_KK						100				// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
 //-----------------------------------------------------------------------------
+
+/*============================== nguyen5 LP problem ============================*
+#define PP_PROBLEM_NAME	"nguyen5"
+#define PP_MPS_FORMAT
+#define PP_M 4		// Number of constrains
+#define PP_N 5		// Number of variables
+#define PP_MAX_OBJ_VALUE 		21.45497290910349
+//------------------------------------------------------------------------------
 
 /*============================== simpleCube LP problem ==========================*
 //#define PP_MPS_FORMAT
@@ -99,9 +109,9 @@ Initial surface points for these problems were calculated using BSF-Apex-Quest.
 #define PP_N 8		// Nnumber of cols in *.mtx
 #endif
 #define PP_MAX_OBJ_VALUE 		55000
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
-/*============================== simple1min LP problem ==========================*
+/*============================== simple1min LP problem =========================*
 #define PP_PROBLEM_NAME	"simple1min"
 #define PP_M 5		// Number of equations (number of rows in *.mtx)
 #define PP_N 8		// Number of variables (number of cols in *.mtx)
@@ -190,6 +200,7 @@ Initial surface points for these problems were calculated using BSF-Apex-Quest.
 #define PP_M 105		// Number of equations (number of rows in *.mtx)
 #define PP_N 110		// Number of variables (number of cols in *.mtx)
 #define PP_MAX_OBJ_VALUE	1848.437080568192
+#define PP_EPS_MAXPROJECTION_ZERO	(PP_EPS_ZERO*10)		// Precision to calculate MFP projection
 //------------------------------------------------------------------------------
 
 /*==============================================================================*/
