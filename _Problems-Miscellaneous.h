@@ -200,6 +200,7 @@ Initial surface points for these problems were calculated using BSF-Apex-Quest.
 #define PP_M 105		// Number of equations (number of rows in *.mtx)
 #define PP_N 110		// Number of variables (number of cols in *.mtx)
 #define PP_MAX_OBJ_VALUE	1848.437080568192
+#undef  PP_EPS_MAXPROJECTION_ZERO
 #define PP_EPS_MAXPROJECTION_ZERO	(PP_EPS_ZERO*10)		// Precision to calculate MFP projection
 //------------------------------------------------------------------------------
 

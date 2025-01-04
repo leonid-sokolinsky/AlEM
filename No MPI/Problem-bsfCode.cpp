@@ -240,7 +240,7 @@ void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
 
 #ifdef PP_MPS_FORMAT
 	cout << "Input format: MPS" << endl;
-	cout << "m =\t" << PD_m << "\tn = " << PD_n << " (after conversion into standard form)" << endl;
+	cout << "m = " << PD_m << " n = " << PD_n << " (after conversion into standard form)" << endl;
 #else
 	cout << "Input format: MTX (with elimination of free variables)" << endl;
 	cout << "Before elimination: m =\t" << PP_M << "\tn = " << PP_N << endl;
@@ -2319,6 +2319,19 @@ namespace SF {
 		if (a_DoT_x_MinuS_b < 0)
 			return true;
 		return false;
+	}
+
+	static inline bool PointIsVertex_i(PT_vector_T x, double eps) {
+		int hCount = 0;
+
+		for (int i = 0; i < PD_m; i++)
+			if (PointBelongsHyperplane_i(x, i, eps))
+				hCount++;
+
+		if (hCount >= PD_n)
+			return true;
+		else
+			return false;
 	}
 
 	static inline int PointLocation_i(PT_vector_T x, int i, double eps, double* a_DoT_x_MinuS_b) {
