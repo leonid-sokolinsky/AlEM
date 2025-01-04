@@ -2411,28 +2411,28 @@ namespace SF {
 	}
 
 	static inline void Print_Number_of_edges(PT_vector_T x) {
-		int mneh_u;
-		unsigned long long me;
+		int mne;
+		unsigned long long ull_mne;
 
-		mneh_u = 0;
+		mne = 0;
 		for (int i = 0; i < PD_m; i++) {
 			if (PD_isEquation[i])
 				continue;
 			if (PointBelongsHyperplane_i(x, i, PP_EPS_POINT_IN_HALFSPACE))
-				mneh_u++;
+				mne++;
 		}
 
-		if (mneh_u == PD_neq)
-			me = (unsigned long long) mneh_u;
+		if (mne == PD_neq)
+			ull_mne = (unsigned long long) mne;
 		else {
-			if (mneh_u > 62) {
-				cout << "Warning: Can't calculate binomial coefficient for number of including hyperplanes mneh_u = "
-					<< mneh_u << " > 62" << endl;
+			if (mne > 62) {
+				cout << "Warning: Can't calculate binomial coefficient for number of including hyperplanes mne = "
+					<< mne << " > 62" << endl;
 				return;
 			}
-			me = BinomialCoefficient(mneh_u, PD_neq - 1);
+			ull_mne = BinomialCoefficient(mne, PD_neq - 1);
 		}
-		cout << me << endl;
+		cout << ull_mne << endl;
 	}
 
 	static inline void Print_Vector(PT_vector_T x) {
