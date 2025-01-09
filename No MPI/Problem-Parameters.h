@@ -31,6 +31,10 @@ This source code has been produced with using BSF-skeleton
 #include "../_Problems-Miscellaneous.h"
 #define PP_PATH "../../Set-of-LP-Problems/Miscellaneous-LP/"
 
+/**
+#include "../_Problems-NetLib-LP.h"
+#define PP_PATH "../../Set-of-LP-Problems/NetLib-LP/"
+
 /*---------------------------------------------------------------------*/
 
 #define PP_METHOD_NAME "AlEM (no MPI)"
@@ -76,7 +80,6 @@ This source code has been produced with using BSF-skeleton
 //-------------------------- Jobs  -----------------------
 // Not used.
 //------------- Locations -------------
-#define PP_DEGENERATE_INEQUALITY	0
 #define PP_ON_HYPERPLANE			1
 #define PP_INSIDE_HALFSPACE			2
 #define PP_OUTSIDE_HALFSPACE		3

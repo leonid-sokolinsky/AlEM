@@ -37,10 +37,12 @@ This include file is part of Problem-Parameters.h
 #define PP_EPS_ZERO					1E-9			// Precision for comparison with zero
 #define PP_EPS_POINT_IN_HALFSPACE	(PP_EPS_ZERO*10)// Precision for MakeHyperplaneList()
 #define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*10)// Accuracy of belonging to hyperplane
-#define PP_EPS_BIPPROJECTION_ROUND		PP_EPS_ZERO		// Precision of rounding vector r
+#define PP_EPS_BIPPROJECTION_ROUND	PP_EPS_ZERO		// Precision of rounding vector r
+#define PP_EPS_MAXPROJECTION_ZERO	PP_EPS_ZERO		// Precision to calculate MFP projection
+#define PP_EPS_W_ROUND				(PP_EPS_ZERO*10)// Precision of rounding w vector
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+7			// Length of Objective Vector
 #define PP_REAL_TIME				500				// This parameter limits the calculation time (compilator limit: 2 147 483 647)
-#define PP_KK						28049408		// Maximal number of edges that include surface point (compilator limit:	2 147 483 647)
+#define PP_KK						28048800		// Maximal number of edges that include surface point (compilator limit:	2 147 483 647)
 //--------------------------------------------------------------------------
 
 /*============================== beaconfd LP problem =======================*

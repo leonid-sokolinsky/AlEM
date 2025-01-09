@@ -17,7 +17,7 @@ LP problems were obtained using BSF-LPP-Generator.
 //						calculating pseudoprojection.
 //-----------------------------------------------------------------------------
 #define PP_EPS_ZERO					1E-6			// Accuracy for comparison with zero
-#define PP_EPS_POINT_IN_HALFSPACE	(PP_EPS_ZERO*10)// Precision for MakeHyperplaneList()
+
 #define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*10)// Accuracy of belonging to hyperplane
 #define PP_EPS_BIPPROJECTION_ROUND		PP_EPS_ZERO		// Precision of rounding vector r
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+9			// Length of Objective Vector

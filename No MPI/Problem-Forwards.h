@@ -27,7 +27,7 @@ namespace SF {
 	void	MakeColumnOfNorms(PT_matrix_T A, PT_column_T norm_a);
 	void	MakeListOfNotIncludingHalfspaces(PT_vector_T x, int* notIncludingHalfspacesList, double eps);
 	void	MakeNeHyperplaneList(PT_vector_T u, int* neHyperplanes_u, int* mneh_u, double eps);
-	void	MovingToPolytope(PT_vector_T startPoint, PT_vector_T directionVector, PT_vector_T finishPoint, double epsMoving);
+	void	MovingToPolytope(PT_vector_T startPoint, PT_vector_T directionVector, PT_vector_T finishPoint, double epsMoving, double epsInHalfspace);
 	bool	MPS___Load_Problem();
 	bool	MPS__MakeProblem(PT_MPS_row_T* row, int n_row, PT_MPS_column_T* column, int n_col, double* loBound, PT_MPS_upBound_T* upBounds, int n_up, PT_MPS_fxVariable_T* fxVariable, int n_fx);
 	bool	MPS__ReadBounds(FILE* stream, PT_MPS_column_T* column, int n_col, double* loBound, PT_MPS_upBound_T* upBound, int* n_up, PT_MPS_fxVariable_T* fxVariable, int* n_fx);
@@ -46,7 +46,7 @@ namespace SF {
 	bool	MPS_ReadColumnLine(FILE* stream, PT_MPS_column_T* column, int* n_col);
 	bool	MPS_ReadName(FILE* stream, char* name);
 	bool	MPS_ReadRHS_line(FILE* stream, PT_MPS_row_T* row, int n_row, PT_MPS_name_T RHS_name);
-	bool	MPS_ReadValue(FILE* stream, double* value); 
+	bool	MPS_ReadValue(FILE* stream, double* value);
 	bool	MPS_SameNames(PT_MPS_name_T name_x, PT_MPS_name_T name_y);
 	int		MPS_SearchColByName(PT_MPS_column_T* column, int j_col, PT_MPS_name_T name);
 	int		MPS_SearchRowByName(PT_MPS_row_T* row, int n_row, PT_MPS_name_T name);
@@ -81,7 +81,7 @@ namespace SF {
 	void	Print_HalfspacesIncludingPoint(PT_vector_T x, double eps);
 	void	Print_HalfspacesOutOfPoint(PT_vector_T x, double eps);
 	void	Print_HyperplanesIncludingPoint(PT_vector_T x, double eps);
-	void	Print_Number_of_edges(PT_vector_T x);
+	void	Print_Number_of_edges(PT_vector_T x, double epsOnHyperplane);
 	void	Print_Vector(PT_vector_T x);
 	double	RelativeError(double trueValue, double calculatedValue);
 	void	Shift(PT_vector_T point, PT_vector_T shiftVector, double factor, PT_vector_T shiftedPoint);
@@ -93,7 +93,6 @@ namespace SF {
 	void	Vector_DivideByNumber(PT_vector_T x, double r, PT_vector_T y);
 	void	Vector_DivideEquals(PT_vector_T x, double r);
 	double	Vector_DotProduct(PT_vector_T x, PT_vector_T y);
-	bool	Vector_Is_Tiny(PT_vector_T x, double eps);
 	void	Vector_MakeLike(PT_vector_T x, double lengthOfLikeVector, PT_vector_T likeVector);
 	void	Vector_MakeMinus_e(PT_vector_T minus_e);
 	void	Vector_MinusEquals(PT_vector_T equalPoint, PT_vector_T minusVector);

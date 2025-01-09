@@ -54,10 +54,19 @@ void PC_bsf_Init(bool* success) {
 
 	MakeColumnOfNorms(PD_A, PD_norm_a);
 
-	if (!PointBelongsPolytope(PD_u_cur, PP_EPS_ZERO)) {
+	for (int i = 0; i < PD_m; i++)
+		if (PD_norm_a[i] < PP_EPS_ZERO) { //Degenerate equation!
+			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
+				cout << "Equation/inequality " << i << " is degenerate with pecision of PP_EPS_ZERO = "
+				<< PP_EPS_ZERO << "!!!\n";
+			*success = false;
+			return;
+		}
+
+	if (!PointBelongsPolytope(PD_u_cur, PP_EPS_ON_HYPERPLANE)) {
 		if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-			cout << "Starting point does not belong to the feasible polytope with precision PP_EPS_ZERO = "
-			<< PP_EPS_ZERO << "!!!\n";
+			cout << "Starting point does not belong to the feasible polytope with precision PP_EPS_ON_HYPERPLANE = "
+			<< PP_EPS_ON_HYPERPLANE << "!!!\n";
 		*success = false;
 		return;
 	}
@@ -127,7 +136,7 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 	#endif // PP_DEBUG /**/
 	// Condition for breakpoint: PD_iterNo == 2 && (BSF_sv_addressOffset + BSF_sv_numberInSublist == 2)
 
-	TWIDDLE_CodeToSubset(edgeCode, PD_neHyperplanes_u, PD_edgeNeHyperplanes, PD_mneh_u, PD_neq - 1, 
+	TWIDDLE_CodeToSubset(edgeCode, PD_neHyperplanes_u, PD_edgeNeHyperplanes, PD_mneh_u, PD_neq - 1,
 		&PD_TWIDDLE_x, &PD_TWIDDLE_y, &PD_TWIDDLE_z, PD_TWIDDLE_p, &PD_TWIDDLE_done, &PD_TWIDDLE_nextEdgeI);
 
 	for (int i = 0; i < PD_mne_p; i++)
@@ -188,7 +197,7 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 		return;
 	}
 
-	if (!PointBelongsPolytope(u_nex, PP_EPS_POINT_IN_HALFSPACE)) {
+	if (!PointBelongsPolytope(u_nex, PP_EPS_ON_HYPERPLANE)) {
 		/*DEBUG PC_bsf_MapF**
 		#ifdef PP_DEBUG
 				cout << "u_nex = ";
@@ -251,7 +260,10 @@ void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
 	if (PD_meq > 0)
 		cout << "Subspace dimension: " << PD_neq << endl;
 
-	cout << "No MPI" << endl;
+	if (BSF_sv_mpiMaster == 0)
+		cout << "No MPI" << endl;
+	else
+		cout << "Number of Workers: " << BSF_sv_numOfWorkers << endl;
 
 #ifdef PP_BSF_OMP
 #ifdef PP_BSF_NUM_THREADS
@@ -282,7 +294,6 @@ void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
 #endif // BIPROJECTION
 
 	cout << "PP_EPS_ZERO\t\t\t" << PP_EPS_ZERO << endl;
-	cout << "PP_EPS_POINT_IN_HALFSPACE\t" << PP_EPS_POINT_IN_HALFSPACE << endl;
 	cout << "PP_EPS_ON_HYPERPLANE\t\t" << PP_EPS_ON_HYPERPLANE << endl;
 #ifdef BIPROJECTION
 	cout << "PP_EPS_BIPPROJECTION_ROUND\t" << PP_EPS_BIPPROJECTION_ROUND << endl;
@@ -302,13 +313,13 @@ void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
 #endif // PP_MATRIX_OUTPUT
 
 #ifdef PP_DEBUG
-	if (!PointBelongsPolytope(PD_u_cur, PP_EPS_POINT_IN_HALFSPACE))
+	if (!PointBelongsPolytope(PD_u_cur, PP_EPS_ON_HYPERPLANE))
 		cout << "u0 is outside feasible polytope!!!\n";
 	else
 		cout << "u0 belongs to feasible polytope.\n";
-	// cout << "Including hyperplanes:\t"; Print_HyperplanesIncludingPoint(PD_u_cur, PP_EPS_POINT_IN_HALFSPACE); cout << endl;
+	// cout << "Including hyperplanes:\t"; Print_HyperplanesIncludingPoint(PD_u_cur, PP_EPS_ON_HYPERPLANE); cout << endl;
 	cout << "// Number of inequality hyperplanes including u0: " << Number_IncludingNeHyperplanes(PD_u_cur, PP_EPS_ON_HYPERPLANE) << endl;
-	cout << "Number of edges:\t"; Print_Number_of_edges(PD_u_cur);
+	cout << "Number of edges:\t"; Print_Number_of_edges(PD_u_cur, PP_EPS_ON_HYPERPLANE);
 #endif // PP_DEBUG
 }
 
@@ -370,7 +381,7 @@ void PC_bsf_ProcessResults(PT_bsf_reduceElem_T* reduceResult, int reduceCounter,
 	cout << "_________________________________________________ " << PD_iterNo << " _____________________________________________________" << endl;
 	//cout << "u_nex:\t"; Print_Vector(reduceResult->u_nex);  cout << "\t";
 	cout << "F(u_nex) = " << reduceResult->objF_nex << endl;
-	//cout << "u_nex hyperplanes:\t"; Print_HyperplanesIncludingPoint(reduceResult->u_nex, PP_EPS_POINT_IN_HALFSPACE); cout << endl;
+	//cout << "u_nex hyperplanes:\t"; Print_HyperplanesIncludingPoint(reduceResult->u_nex, PP_EPS_ON_HYPERPLANE); cout << endl;
 #endif // PP_DEBUG
 
 	Vector_Copy(reduceResult->u_nex, PD_u_cur);
@@ -468,9 +479,6 @@ namespace SF {
 	static inline double Distance_PointToHalfspace_i(PT_vector_T x, int i) {
 		double a_DoT_z_MinuS_b = Vector_DotProduct(PD_A[i], x) - PD_b[i];
 
-		if (PD_norm_a[i] < PP_EPS_ZERO) //Degenerate equation
-			return 0;
-
 		if (a_DoT_z_MinuS_b < 0) // Point belongs to halfspace
 			return 0;
 
@@ -478,10 +486,7 @@ namespace SF {
 	}
 
 	static inline double Distance_PointToHyperplane_i(PT_vector_T x, int i) {
-		if (PD_norm_a[i] < PP_EPS_ZERO) //Degenerate equation
-			return 0;
-		else
-			return fabs(Vector_DotProduct(PD_A[i], x) - PD_b[i]) / PD_norm_a[i];
+		return fabs(Vector_DotProduct(PD_A[i], x) - PD_b[i]) / PD_norm_a[i];
 	}
 
 	static inline double Distance_PointToPoint(PT_vector_T x, PT_vector_T y) {
@@ -593,7 +598,7 @@ namespace SF {
 #endif // PP_DEBUG /**/
 	}
 
-	static inline void JumpingOnPolytope(PT_vector_T startPoint, PT_vector_T directionVector, PT_vector_T finishPoint, double eps) {
+	static inline void JumpingOnPolytope(PT_vector_T startPoint, PT_vector_T directionVector, PT_vector_T finishPoint, double eps_zero) {
 		PT_vector_T o; // Oblique projection vector
 		PT_vector_T o_min; // Oblique projection vector with minimum length
 		double lengthSQR_o;
@@ -608,17 +613,14 @@ namespace SF {
 		Vector_Zeroing(o_min);
 
 		for (int i = 0; i < PD_m; i++) {
-			if (PD_isEquation[i])
-				continue;
-			location_z = PointLocation_i(z, i, eps, &a_DoT_z_MinuS_b);
-			assert(location_z != PP_DEGENERATE_INEQUALITY);
 
 			a_DoT_d = Vector_DotProduct(PD_A[i], d);
 			norm_a_DoT_norm_d = a_DoT_d / (PD_norm_a[i] * Vector_Norm(d));
 
+			location_z = PointLocation_i(z, i, eps_zero, &a_DoT_z_MinuS_b);
 			switch (location_z) {
 			case PP_ON_HYPERPLANE:
-				if (fabs(norm_a_DoT_norm_d) < eps)
+				if (fabs(norm_a_DoT_norm_d) < eps_zero)
 					continue;
 				if (norm_a_DoT_norm_d < 0)
 					continue;
@@ -626,7 +628,7 @@ namespace SF {
 				Vector_Copy(startPoint, finishPoint);
 				return;
 			case PP_INSIDE_HALFSPACE:
-				if (fabs(norm_a_DoT_norm_d) < eps)
+				if (fabs(norm_a_DoT_norm_d) < eps_zero)
 					continue;
 				if (norm_a_DoT_norm_d < 0)
 					continue;
@@ -652,10 +654,10 @@ namespace SF {
 			norm_a[i] = Vector_Norm(A[i]);
 	}
 
-	static inline void MakeListOfNotIncludingHalfspaces(PT_vector_T x, int* notIncludingHalfspacesList, double eps) {
+	static inline void MakeListOfNotIncludingHalfspaces(PT_vector_T x, int* notIncludingHalfspacesList, double eps_on_hyperplane) {
 		int mo = 0;
 		for (int i = 0; i < PD_m; i++)
-			if (!PointBelongsHalfspace_i(x, i, eps)) {
+			if (!PointBelongsHalfspace_i(x, i, eps_on_hyperplane)) {
 				notIncludingHalfspacesList[mo] = i;
 				mo++;
 			}
@@ -663,20 +665,20 @@ namespace SF {
 			notIncludingHalfspacesList[mo] = -1;
 	}
 
-	static inline void MakeNeHyperplaneList(PT_vector_T u, int* neHyperplanes_u, int* mneh_u, double eps) {
+	static inline void MakeNeHyperplaneList(PT_vector_T u, int* neHyperplanes_u, int* mneh_u, double eps_on_hyperplane) {
 		// List of hyperplanes that are not equations and include point u.
 		*mneh_u = 0;
 		for (int i = 0; i < PD_m; i++) {
 			if (PD_isEquation[i])
 				continue;
-			if (PointBelongsHyperplane_i(u, i, eps)) {
+			if (PointBelongsHyperplane_i(u, i, eps_on_hyperplane)) {
 				neHyperplanes_u[*mneh_u] = i;
 				(*mneh_u)++;
 			}
 		}
 	}
 
-	static inline void MovingToPolytope(PT_vector_T startPoint, PT_vector_T directionVector, PT_vector_T finishPoint, double epsMoving) {
+	static inline void MovingToPolytope(PT_vector_T startPoint, PT_vector_T directionVector, PT_vector_T finishPoint, double eps_moving, double eps_on_hyperplane) {
 		double leftBound = 0;
 		double rightBound = PP_DBL_MAX;
 		double factor = 1;
@@ -685,23 +687,23 @@ namespace SF {
 		int mo;								// Number of out half-spaces
 		bool pointInsideCone;
 
-		assert(Vector_Norm(directionVector) >= PP_EPS_ZERO);
+		assert(Vector_Norm(directionVector) >= eps_moving);
 
 		mo = 0;
 		for (int i = 0; i < PD_m; i++)
-			if (!PointBelongsHalfspace_i(startPoint, i, PP_EPS_POINT_IN_HALFSPACE)) {
+			if (!PointBelongsHalfspace_i(startPoint, i, eps_on_hyperplane)) {
 				outerHalspace_i[mo] = i;
 				mo++;
 			}
 
 		delta = factor / 2;
 
-		while (rightBound - leftBound >= PP_EPS_ZERO && delta > 0) {
+		while (rightBound - leftBound >= eps_moving && delta > 0) {
 			Shift(startPoint, directionVector, factor, finishPoint);
 
 			pointInsideCone = true;
 			for (int i = 0; i < mo; i++)
-				if (PointBelongsHalfspace_i(finishPoint, outerHalspace_i[i], PP_EPS_POINT_IN_HALFSPACE)) {
+				if (PointBelongsHalfspace_i(finishPoint, outerHalspace_i[i], eps_on_hyperplane)) {
 					pointInsideCone = false;
 					break;
 				}
@@ -719,11 +721,11 @@ namespace SF {
 		}
 
 		Shift(startPoint, directionVector, factor, finishPoint);
-		delta = epsMoving;
+		delta = eps_moving;
 		do {
 			pointInsideCone = false;
 			for (int i = 0; i < mo; i++)
-				if (!PointBelongsHalfspace_i(finishPoint, outerHalspace_i[i], epsMoving)) {
+				if (!PointBelongsHalfspace_i(finishPoint, outerHalspace_i[i], eps_moving)) {
 					pointInsideCone = true;
 					factor -= delta;
 					delta *= 2;
@@ -2168,13 +2170,13 @@ namespace SF {
 		fsetpos(stream, &pos);
 	}
 
-	static inline int Number_IncludingNeHyperplanes(PT_vector_T x, double eps) {
+	static inline int Number_IncludingNeHyperplanes(PT_vector_T x, double eps_on_hyperplane) {
 		int number = 0;
 
 		for (int i = 0; i < PD_m; i++) {
 			if (PD_isEquation[i])
 				continue;
-			if (PointBelongsHyperplane_i(x, i, eps))
+			if (PointBelongsHyperplane_i(x, i, eps_on_hyperplane))
 				number++;
 		}
 		return number;
@@ -2187,7 +2189,7 @@ namespace SF {
 		return s;
 	}
 
-	static inline void	ObliqueProjectingVectorOntoHalfspace_i(PT_vector_T z, int i, PT_vector_T d, PT_vector_T o, double eps, int* exitCode) {
+	static inline void	ObliqueProjectingVectorOntoHalfspace_i(PT_vector_T z, int i, PT_vector_T d, PT_vector_T o, double eps_zero, int* exitCode) {
 		// Oblique projecting vector o of point z onto Half-space H_i with respect to vector d
 		double a_DoT_d;	// <a,d>
 		double norm_a_DoT_norm_d; // <a,d>/(||a||*||d||)
@@ -2195,21 +2197,20 @@ namespace SF {
 		double factor;	// (b - <a,z>) / <a,d>
 
 		Vector_Zeroing(o);
-		
-		*exitCode = PointLocation_i(z, i, eps, &a_DoT_z_MinuS_b);
+
+		*exitCode = PointLocation_i(z, i, eps_zero, &a_DoT_z_MinuS_b);
 		a_DoT_d = Vector_DotProduct(PD_A[i], d); // <a,d>
 
 		a_DoT_d = Vector_DotProduct(PD_A[i], d);
 		norm_a_DoT_norm_d = a_DoT_d / (PD_norm_a[i] * Vector_Norm(d));
 
 		switch (*exitCode) {
-		case PP_DEGENERATE_INEQUALITY:
 		case PP_ON_HYPERPLANE:
 		case PP_INSIDE_HALFSPACE:
 			Vector_Copy(z, o);
 			return;
 		case PP_OUTSIDE_HALFSPACE:
-			if (fabs(norm_a_DoT_norm_d) < eps) {
+			if (fabs(norm_a_DoT_norm_d) < eps_zero) {
 				*exitCode = PP_PARALLEL;
 				Vector_SetValue(o, PP_INFINITY);
 				return;
@@ -2232,19 +2233,14 @@ namespace SF {
 		return;
 	}
 
-	static inline void OrthogonalProjectingVectorOntoHalfspace_i(PT_vector_T z, int i, PT_vector_T r, double eps, int* exitCode) {
+	static inline void OrthogonalProjectingVectorOntoHalfspace_i(PT_vector_T z, int i, PT_vector_T r, double eps_zero, int* exitCode) {
 		double factor;
 		double a_DoT_z_MinuS_b = Vector_DotProduct(PD_A[i], z) - PD_b[i]; // <a,z> - b
 		double distance = fabs(a_DoT_z_MinuS_b) / PD_norm_a[i];
 
 		Vector_Zeroing(r);
 
-		if (PD_norm_a[i] < PP_EPS_ZERO) {
-			*exitCode = PP_DEGENERATE_INEQUALITY;
-			return;
-		}
-
-		if (distance < eps) {
+		if (distance < eps_zero) {
 			*exitCode = PP_ON_HYPERPLANE;
 			return;
 		}
@@ -2262,16 +2258,13 @@ namespace SF {
 
 	static inline void OrthogonalProjectingVectorOntoHyperplane_i(PT_vector_T x, int i, PT_vector_T p) {
 		double ns = Vector_NormSquare(PD_A[i]);
-		assert(ns >= PP_EPS_ZERO);
 		Vector_MultiplyByNumber(PD_A[i], -(Vector_DotProduct(PD_A[i], x) - PD_b[i]) / ns, p);
 	}
 
-	static inline bool PointBelongsHalfspace_i(PT_vector_T x, int i, double eps) {
-		if (PD_norm_a[i] < eps) //Degenerate equation
-			return true;
+	static inline bool PointBelongsHalfspace_i(PT_vector_T x, int i, double eps_on_hyperplane) {
 		double a_DoT_x_MinuS_b = Vector_DotProduct(PD_A[i], x) - PD_b[i];
 		double distanceToHyperplane = fabs(a_DoT_x_MinuS_b) / PD_norm_a[i];
-		if (distanceToHyperplane < eps)
+		if (distanceToHyperplane < eps_on_hyperplane)
 			return true;
 		if (PD_isEquation[i])
 			return false;
@@ -2280,23 +2273,32 @@ namespace SF {
 		return false;
 	}
 
-	static inline bool PointBelongsHyperplane_i(PT_vector_T x, int i, double eps) {
-		if (Distance_PointToHyperplane_i(x, i) < eps)
+	static inline bool PointBelongsHyperplane_i(PT_vector_T x, int i, double eps_on_hyperplane) {
+		double dist = Distance_PointToHyperplane_i(x, i);
+
+#ifdef PP_DEBUG
+		if (dist > PP_EPS_ON_HYPERPLANE && dist < PP_EPS_ON_HYPERPLANE * 100) {
+			cout << "Distance from testing point is less than PP_EPS_ON_HYPERPLANE*100, but greater than PP_EPS_ON_HYPERPLANE!\n";
+			system("pause");
+		}
+#endif
+
+		if (dist < eps_on_hyperplane)
 			return true;
 		else
 			return false;
 	}
 
-	static inline bool PointBelongsPolytope(PT_vector_T x, double eps) { // If the point belongs to the polytope with prescigion of eps
+	static inline bool PointBelongsPolytope(PT_vector_T x, double eps_on_hyperplane) { // If the point belongs to the polytope with prescigion of eps_on_hyperplane
 		for (int i = 0; i < PD_m; i++)
-			if (!PointBelongsHalfspace_i(x, i, eps))
+			if (!PointBelongsHalfspace_i(x, i, eps_on_hyperplane))
 				return false;
 		return true;
 	}
 
-	static inline bool PointBelongsOuterCone(PT_vector_T x, int* notIncludingHalfspacesList, double eps) { // If the point belongs to the outer cone with prescigion of eps
+	static inline bool PointBelongsOuterCone(PT_vector_T x, int* notIncludingHalfspacesList, double eps_on_hyperplane) { // If the point belongs to the outer cone with prescigion of eps_on_hyperplane
 		for (int i = 0; i < PD_m && notIncludingHalfspacesList[i] >= 0; i++)
-			if (PointBelongsHalfspace_i(x, i, eps))
+			if (PointBelongsHalfspace_i(x, i, eps_on_hyperplane))
 				return false;
 		return true;
 	}
@@ -2309,23 +2311,21 @@ namespace SF {
 			x[j] = ratio * x[j] - (ratio - 1) * center[j];
 	}
 
-	static inline bool PointInsideHalfspace_i(PT_vector_T x, int i, double eps) {
-		if (PD_norm_a[i] < PP_EPS_ZERO) //Degenerate equation
-			return true;
+	static inline bool PointInsideHalfspace_i(PT_vector_T x, int i, double eps_on_hyperplane) {
 		double a_DoT_x_MinuS_b = Vector_DotProduct(PD_A[i], x) - PD_b[i];
 		double distanceToHyperplane = fabs(a_DoT_x_MinuS_b) / PD_norm_a[i];
-		if (distanceToHyperplane < eps)
+		if (distanceToHyperplane < eps_on_hyperplane)
 			return false;
 		if (a_DoT_x_MinuS_b < 0)
 			return true;
 		return false;
 	}
 
-	static inline bool PointIsVertex_i(PT_vector_T x, double eps) {
+	static inline bool PointIsVertex_i(PT_vector_T x, double eps_on_hyperplane) {
 		int hCount = 0;
 
 		for (int i = 0; i < PD_m; i++)
-			if (PointBelongsHyperplane_i(x, i, eps))
+			if (PointBelongsHyperplane_i(x, i, eps_on_hyperplane))
 				hCount++;
 
 		if (hCount >= PD_n)
@@ -2334,14 +2334,11 @@ namespace SF {
 			return false;
 	}
 
-	static inline int PointLocation_i(PT_vector_T x, int i, double eps, double* a_DoT_x_MinuS_b) {
-
-		if (PD_norm_a[i] < PP_EPS_ZERO)
-			return PP_DEGENERATE_INEQUALITY;
+	static inline int PointLocation_i(PT_vector_T x, int i, double eps_zero, double* a_DoT_x_MinuS_b) {
 
 		*a_DoT_x_MinuS_b = Vector_DotProduct(PD_A[i], x) - PD_b[i];
 
-		if (fabs(*a_DoT_x_MinuS_b) / PD_norm_a[i] < eps)// <a,x> = b
+		if (fabs(*a_DoT_x_MinuS_b) / PD_norm_a[i] < eps_zero)// <a,x> = b
 			return PP_ON_HYPERPLANE;
 
 		if (*a_DoT_x_MinuS_b < 0)								// <a,x> < b
@@ -2369,13 +2366,13 @@ namespace SF {
 		}
 	}
 
-	static inline void Print_HalfspacesIncludingPoint(PT_vector_T x, double eps) {
+	static inline void Print_HalfspacesIncludingPoint(PT_vector_T x, double eps_on_hyperplane) {
 		bool comma = false;
 
 		cout << "{";
 
 		for (int i = 0; i < PD_m; i++) {
-			if (PointBelongsHalfspace_i(x, i, eps)) {
+			if (PointBelongsHalfspace_i(x, i, eps_on_hyperplane)) {
 				if (comma)
 					cout << ", ";
 				else
@@ -2387,13 +2384,13 @@ namespace SF {
 		cout << "}";
 	}
 
-	static inline void Print_HalfspacesOutOfPoint(PT_vector_T x, double eps) {
+	static inline void Print_HalfspacesOutOfPoint(PT_vector_T x, double eps_on_hyperplane) {
 		bool comma = false;
 
 		cout << "{";
 
 		for (int i = 0; i < PD_m; i++) {
-			if (!PointBelongsHalfspace_i(x, i, eps)) {
+			if (!PointBelongsHalfspace_i(x, i, eps_on_hyperplane)) {
 				if (comma)
 					cout << ", ";
 				else
@@ -2405,13 +2402,13 @@ namespace SF {
 		cout << "}";
 	}
 
-	static inline void Print_HyperplanesIncludingPoint(PT_vector_T x, double eps) {
+	static inline void Print_HyperplanesIncludingPoint(PT_vector_T x, double eps_on_hyperplane) {
 		bool comma = false;
 
 		cout << "{";
 
 		for (int i = 0; i < PD_m; i++) {
-			if (PointBelongsHyperplane_i(x, i, eps)) {
+			if (PointBelongsHyperplane_i(x, i, eps_on_hyperplane)) {
 				if (comma)
 					cout << ", ";
 				else
@@ -2423,7 +2420,7 @@ namespace SF {
 		cout << "}";
 	}
 
-	static inline void Print_Number_of_edges(PT_vector_T x) {
+	static inline void Print_Number_of_edges(PT_vector_T x, double eps_on_hyperplane) {
 		int mne;
 		unsigned long long ull_mne;
 
@@ -2431,7 +2428,7 @@ namespace SF {
 		for (int i = 0; i < PD_m; i++) {
 			if (PD_isEquation[i])
 				continue;
-			if (PointBelongsHyperplane_i(x, i, PP_EPS_POINT_IN_HALFSPACE))
+			if (PointBelongsHyperplane_i(x, i, eps_on_hyperplane))
 				mne++;
 		}
 
@@ -2454,10 +2451,10 @@ namespace SF {
 	}
 
 	static inline double RelativeError(double trueValue, double calculatedValue) {
-		if (fabs(trueValue) >= PP_EPS_ZERO)
-			return fabs(calculatedValue - trueValue) / fabs(trueValue);
-		else
+		if (trueValue == 0)
 			return fabs(calculatedValue - trueValue);
+		else
+			return fabs(calculatedValue - trueValue) / fabs(trueValue);
 	}
 
 	static inline void TWIDDLE // https://doi.org/10.1145/362384.362502
@@ -2577,10 +2574,6 @@ namespace SF {
 		return sum;
 	}
 
-	static inline bool Vector_Is_Tiny(PT_vector_T x, double eps) {
-		return Vector_Norm(x) < eps;
-	}
-
 	static inline void Vector_MakeLike(PT_vector_T x, double lengthOfLikeVector, PT_vector_T likeVector) {
 		double norm_x = Vector_Norm(x);
 		if (norm_x == 0)
@@ -2628,14 +2621,14 @@ namespace SF {
 			equalVector[j] += plusVector[j];
 	}
 
-	static inline void Vector_Round(PT_vector_T x, double eps) {
+	static inline void Vector_Round(PT_vector_T x, double eps_round) {
 		double floorValue;
 		double fractionalPart;
 		double sign;
 		double absValue;
 
 		for (int j = 0; j < PD_n; j++) {
-			if (fabs(x[j]) < eps) {
+			if (fabs(x[j]) < eps_round) {
 				x[j] = 0;
 				continue;
 			}
@@ -2643,11 +2636,11 @@ namespace SF {
 			sign = x[j] > 0 ? 1 : -1;
 			floorValue = floor(absValue);
 			fractionalPart = absValue - floorValue;
-			if (1 - fractionalPart < eps) {
+			if (1 - fractionalPart < eps_round) {
 				x[j] = sign * (floorValue + 1);
 				continue;
 			}
-			if (fractionalPart < eps)
+			if (fractionalPart < eps_round)
 				x[j] = sign * floorValue;
 		}
 	}
@@ -2664,6 +2657,7 @@ namespace SF {
 	static inline void Vector_Zeroing(PT_vector_T x) {  // x = 0
 		for (int j = 0; j < PD_n; j++) x[j] = 0;
 	}
+
 }
 
 //---------------------------------- Private Functions -------------------------
@@ -2698,7 +2692,7 @@ namespace PF {
 				exit(1);
 			}
 #endif // PP_DEBUG
-			*med_u = (int)long_med_u;
+			* med_u = (int)long_med_u;
 		}
 	}
 
@@ -2738,17 +2732,17 @@ namespace PF {
 	static inline void PreparationForIteration(PT_vector_T u) {
 		int med_u;
 
-		MakeNeHyperplaneList(u, PD_neHyperplanes_u, &PD_mneh_u, PP_EPS_POINT_IN_HALFSPACE);
-        assert(PD_mneh_u <= PP_MM);
+		MakeNeHyperplaneList(u, PD_neHyperplanes_u, &PD_mneh_u, PP_EPS_ON_HYPERPLANE);
+		assert(PD_mneh_u <= PP_MM);
 
 		if (PD_mneh_u < PD_neq) {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-				cout << "\nPreparationForIteration error: Starting point u is not vertex with prescision " << PP_EPS_POINT_IN_HALFSPACE << ". Number of including inequality-hyperplanes = " << PD_mneh_u
+				cout << "\nPreparationForIteration error: Starting point u is not vertex with prescision " << PP_EPS_ON_HYPERPLANE << ". Number of including inequality-hyperplanes = " << PD_mneh_u
 				<< " < n = " << PD_n << "\n";
 			cout << "PD_u_cur: ";
 			Print_Vector(PD_u_cur);
 			cout << "\tObjF(u) = " << ObjF(PD_u_cur) << endl;
-			cout << "\nPerhaps you should decrease parameter PP_EPS_POINT_IN_HALFSPACE or increase parameter PP_OBJECTIVE_VECTOR_LENGTH.\n";
+			cout << "\nPerhaps you should decrease parameter PP_EPS_ON_HYPERPLANE or increase parameter PP_OBJECTIVE_VECTOR_LENGTH.\n";
 			exit(1);
 		}
 
