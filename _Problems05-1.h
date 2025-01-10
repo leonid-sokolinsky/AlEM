@@ -10,6 +10,11 @@ Initial surface points for these problems were calculated using Quest.
 ===============================================================================*/
 #pragma once
 
+//-------------------------- Compilation Modes ---------------------------------
+#define PP_GRADIENT
+#define PP_BIPROJECTION
+//------------------------------------------------------------------------------
+
 //=========================== Problem Parameters ===============================
 // PP_OBJECTIVE_VECTOR_LENGTH - direct dependence on dimension PD_n.
 // P_EPS_ZERO - inverse dependence on PP_OBJECTIVE_VECTOR_LENGTH.
