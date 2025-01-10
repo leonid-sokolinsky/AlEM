@@ -9,34 +9,39 @@ LP problems were obtained using BSF-LPP-Generator.
 ===============================================================================*/
 #pragma once
 
-//============================== Problem Parameters ===========================
+//-------------------------- Compilation Modes ---------------------------------
+#define PP_GRADIENT
+//#define PP_BIPROJECTION
+//------------------------------------------------------------------------------
+
+//============================== Problem Parameters ============================
 // PP_OBJECTIVE_VECTOR_LENGTH - direct dependence on dimension PD_n.
 // P_EPS_ZERO - inverse dependence on PP_OBJECTIVE_VECTOR_LENGTH.
-// PP_EPS_BIPPROJECTION_ROUND - inverse dependence on PP_OBJECTIVE_VECTOR_LENGTH. 
+// PP_EPS_PROJECTION - inverse dependence on PP_OBJECTIVE_VECTOR_LENGTH. 
 //						This parameter affects terminate condition when 
 //						calculating pseudoprojection.
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 #define PP_EPS_ZERO					1E-6			// Accuracy for comparison with zero
-
 #define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*10)// Accuracy of belonging to hyperplane
-#define PP_EPS_BIPPROJECTION_ROUND		PP_EPS_ZERO		// Precision of rounding vector r
+#define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)// Precision of rounding pseudoprojecting vectors
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+9			// Length of Objective Vector
-//-----------------------------------------------------------------------------
-#define PP_MAX_PROJECTING_ITER		1E+7	// Maximum acceptable number of iterations in PseudoprojectionOnFace()
-#define PP_PROBE_LENGTH				0.1		// Length of probe shift
-//=============================================================================
+//==============================================================================
 
-/*============================== rnd100-0 LP problem ==========================*
-// Solution:	100  200  ...  200
+/*============================== rnd100-0 LP problem ===========================*/
 #define PP_PROBLEM_NAME	"rnd100-0"
 #define PP_KK	100		// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
 #define PP_M	101		// Number of equations (number of rows in *.mtx)
 #define PP_N	201		// Number of variables (number of cols in *.mtx)
 #define PP_MAX_OBJ_VALUE 1009900 // =200*(n-1)*(2+n)/2+100
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+// Elapsed time: 13.555384
+// Number of iterations: 5
+// Computed objective value: 1009900
+// Maximal objective value:  1009900
+// Relative error = 0
+//------------------------------------------------------------------------------
 
-/*============================== rnd150-0 LP problem ==========================*
-// Solution:	100  200  ...  200
+/*============================== rnd150-0 LP problem ===========================*
 #define PP_PROBLEM_NAME	"rnd150-0"
 #define PP_KK	150		// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
 #define PP_M	151		// Number of equations (number of rows in *.mtx)
@@ -45,7 +50,6 @@ LP problems were obtained using BSF-LPP-Generator.
 //-----------------------------------------------------------------------------
 
 /*============================== rnd200-0 LP problem ==========================*
-// Solution:	100  200  ...  200
 #define PP_PROBLEM_NAME	"rnd200-0"
 #define PP_KK	200		// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
 #define PP_M	201		// Number of equations (number of rows in *.mtx)
@@ -54,7 +58,6 @@ LP problems were obtained using BSF-LPP-Generator.
 //-----------------------------------------------------------------------------
 
 /*============================== rnd250-0 LP problem ==========================*
-// Solution:	100  200  ...  200
 #define PP_PROBLEM_NAME	"rnd250-0"
 #define PP_KK	250		// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
 #define PP_M	251		// Number of equations (number of rows in *.mtx)
@@ -63,7 +66,6 @@ LP problems were obtained using BSF-LPP-Generator.
 //-----------------------------------------------------------------------------
 
 /*============================== rnd400-0 LP problem ==========================*
-// Solution:	100  200  ...  200
 #define PP_PROBLEM_NAME	"rnd400-0"
 #define PP_KK	400		// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
 #define PP_M	401		// Number of equations (number of rows in *.mtx)
@@ -72,7 +74,6 @@ LP problems were obtained using BSF-LPP-Generator.
 //-----------------------------------------------------------------------------
 
 /*============================== rnd600-0 LP problem ==========================*
-// Solution:	100  200  ...  200
 #define PP_PROBLEM_NAME	"rnd600-0"
 #define PP_KK	600		// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
 #define PP_M	601		// Number of equations (number of rows in *.mtx)
@@ -81,7 +82,6 @@ LP problems were obtained using BSF-LPP-Generator.
 //-----------------------------------------------------------------------------
 
 /*============================== rnd800-0 LP problem ==========================*
-// Solution:	100  200  ...  200
 #define PP_PROBLEM_NAME	"rnd800-0"
 #define PP_KK	800		// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
 #define PP_M	801		// Number of equations (number of rows in *.mtx)
@@ -89,8 +89,7 @@ LP problems were obtained using BSF-LPP-Generator.
 #define PP_MAX_OBJ_VALUE 64079900
 //-----------------------------------------------------------------------------
 
-/*============================== rnd1000-0 LP problem =========================*/
-// Solution:	100  200  ...  200
+/*============================== rnd1000-0 LP problem =========================*
 #define PP_PROBLEM_NAME	"rnd1000-0"
 #define PP_KK	1000		// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
 #define PP_M	1001		// Number of equations (number of rows in *.mtx)

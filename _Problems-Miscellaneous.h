@@ -5,21 +5,24 @@ Module: _Problems-Miscellaneous.h (Miscellaneous LP problems)
 Prefix: PP
 Authors: Alexander E. Zhulev & Leonid B. Sokolinsky
 This include file is part of Problem-Parameters.h
-Initial surface points for these problems were calculated using BSF-Apex-Quest.
+Initial surface points for these problems were calculated using Quest.
 ================================================================================*/
 #pragma once
+
+//-------------------------- Compilation Modes ---------------------------------
+#define PP_GRADIENT
+#define PP_BIPROJECTION
+//------------------------------------------------------------------------------
 
 //=========================== problem Parameters ===============================
 // PP_OBJECTIVE_VECTOR_LENGTH - direct dependence on dimension PD_n.
 // P_EPS_ZERO - inverse dependence on PP_OBJECTIVE_VECTOR_LENGTH.
-// PP_EPS_BIPPROJECTION_ROUND - inverse dependence on PP_OBJECTIVE_VECTOR_LENGTH. 
+// PP_EPS_PROJECTION - inverse dependence on PP_OBJECTIVE_VECTOR_LENGTH. 
 //						This parameter affects terminate condition when 
 //						calculating pseudoprojection.
 #define PP_EPS_ZERO					1E-9			// Precision for comparison with zero
 #define PP_EPS_ON_HYPERPLANE		PP_EPS_ZERO		// Accuracy of belonging to hyperplane
-#define PP_EPS_BIPPROJECTION_ROUND	PP_EPS_ZERO		// Precision of rounding vector r
-#define PP_EPS_MAXPROJECTION_ZERO	PP_EPS_ZERO		// Precision to calculate MFP projection
-#define PP_EPS_W_ROUND				(PP_EPS_ZERO*10)// Precision of rounding w vector
+#define PP_EPS_PROJECTION	PP_EPS_ZERO		// Precision of rounding vector r
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+7			// Length of Objective Vector
 #define PP_KK						100				// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
 //------------------------------------------------------------------------------
@@ -199,8 +202,8 @@ Initial surface points for these problems were calculated using BSF-Apex-Quest.
 #define PP_M 105		// Number of equations (number of rows in *.mtx)
 #define PP_N 110		// Number of variables (number of cols in *.mtx)
 #define PP_MAX_OBJ_VALUE	1848.437080568192
-#undef  PP_EPS_MAXPROJECTION_ZERO
-#define PP_EPS_MAXPROJECTION_ZERO	(PP_EPS_ZERO*10)		// Precision to calculate MFP projection
+#undef  PP_EPS_PROJECTION
+#define PP_EPS_PROJECTION	(PP_EPS_ZERO*10)		// Precision to calculate MFP projection
 //------------------------------------------------------------------------------
 
 /*==============================================================================*/

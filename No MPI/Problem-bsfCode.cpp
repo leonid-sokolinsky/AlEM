@@ -154,9 +154,9 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 	Vector_Addition(u_cur, PD_objVector, v);
 
 #ifdef BIPROJECTION
-	Flat_BipProjection(PD_edgeAlHyperplanes, PD_meq + PD_mne_p, v, PP_EPS_BIPPROJECTION_ROUND, PP_EPS_ZERO, PP_MAX_PSEUDOPROJECTING_ITER, w, success);
+	Flat_BipProjection(PD_edgeAlHyperplanes, PD_meq + PD_mne_p, v, PP_EPS_PROJECTION, PP_EPS_ZERO, PP_MAX_PSEUDOPROJECTING_ITER, w, success);
 #else
-	Flat_MaxProjection(PD_edgeAlHyperplanes, PD_meq + PD_mne_p, v, PP_EPS_MAXPROJECTION_ZERO, PP_EPS_ZERO, PP_MAX_PSEUDOPROJECTING_ITER, w, success);
+	Flat_MaxProjection(PD_edgeAlHyperplanes, PD_meq + PD_mne_p, v, PP_EPS_PROJECTION, PP_EPS_ZERO, PP_MAX_PSEUDOPROJECTING_ITER, w, success);
 #endif // BIPROJECTION
 
 	if (!*success) {
@@ -167,7 +167,7 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 		return;
 	}
 
-	Vector_Round(w, PP_EPS_W_ROUND);
+	Vector_Round(w, PP_EPS_PROJECTION);
 	Vector_Subtraction(w, u_cur, d);
 
 	norm_d = Vector_Norm(d);
@@ -295,12 +295,7 @@ void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
 
 	cout << "PP_EPS_ZERO\t\t\t" << PP_EPS_ZERO << endl;
 	cout << "PP_EPS_ON_HYPERPLANE\t\t" << PP_EPS_ON_HYPERPLANE << endl;
-#ifdef BIPROJECTION
-	cout << "PP_EPS_BIPPROJECTION_ROUND\t" << PP_EPS_BIPPROJECTION_ROUND << endl;
-#else
-	cout << "PP_EPS_MAXPROJECTION_ZERO\t" << PP_EPS_MAXPROJECTION_ZERO << endl;
-#endif // BIPROJECTION
-	cout << "PP_EPS_W_ROUND\t\t\t" << PP_EPS_W_ROUND << endl;
+	cout << "PP_EPS_PROJECTION\t" << PP_EPS_PROJECTION << endl;
 	cout << "PP_OBJECTIVE_VECTOR_LENGTH\t" << PP_OBJECTIVE_VECTOR_LENGTH << endl;
 	cout << "--------------- Data ---------------\n";
 	cout << "F(u0) = " << setw(PP_SETW) << ObjF(PD_u_cur) << endl;

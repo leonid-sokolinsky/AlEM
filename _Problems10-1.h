@@ -6,22 +6,26 @@ Prefix: PP
 Authors: Alexander E. Zhulev & Leonid B. Sokolinsky
 This include file is part of Problem-Parameters.h
 LP problems were obtained using BSF-LPP-Generator.
-Initial surface points for these problems were calculated using BSF-Apex-Quest.
+Initial surface points for these problems were calculated using Quest.
 ==============================================================================*/
 #pragma once
+
+//-------------------------- Compilation Modes ---------------------------------
+#define PP_GRADIENT
+//#define PP_BIPROJECTION
+//------------------------------------------------------------------------------
 
 //============================== Problem Parameters =============================
 // PP_OBJECTIVE_VECTOR_LENGTH - direct dependence on dimension PD_n.
 // P_EPS_ZERO - inverse dependence on PP_OBJECTIVE_VECTOR_LENGTH.
-// PP_EPS_BIPPROJECTION_ROUND - inverse dependence on PP_OBJECTIVE_VECTOR_LENGTH. 
+// PP_EPS_PROJECTION - inverse dependence on PP_OBJECTIVE_VECTOR_LENGTH. 
 //						This parameter affects terminate condition when 
 //						calculating pseudoprojection.
 //-----------------------------------------------------------------------------
-#define PP_EPS_ZERO					1E-9			// Accuracy for comparison with zero
-
+#define PP_EPS_ZERO					1E-8			// Accuracy for comparison with zero
 #define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*10)// Accuracy of belonging to hyperplane
-#define PP_EPS_BIPPROJECTION_ROUND		PP_EPS_ZERO		// Precision of rounding pseudoprojecting vectors
-#define PP_OBJECTIVE_VECTOR_LENGTH	1E+10			// Length of Objective Vector
+#define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)// Precision of rounding pseudoprojecting vectors
+#define PP_OBJECTIVE_VECTOR_LENGTH	1E+9			// Length of Objective Vector
 //-----------------------------------------------------------------------------
 #define PP_KK	10		// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
 #define PP_M	11		// Number of equations (number of rows in *.mtx)
@@ -33,6 +37,12 @@ Initial surface points for these problems were calculated using BSF-Apex-Quest.
 // Exact solution:	100  200  200  200  200  200  200  200  200  200
 #define PP_PROBLEM_NAME	"rnd10-0"
 #define PP_MAX_OBJ_VALUE 10900			
+//-----------------------------------------------------------------------------
+// Elapsed time: 0.0010709
+// Number of iterations: 0
+// Computed objective value: 10900
+// Maximal objective value:  10900
+// Relative error = 0
 //-----------------------------------------------------------------------------
 
 /*============================== rnd10-1-1 LP problem ============================*
