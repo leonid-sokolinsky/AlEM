@@ -10,29 +10,29 @@ Initial surface points for these problems were calculated using Quest.
 #pragma once
 
 //-------------------------- Compilation Modes ---------------------------------
-#define PP_GRADIENT
+//#define PP_GRADIENT
 #define PP_BIPROJECTION
 //------------------------------------------------------------------------------
 
-//=========================== problem Parameters ===============================
+//=========================== problem Parameters ===============================*/
 // PP_OBJECTIVE_VECTOR_LENGTH - direct dependence on dimension PD_n.
 // P_EPS_ZERO - inverse dependence on PP_OBJECTIVE_VECTOR_LENGTH.
 // PP_EPS_PROJECTION - inverse dependence on PP_OBJECTIVE_VECTOR_LENGTH. 
 //						This parameter affects terminate condition when 
 //						calculating pseudoprojection.
 #define PP_EPS_ZERO					1E-9			// Precision for comparison with zero
-#define PP_EPS_ON_HYPERPLANE		PP_EPS_ZERO		// Accuracy of belonging to hyperplane
-#define PP_EPS_PROJECTION	PP_EPS_ZERO		// Precision of rounding vector r
-#define PP_OBJECTIVE_VECTOR_LENGTH	1E+7			// Length of Objective Vector
-#define PP_KK						100				// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
-//------------------------------------------------------------------------------
+#define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*10)// Accuracy of belonging to hyperplane
+#define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)// Precision to calculate pseudoprojection
+#define PP_OBJECTIVE_VECTOR_LENGTH	1E+8			// Length of Objective Vector
+#define PP_KK						10				// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
+//==============================================================================
 
 /*============================== nguyen5 LP problem ============================*
 #define PP_PROBLEM_NAME	"nguyen5"
 #define PP_MPS_FORMAT
 #define PP_M 4		// Number of constrains
 #define PP_N 5		// Number of variables
-#define PP_MAX_OBJ_VALUE 		21.45497290910349
+#define PP_MAX_OBJ_VALUE 		21.4549729091014071968857
 //------------------------------------------------------------------------------
 
 /*============================== simpleCube LP problem =========================*
@@ -159,51 +159,54 @@ Initial surface points for these problems were calculated using Quest.
 #define PP_PROBLEM_NAME	"cone3-0"
 #define PP_M 11		// Number of equations (number of rows in *.mtx)
 #define PP_N 14		// Number of variables (number of cols in *.mtx)
-#define PP_MAX_OBJ_VALUE 		132.5
+#define PP_MAX_OBJ_VALUE 132.5
 //------------------------------------------------------------------------------
 
 /*============================== rnd3_3_Olkhovsky56 LP problem =================*
 #define PP_PROBLEM_NAME	"rnd3_3_Olkhovsky56"
 #define PP_M 6		// Number of equations (number of rows in *.mtx)
 #define PP_N 9		// Number of variables (number of cols in *.mtx)
-#define PP_MAX_OBJ_VALUE 		990.7971187553596
+#define PP_MAX_OBJ_VALUE 990.797118755359406350181
 //------------------------------------------------------------------------------
 
 /*============================== rnd3_3_Olkhovsky289 LP problem ================*
 #define PP_PROBLEM_NAME	"rnd3_3_Olkhovsky289"
 #define PP_M 6		// Number of equations (number of rows in *.mtx)
 #define PP_N 9		// Number of variables (number of cols in *.mtx)
-#define PP_MAX_OBJ_VALUE 		671.9524948597968
+#define PP_MAX_OBJ_VALUE 671.952494859796388482209
 //------------------------------------------------------------------------------
 
 /*============================== rnd3_3_Olkhovsky331 LP problem ================*
 #define PP_PROBLEM_NAME	"rnd3_3_Olkhovsky331"
 #define PP_M 6		// Number of equations (number of rows in *.mtx)
 #define PP_N 9		// Number of variables (number of cols in *.mtx)
-#define PP_MAX_OBJ_VALUE 		714.5354779653184
+#define PP_MAX_OBJ_VALUE 714.535477965318250426208
 //------------------------------------------------------------------------------
 
 /*============================== rnd3_3_Olkhovsky336 LP problem ================*
 #define PP_PROBLEM_NAME	"rnd3_3_Olkhovsky336"
 #define PP_M 6		// Number of equations (number of rows in *.mtx)
 #define PP_N 9		// Number of variables (number of cols in *.mtx)
-#define PP_MAX_OBJ_VALUE 		998.1934486487395
+#define PP_MAX_OBJ_VALUE 998.193448648739490636217
 //------------------------------------------------------------------------------
 
 /*============================== rnd3-10 LP problem ============================*
 #define PP_PROBLEM_NAME	"rnd3-10"
 #define PP_M 13		// Number of equations (number of rows in *.mtx)
 #define PP_N 16		// Number of variables (number of cols in *.mtx)
-#define PP_MAX_OBJ_VALUE 		852.0289179009729
+#define PP_MAX_OBJ_VALUE 852.028917900972714960517
 //------------------------------------------------------------------------------
 
 /*============================== rnd5-100 LP problem ===========================*/
 #define PP_PROBLEM_NAME	"rnd5-100"
 #define PP_M 105		// Number of equations (number of rows in *.mtx)
 #define PP_N 110		// Number of variables (number of cols in *.mtx)
-#define PP_MAX_OBJ_VALUE	1848.437080568192
-#undef  PP_EPS_PROJECTION
-#define PP_EPS_PROJECTION	(PP_EPS_ZERO*10)		// Precision to calculate MFP projection
+#define PP_MAX_OBJ_VALUE	1848.43708056819241392077
+//------------------------------------------------------------------------------
+#ifndef PP_BIPROJECTION
+#undef PP_EPS_PROJECTION
+#define PP_EPS_PROJECTION			(PP_EPS_ZERO*100)	// Precision to calculate projection
+#endif // !PP_BIPROJECTION
 //------------------------------------------------------------------------------
 
 /*==============================================================================*/

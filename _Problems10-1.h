@@ -30,11 +30,9 @@ Initial surface points for these problems were calculated using Quest.
 #define PP_KK	10		// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
 #define PP_M	11		// Number of equations (number of rows in *.mtx)
 #define PP_N	21		// Number of variables (number of cols in *.mtx)
-#define PP_PROBE_LENGTH			0.001		// Length of probe shift
 //-----------------------------------------------------------------------------
 
 /*============================== rnd10-0 LP problem ==============================*/
-// Exact solution:	100  200  200  200  200  200  200  200  200  200
 #define PP_PROBLEM_NAME	"rnd10-0"
 #define PP_MAX_OBJ_VALUE 10900			
 //-----------------------------------------------------------------------------

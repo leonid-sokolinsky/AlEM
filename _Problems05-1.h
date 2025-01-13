@@ -12,7 +12,7 @@ Initial surface points for these problems were calculated using Quest.
 
 //-------------------------- Compilation Modes ---------------------------------
 #define PP_GRADIENT
-#define PP_BIPROJECTION
+//#define PP_BIPROJECTION
 //------------------------------------------------------------------------------
 
 //=========================== Problem Parameters ===============================
@@ -23,8 +23,8 @@ Initial surface points for these problems were calculated using Quest.
 //						calculating pseudoprojection.
 //------------------------------------------------------------------------------
 #define PP_EPS_ZERO					1E-10				// Accuracy for comparison with zero
-#define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*10)	// Accuracy of belonging to hyperplane
-#define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)	// Precision to calculate pseudoprojection
+#define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*100)	// Accuracy of belonging to hyperplane
+#define PP_EPS_PROJECTION			(PP_EPS_ZERO*1000)	// Precision to calculate pseudoprojection
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+9				// Length of Objective Vector
 //------------------------------------------------------------------------------
 #define PP_KK						5		// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
@@ -33,39 +33,38 @@ Initial surface points for these problems were calculated using Quest.
 //------------------------------------------------------------------------------
 
 /*============================== rnd5-0 LP problem =============================*
-// Exact solution:	100   200   200   200   200
 #define PP_PROBLEM_NAME	"rnd5-0"
 #define PP_MAX_OBJ_VALUE 		2900
 //------------------------------------------------------------------------------
 
 /*============================== rnd5-1-1 LP problem ===========================*
 #define PP_PROBLEM_NAME	"rnd5-1-1"
-#define PP_MAX_OBJ_VALUE 2584.349489709197
+#define PP_MAX_OBJ_VALUE 2584.34948970921050204197
 //------------------------------------------------------------------------------
 
-/*============================== rnd5-1-2 LP problem ============================
+/*============================== rnd5-1-2 LP problem ===========================*
 #define PP_PROBLEM_NAME	"rnd5-1-2"
-#define PP_MAX_OBJ_VALUE 2657.525612539948
+#define PP_MAX_OBJ_VALUE 2657.52561253995372680947
 //------------------------------------------------------------------------------
 
 /*============================== rnd5-1-3 LP problem ===========================*
 #define PP_PROBLEM_NAME	"rnd5-1-3"
-#define PP_MAX_OBJ_VALUE 2424.919153811911
+#define PP_MAX_OBJ_VALUE 2424.91915381191120104631
 //------------------------------------------------------------------------------
 
-/*============================== rnd5-1-4 LP problem ===========================*
+/*============================== rnd5-1-4 LP problem ===========================*/
 #define PP_PROBLEM_NAME	"rnd5-1-4"
-#define PP_MAX_OBJ_VALUE 2300.112758698184
+#define PP_MAX_OBJ_VALUE 2300.11275869818382489029
 //------------------------------------------------------------------------------
 
-/*============================== rnd5-1-5 LP problem ============================*
+/*============================== rnd5-1-5 LP problem ===========================*
 #define PP_PROBLEM_NAME	"rnd5-1-5"
-#define PP_MAX_OBJ_VALUE 2626.473236207309
+#define PP_MAX_OBJ_VALUE 2626.47323620733186544385
 //------------------------------------------------------------------------------
 
-/*============================== rnd5-1-6 LP problem ============================*/
+/*============================== rnd5-1-6 LP problem ===========================*
 #define PP_PROBLEM_NAME	"rnd5-1-6"
-#define PP_MAX_OBJ_VALUE 2675.35199418665
+#define PP_MAX_OBJ_VALUE 2675.35199418665160919772
 //------------------------------------------------------------------------------
 
 /*===============================================================================*/

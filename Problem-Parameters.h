@@ -19,9 +19,13 @@ This source code has been produced with using BSF-skeleton
 #include "_Problems100_1000-0.h"
 #define PP_PATH "../../Set-of-LP-Problems/Rnd-LP/"
 
-/**/
+/**
 #include "_Problems-Miscellaneous.h"
 #define PP_PATH "../../Set-of-LP-Problems/Miscellaneous-LP/"
+
+/**/
+#include "_Problems-NetLib-LP.h"
+#define PP_PATH "../../Set-of-LP-Problems/NetLib-LP/"
 
 /*------------------------------------------------------------------------------*/
 
@@ -31,6 +35,8 @@ This source code has been produced with using BSF-skeleton
 #define PP_DEBUG
 //#define PP_MATRIX_OUTPUT
 //#define PP_SAVE_RESULT
+#define PP_SAVE_ITER_RESULT
+#define PP_CHECK_MAX_OBJ_VALUE // Exit if relative error of computed maximum of objective function is less than PP_EPS_ZERO (demands #define PP_MAX_OBJ_VALUE)
 //#define MPS_MIN_OF_OBJECTIVE_FUNCTION
 
 //================================ Problem Paramrters ==========================
@@ -41,9 +47,9 @@ This source code has been produced with using BSF-skeleton
 #endif // PP_MPS_FORMAT
 
 #define PP_MAX_ITER_COUNT				10000000000		// Maximal count of iterations
-#define PP_MAX_PSEUDOPROJECTING_ITER	100000000		// Maximum acceptable number of iterations in SF::Flat_BipProjection()
+#define PP_MAX_PSEUDOPROJECTING_ITER	100000000		// Maximum acceptable number of iterations in Pseudoprojection on flat
 #define PP_DBL_MAX						1E+308			// Highest float value
-#define PP_RND_MAX						32767			// This is necessary for compatibility with different compilers
+#define PP_INT_MAX						2147483647		// This is necessary for compatibility with different compilers
 //-------------------------- Input/Outpoot Parameters --------------------------
 #define PP_OUTPUT_LIMIT	30	// Number of Elements to output
 #define PP_SETW 16
