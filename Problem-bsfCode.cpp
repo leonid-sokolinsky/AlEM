@@ -129,12 +129,13 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 		return;
 	}
 	
-#ifdef PP_DEBUG
+	/*DEBUG PC_bsf_MapF**
+	#ifdef PP_DEBUG
 	int num_of_edges = (int) BinomialCoefficient(PD_mneh_u, PD_neq - 1) / BSF_sv_numOfWorkers;
 	if (BSF_sv_numberInSublist % PP_ITER_COUNT == 0)
 		if (BSF_sv_mpiRank == 0) 
 			cout << BSF_sv_sublistLength - BSF_sv_numberInSublist << " iterations remain to execute" << endl;
-#endif // PP_DEBUG /**/
+	#endif // PP_DEBUG /**/
 
 	/*DEBUG PC_bsf_MapF**
 	#ifdef PP_DEBUG
@@ -160,9 +161,9 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 	Vector_Addition(u_cur, PD_objVector, v);
 
 #ifdef PP_BIPROJECTION
-	Flat_BipProjection(PD_edgeAlHyperplanes, PD_n - 1, v, PP_EPS_PROJECTION, PP_EPS_ZERO, PP_MAX_PSEUDOPROJECTING_ITER, w, success);
+	Flat_BipProjection(PD_edgeAlHyperplanes, PD_n - 1, v, PP_EPS_PROJECTION, PP_MAX_PSEUDOPROJECTING_ITER, w, success);
 #else
-	Flat_MaxProjection(PD_edgeAlHyperplanes, PD_n - 1, v, PP_EPS_PROJECTION, PP_EPS_ZERO, PP_MAX_PSEUDOPROJECTING_ITER, w, success);
+	Flat_MaxProjection(PD_edgeAlHyperplanes, PD_n - 1, v, PP_EPS_PROJECTION, PP_MAX_PSEUDOPROJECTING_ITER, w, success);
 #endif // PP_BIPROJECTION
 
 	if (!*success) {
@@ -517,10 +518,14 @@ namespace SF {
 		return Vector_NormSquare(z);
 	}
 
-	static inline void Flat_BipProjection(int* flatHyperplanes, int m_flat, PT_vector_T v, double eps_projection, double eps_zero, int maxProjectingIter, PT_vector_T w, int* success) {
+	static inline void Flat_BipProjection(int* flatHyperplanes, int m_flat, PT_vector_T v, double eps_zero, int maxProjectingIter, PT_vector_T w, int* success) {
+		PT_vector_T p;
 		PT_vector_T r;
 		int iterCount = 0;
 		double dist;
+		double dist_prev = PP_INFINITY;
+		double delta_dist;
+
 
 		Vector_Copy(v, w);
 		*success = true;
@@ -529,16 +534,10 @@ namespace SF {
 			Vector_Zeroing(r);
 
 			for (int i = 0; i < m_flat; i++) {
-				PT_vector_T p;
 				OrthogonalProjectingVectorOntoHyperplane_i(w, flatHyperplanes[i], p);
 				Vector_PlusEquals(r, p);
 			}
 			Vector_DivideEquals(r, m_flat);
-			Vector_Round(r, eps_zero);
-
-			dist = Vector_Norm(r);
-			if (dist < eps_projection)
-				break;
 
 			Vector_PlusEquals(w, r);
 
@@ -547,19 +546,25 @@ namespace SF {
 				*success = false;
 				break;
 			}
-		} while (true);
+
+			dist = Vector_Norm(r);
+			delta_dist = fabs(dist - dist_prev);
+			dist_prev = dist;
+		} while (delta_dist >= eps_zero);
 		/*DEBUG PC_bsf_MapF**
 #ifdef PP_DEBUG
 		//cout << "Flat_BipProjection: iterCount = " << iterCount << endl;
 #endif // PP_DEBUG /**/
 	}
 
-	static inline void Flat_MaxProjection(int* flatHyperplanes, int m_flat, PT_vector_T v, double eps_projection, double eps_zero, int maxProjectingIter, PT_vector_T w, int* success) {
+	static inline void Flat_MaxProjection(int* flatHyperplanes, int m_flat, PT_vector_T v, double eps_zero, int maxProjectingIter, PT_vector_T w, int* success) {
+		PT_vector_T p;
 		PT_vector_T w_max;
 		double max_dist;
+		double max_dist_prev = PP_INFINITY;
+		double delta_dist;
 		int max_i;
 		int iterCount = 0;
-		PT_vector_T r;
 
 		Vector_Copy(v, w);
 		*success = true;
@@ -568,11 +573,10 @@ namespace SF {
 			max_dist = 0;
 			max_i = -1;
 			for (int i = 0; i < m_flat; i++) {
-				OrthogonalProjectingVectorOntoHyperplane_i(w, flatHyperplanes[i], r);
-				Vector_Round(r, eps_zero);
-				double dist = Vector_Norm(r);
+				OrthogonalProjectingVectorOntoHyperplane_i(w, flatHyperplanes[i], p);
+				double dist = Vector_Norm(p);
 				if (dist > max_dist) {
-					Vector_Addition(w, r, w_max);
+					Vector_Addition(w, p, w_max);
 					max_dist = dist;
 					max_i = i;
 				}
@@ -580,9 +584,9 @@ namespace SF {
 
 			if (max_i < 0) {
 				/*DEBUG Flat_MaxProjection**
-		#ifdef PP_DEBUG
-						cout << "Flat_MaxProjection: iterCount = " << iterCount << endl;
-		#endif // PP_DEBUG /**/
+#ifdef PP_DEBUG
+				cout << "Flat_MaxProjection: iterCount = " << iterCount << endl;
+#endif // PP_DEBUG /**/
 				return;
 			}
 
@@ -593,7 +597,17 @@ namespace SF {
 				*success = false;
 				break;
 			}
-		} while (max_dist >= eps_projection);
+
+			delta_dist = fabs(max_dist - max_dist_prev);
+			max_dist_prev = max_dist;
+
+			/*DEBUG Flat_MaxProjection**
+#ifdef PP_DEBUG
+			if (iterCount % PP_PROJECTION_COUNT == 0)
+				cout << "Worker " << BSF_sv_mpiRank << ": \tdelta_dist = " << delta_dist << endl;
+#endif // PP_DEBUG /**/
+
+		} while (delta_dist >= eps_zero);
 
 		/*DEBUG Flat_MaxProjection**
 		#ifdef PP_DEBUG
@@ -2641,32 +2655,38 @@ namespace PF {
 		}
 	}
 
-	static inline int MakeEdgeList(int* edgeCodeList, int med_u) {
-		unsigned int uindex;
+	static inline void MakeEdgeList(int* edgeCodeList, int med_u) {
 		int index;
-		int err;
-
-		for (int k = 0; k < PP_KK; k++) {
-			edgeCodeList[k] = -1;
+		int numOfWorkers = BSF_sv_numOfWorkers;
+		int bd_sublistSize[PP_BSF_MAX_MPI_SIZE];
+		int bd_offset[PP_BSF_MAX_MPI_SIZE];
+		int listSize = PP_KK;
+		int elemsPerWorker = listSize / numOfWorkers;
+		int tailLength = listSize - elemsPerWorker * numOfWorkers;
+		int offset = 0;
+		
+		for (int rank = 0; rank < numOfWorkers; rank++) {
+			bd_sublistSize[rank] = elemsPerWorker + (rank < tailLength ? 1 : 0);
+			bd_offset[rank] = offset;
+			offset += bd_sublistSize[rank];
 		}
-
+			
 		assert(PP_KK <= PP_INT_MAX);
 
+		for (int k = 0; k < PP_KK; k++) edgeCodeList[k] = -1;
+
+		offset = 0;
+		int count = 0;
 		for (int k = 0; k < med_u; k++) {
-			err = rand_s(&uindex);
-			if (err != 0)
-				return err;
-			index = (int)((double)uindex / ((double)UINT_MAX + 1) * PP_KK);
-			if (edgeCodeList[index] == -1)
-				edgeCodeList[index] = 0;
-			else {
-				for (int ki = 1; ki < PP_KK; ki++) {
-					if (edgeCodeList[(index + ki) % PP_KK] == -1) {
-						edgeCodeList[(index + ki) % PP_KK] = 0;
-						break;
-					}
-				}
+			for (int rank = 0; rank < numOfWorkers; rank++) {
+				edgeCodeList[bd_offset[rank] + offset] = 0;
+				count++;
+				if (count == med_u)
+					break;
 			}
+			if (count == med_u)
+				break;
+			offset++;
 		}
 
 		index = 0;
@@ -2676,7 +2696,6 @@ namespace PF {
 				index++;
 			}
 		}
-		return 0;
 	}
 
 	static inline void PreparationForIteration(PT_vector_T u) {
@@ -2697,8 +2716,7 @@ namespace PF {
 		}
 
 		CalculateNumberOfEdges(PD_neq, PD_mneh_u, &med_u);
-		int err = MakeEdgeList(PD_edgeCodes, med_u);
-		assert(err == 0);
+		MakeEdgeList(PD_edgeCodes, med_u);
 		PD_TWIDDLE_done = false;
 		PD_TWIDDLE_nextEdgeI = 0;
 		TWIDDLE_Make_p(PD_TWIDDLE_p, PD_mneh_u, PD_neq - 1);

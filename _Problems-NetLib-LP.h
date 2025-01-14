@@ -46,8 +46,8 @@ This include file is part of Problem-Parameters.h
 #define PP_KK 475020	// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
 #define PP_MAX_OBJ_VALUE 464.75314285714285714285714285714
 //------------------------------------------------------------------------------
-#define PP_EPS_ZERO					1E-7				// Accuracy for comparison with zero
-#define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*10)	// Accuracy of belonging to hyperplane
+#define PP_EPS_ZERO					1E-11				// Accuracy for comparison with zero
+#define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*100)	// Accuracy of belonging to hyperplane
 #define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)	// Precision to calculate projection
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+7				// Length of Objective Vector
 //------------------------------------------------------------------------------
@@ -80,7 +80,7 @@ This include file is part of Problem-Parameters.h
 // Relative error = 0.00659
 // //--------------------------------------------------------------------------
 
-/*============================== blend LP problem ==========================*/
+/*============================== blend LP problem ==============================*/
 // Number of equations: 43
 // Subspace dimension: 40
 #define PP_PROBLEM_NAME		"blend"
@@ -88,14 +88,15 @@ This include file is part of Problem-Parameters.h
 #define PP_N 83			// Number of variables in mps-file
 #define PP_KK 11480		// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
 #define PP_MAX_OBJ_VALUE 30.812149845828220173774356124984	// Exact maximum value of objective function
-//--------------------------------------------------------------------------
-#define PP_EPS_ZERO					1E-7				// Accuracy for comparison with zero
-#define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*10)	// Accuracy of belonging to hyperplane
+//------------------------------------------------------------------------------
+#define PP_EPS_ZERO					1E-11				// Accuracy for comparison with zero
+#define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*100)	// Accuracy of belonging to hyperplane
 #define PP_EPS_PROJECTION			(PP_EPS_ZERO*100)	// Precision to calculate projection
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+7				// Length of Objective Vector
-//--------------------------------------------------------------------------
+//------------------------------ ifdef PP_DEBUG --------------------------------
 #define PP_ITER_COUNT				1					// Each PP_ITER_COUNT-th iteration to be outputted inside PC_bsf_MapF(*)
-//--------------------------------------------------------------------------
+#define PP_PROJECTION_COUNT			1000				// Each PP_PROJECTION_COUNT iteration to be outputted inside Flat_MaxProjection(*)
+//------------------------------------------------------------------------------
 
 /*============================== kb2 LP problem ============================*
 // Number of equations: 16
@@ -103,14 +104,15 @@ This include file is part of Problem-Parameters.h
 #define PP_PROBLEM_NAME		"kb2"
 #define PP_M 43	// Number of equations (after conversion to standard form)
 #define PP_N 41	// Number of variables in mps-file (after conversion to standard form)
+#define PP_KK 2925	// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
 #define PP_MAX_OBJ_VALUE 1749.9001299062057129526866493726
 //--------------------------------------------------------------------------
-#define PP_EPS_ZERO					1E-7			// Precision for comparison with zero
-
+#define PP_EPS_ZERO					1E-11			// Precision for comparison with zero
 #define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*10)// Accuracy of belonging to hyperplane
-#define PP_EPS_PROJECTION		PP_EPS_ZERO		// Precision to calculate projection
+#define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)// Precision to calculate projection
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+7			// Length of Objective Vector
-
+//--------------------------------------------------------------------------
+#define PP_ITER_COUNT				1					// Each PP_ITER_COUNT-th iteration to be outputted inside PC_bsf_MapF(*)
 //--------------------------------------------------------------------------
 
 /*============================== recipe LP problem =========================*
