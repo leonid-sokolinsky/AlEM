@@ -37,7 +37,7 @@ This include file is part of Problem-Parameters.h
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+7			// Length of Objective Vector
 //------------------------------------------------------------------------------
 
-/*============================== afiro LP problem ==========================*
+/*============================== afiro LP problem ==========================*/
 // Number of equations : 8
 // Subspace dimension : 24
 #define PP_PROBLEM_NAME	"afiro"
@@ -47,17 +47,18 @@ This include file is part of Problem-Parameters.h
 #define PP_MAX_OBJ_VALUE 464.75314285714285714285714285714
 //------------------------------------------------------------------------------
 #define PP_EPS_ZERO					1E-11				// Accuracy for comparison with zero
-#define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*100)	// Accuracy of belonging to hyperplane
+#define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*1000)	// Accuracy of belonging to hyperplane
 #define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)	// Precision to calculate projection
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+7				// Length of Objective Vector
+//------------------------------ ifdef PP_DEBUG --------------------------------
+//#define PP_ITER_COUNT				10000				// Each PP_ITER_COUNT-th iteration to be outputted inside PC_bsf_MapF(*)
+//#define PP_PROJECTION_COUNT		100000				// Each PP_PROJECTION_COUNT iteration to be outputted inside Flat_MaxProjection(*)
 //------------------------------------------------------------------------------
-#define PP_ITER_COUNT				1000				// Each PP_ITER_COUNT-th iteration to be outputted inside PC_bsf_MapF(*)
-//------------------------------------------------------------------------------
-// Elapsed time: 945.68587
+// Elapsed time: 141.26462
 // Number of iterations: 4
-// Computed objective value: 464.753154412741821488453
+// Computed objective value: 464.753154364924114361202
 // Maximal objective value:  464.753142857142847788054
-// Relative error = 2.49e-08 
+// Relative error = 2.48e-08 
 //------------------------------------------------------------------------------
 
 /*============================== beaconfd LP problem ===========================*
@@ -80,7 +81,7 @@ This include file is part of Problem-Parameters.h
 // Relative error = 0.00659
 // //--------------------------------------------------------------------------
 
-/*============================== blend LP problem ==============================*/
+/*============================== blend LP problem ==============================*
 // Number of equations: 43
 // Subspace dimension: 40
 #define PP_PROBLEM_NAME		"blend"

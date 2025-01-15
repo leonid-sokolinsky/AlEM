@@ -124,18 +124,17 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 	PT_vector_T d;	// direction vector
 	int edgeCode = *mapElem->edgeCode;
 
+	#ifdef PP_DEBUG
+	static int map_counter;
+	map_counter++;
+	if (map_counter % PP_ITER_COUNT == 0) 
+		cout << "Worker " << BSF_sv_mpiRank << ": number of iterations = " << map_counter << endl;
+	#endif // PP_DEBUG
+
 	if (edgeCode == -1) {
 		*success = false;
 		return;
 	}
-	
-	/*DEBUG PC_bsf_MapF**
-	#ifdef PP_DEBUG
-	int num_of_edges = (int) BinomialCoefficient(PD_mneh_u, PD_neq - 1) / BSF_sv_numOfWorkers;
-	if (BSF_sv_numberInSublist % PP_ITER_COUNT == 0)
-		if (BSF_sv_mpiRank == 0) 
-			cout << BSF_sv_sublistLength - BSF_sv_numberInSublist << " iterations remain to execute" << endl;
-	#endif // PP_DEBUG /**/
 
 	/*DEBUG PC_bsf_MapF**
 	#ifdef PP_DEBUG
@@ -160,11 +159,11 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 
 	Vector_Addition(u_cur, PD_objVector, v);
 
-#ifdef PP_BIPROJECTION
+	#ifdef PP_BIPROJECTION
 	Flat_BipProjection(PD_edgeAlHyperplanes, PD_n - 1, v, PP_EPS_PROJECTION, PP_MAX_PSEUDOPROJECTING_ITER, w, success);
-#else
+	#else
 	Flat_MaxProjection(PD_edgeAlHyperplanes, PD_n - 1, v, PP_EPS_PROJECTION, PP_MAX_PSEUDOPROJECTING_ITER, w, success);
-#endif // PP_BIPROJECTION
+	#endif // PP_BIPROJECTION
 
 	if (!*success) {
 		cout << "\n\nProcess " << BSF_sv_mpiRank
@@ -184,13 +183,13 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 				cout << "\t\t\t\t\t\t\t\t\t\t\t\t\t||d|| = ||w - u_cur|| < PP_EPS_ZERO ===>>> movement is impossible.\n";
 		#endif // PP_DEBUG /**/
 		reduceElem->objF_nex = -PP_INFINITY;
-#ifdef PP_GRADIENT
+		#ifdef PP_GRADIENT
 		reduceElem->objF_grd = -PP_INFINITY;
-#endif // PP_GRADIENT
+		#endif // PP_GRADIENT
 		return;
 	}
 
-	JumpingOnPolytope(u_cur, d, u_nex, PP_EPS_ZERO);
+	JumpingOnPolytope(u_cur, d, u_nex, PP_EPS_ON_HYPERPLANE, PP_EPS_ZERO);
 
 	if (Distance_PointToPoint(u_cur, u_nex) < PP_EPS_ZERO) {
 		/*DEBUG PC_bsf_MapF**
@@ -198,9 +197,9 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 		cout << "\n||u_nex - u_cur|| < PP_EPS_ZERO ===>>> movement is impossible.\n";
 		#endif // PP_DEBUG /**/
 		reduceElem->objF_nex = -PP_INFINITY;
-#ifdef PP_GRADIENT
+		#ifdef PP_GRADIENT
 		reduceElem->objF_grd = -PP_INFINITY;
-#endif // PP_GRADIENT
+		#endif // PP_GRADIENT
 		return;
 	}
 
@@ -208,21 +207,22 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 
 	reduceElem->objF_nex = ObjF(u_nex);
 
-#ifdef PP_GRADIENT
+	#ifdef PP_GRADIENT
 	PT_vector_T u_grd;
 	Shift(u_cur, d, 1 / norm_d, u_grd);
 	reduceElem->objF_grd = ObjF(u_grd);
-#endif // PP_GRADIENT
+	#endif // PP_GRADIENT
 
 	/*DEBUG PC_bsf_MapF**
-#ifdef PP_DEBUG
-//cout << "\nu_nex = "; Print_Vector(u_nex);
-#ifdef PP_GRADIENT
+	#ifdef PP_DEBUG
+	//cout << "\nu_nex = "; Print_Vector(u_nex);
+	#ifdef PP_GRADIENT
 	cout << PF_MAP_LIST_INDEX << "\tF(u_grd) = " << setprecision(24) << reduceElem->objF_grd << "\t\t---> Movement is possible." << endl;
-#else
+	#else
 	cout << "\tF(u_nex) = " << setw(PP_SETW) << reduceElem->objF_nex << "\t\t---> Movement is possible." << endl;
-#endif // PP_GRADIENT
+	#endif // PP_GRADIENT
 	#endif // PP_DEBUG /**/
+
 } // end PC_bsf_MapF
 
 void PC_bsf_MapF_1(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T_1* reduceElem, int* success) {
@@ -355,7 +355,7 @@ void PC_bsf_ProcessResults(PT_bsf_reduceElem_T* reduceResult, int reduceCounter,
 	}
 
 #ifdef PP_CHECK_MAX_OBJ_VALUE
-	if (RelativeError(PP_MAX_OBJ_VALUE, reduceResult->objF_nex) < PP_EPS_ZERO) {
+	if (RelativeError(PP_MAX_OBJ_VALUE, reduceResult->objF_nex) < PP_EPS_RELATIVE_ERROR) {
 		Vector_Copy(reduceResult->u_nex, PD_u_cur);
 		*toExit = true;
 		return;
@@ -601,7 +601,7 @@ namespace SF {
 			delta_dist = fabs(max_dist - max_dist_prev);
 			max_dist_prev = max_dist;
 
-			/*DEBUG Flat_MaxProjection**
+			/*DEBUG Flat_MaxProjection*/
 #ifdef PP_DEBUG
 			if (iterCount % PP_PROJECTION_COUNT == 0)
 				cout << "Worker " << BSF_sv_mpiRank << ": \tdelta_dist = " << delta_dist << endl;
@@ -615,7 +615,7 @@ namespace SF {
 		#endif // PP_DEBUG /**/
 	}
 
-	static inline void JumpingOnPolytope(PT_vector_T startPoint, PT_vector_T directionVector, PT_vector_T finishPoint, double eps_zero) {
+	static inline void JumpingOnPolytope(PT_vector_T startPoint, PT_vector_T directionVector, PT_vector_T finishPoint, double eps_on_hyperplane, double eps_zero) {
 		PT_vector_T o; // Oblique projection vector
 		PT_vector_T o_min; // Oblique projection vector with minimum length
 		double lengthSQR_o;
@@ -634,7 +634,7 @@ namespace SF {
 			a_DoT_d = Vector_DotProduct(PD_A[i], d);
 			norm_a_DoT_norm_d = a_DoT_d / (PD_norm_a[i] * Vector_Norm(d));
 
-			location_z = PointLocation_i(z, i, eps_zero, &a_DoT_z_MinuS_b);
+			location_z = PointLocation_i(z, i, eps_on_hyperplane, &a_DoT_z_MinuS_b);
 			switch (location_z) {
 			case PP_ON_HYPERPLANE:
 				if (fabs(norm_a_DoT_norm_d) < eps_zero)
@@ -659,6 +659,9 @@ namespace SF {
 					Vector_Copy(o, o_min);
 				}
 				break;
+			case PP_OUTSIDE_HALFSPACE:
+				cout << "JumpingOnPolytope error: Point is outside halfspace!\n";
+				assert(false);
 			default:
 				assert(false);
 			}
@@ -2238,7 +2241,7 @@ namespace SF {
 #ifdef PP_DEBUG
 		if (dist > PP_EPS_ON_HYPERPLANE && dist < PP_EPS_ON_HYPERPLANE * 100) {
 			cout << "Distance from testing point is less than PP_EPS_ON_HYPERPLANE*100, but greater than PP_EPS_ON_HYPERPLANE!\n";
-			system("pause");
+			//system("pause");
 		}
 #endif
 
@@ -2294,10 +2297,10 @@ namespace SF {
 	}
 
 	static inline int PointLocation_i(PT_vector_T x, int i, double eps_zero, double* a_DoT_x_MinuS_b) {
-
 		*a_DoT_x_MinuS_b = Vector_DotProduct(PD_A[i], x) - PD_b[i];
+		double dist = fabs(*a_DoT_x_MinuS_b) / PD_norm_a[i];
 
-		if (fabs(*a_DoT_x_MinuS_b) / PD_norm_a[i] < eps_zero)// <a,x> = b
+		if (dist < eps_zero)// <a,x> = b
 			return PP_ON_HYPERPLANE;
 
 		if (*a_DoT_x_MinuS_b < 0)								// <a,x> < b
