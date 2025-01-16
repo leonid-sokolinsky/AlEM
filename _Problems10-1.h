@@ -3,11 +3,12 @@ Project: LiFe - New Linear Programming Solvers
 Theme: AlEM - Along Edges Movement method
 Module: _Problems10-1.h (LP problems of dimension 10 with 1 random inequality: LP-Rnd-Problems Set)
 Prefix: PP
-Authors: Alexander E. Zhulev & Leonid B. Sokolinsky
+Author: Leonid B. Sokolinsky
 This include file is part of Problem-Parameters.h
-LP problems were obtained using BSF-LPP-Generator.
-Initial surface points for these problems were calculated using Quest.
-==============================================================================*/
+Start vertex *_v.mtx for these problems was calculated by VeSP https://github.com/leonid-sokolinsky/VeSP
+LP problems were obtained using LPP-Generator https://github.com/leonid-sokolinsky/LPP-Generator
+LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Problems/tree/main/Rnd-LP
+================================================================================*/
 #pragma once
 
 //-------------------------- Compilation Modes ---------------------------------

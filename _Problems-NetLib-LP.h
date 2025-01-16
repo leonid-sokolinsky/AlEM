@@ -1,10 +1,12 @@
 /*==========================================================================
 Project: LiFe - New Linear Programming Solvers
-Theme: SAlEM - Stochastic Along Edges Movement method
+Theme: AlEM - Along Edges Movement method
 Module: _Problems-NetLib-LP.h (Problems from the NETLIB LP Test Problem Set)
 Prefix: PP
 Author: Leonid B. Sokolinsky
 This include file is part of Problem-Parameters.h
+Start vertex *_v.mtx for these problems was calculated by VeSP https://github.com/leonid-sokolinsky/VeSP
+LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Problems/tree/main/NetLib-LP
 ============================================================================*/
 #pragma once
 

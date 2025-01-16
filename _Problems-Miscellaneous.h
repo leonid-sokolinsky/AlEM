@@ -3,9 +3,10 @@ Project: LiFe - New Linear Programming Solvers
 Theme: AlEM - Along Edges Movement method
 Module: _Problems-Miscellaneous.h (Miscellaneous LP problems)
 Prefix: PP
-Authors: Alexander E. Zhulev & Leonid B. Sokolinsky
+Author: Leonid B. Sokolinsky
 This include file is part of Problem-Parameters.h
-Initial surface points for these problems were calculated using Quest.
+Start vertex *_v.mtx for these problems was calculated by VeSP https://github.com/leonid-sokolinsky/VeSP
+LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Problems/tree/main/Miscellaneous-LP
 ================================================================================*/
 #pragma once
 

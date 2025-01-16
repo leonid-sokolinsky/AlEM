@@ -3,8 +3,11 @@ Project: LiFe - New Linear Programming Solvers
 Theme: AlEM - Along Edges Movement method
 Module: _Problems-Klee-Minty-Cube.h (Problems from the LP-Klee-Minty-Cube Set)
 Prefix: PP
-Authors: Alexander E. Zhulev & Leonid B. Sokolinsky
+Author: Leonid B. Sokolinsky
 This include file is part of Problem-Parameters.h
+Start vertex *_v.mtx for these problems was calculated by VeSP https://github.com/leonid-sokolinsky/VeSP
+LP problems were obtained using Klee-Minty-Cube-Generator https://github.com/leonid-sokolinsky/Klee-Minty-Cube-Generator
+LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Problems/tree/main/Klee-Minty-Cube
 ================================================================================*/
 #pragma once
 
