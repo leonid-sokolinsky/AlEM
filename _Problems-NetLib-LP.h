@@ -39,7 +39,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+7			// Length of Objective Vector
 //------------------------------------------------------------------------------
 
-/*============================== afiro LP problem ==========================*/
+/*============================== afiro LP problem ==========================*
 // Number of equations : 8
 // Subspace dimension : 24
 #define PP_PROBLEM_NAME	"afiro"
@@ -56,11 +56,11 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 //#define PP_ITER_COUNT				10000				// Each PP_ITER_COUNT-th iteration to be outputted inside PC_bsf_MapF(*)
 //#define PP_PROJECTION_COUNT		100000				// Each PP_PROJECTION_COUNT iteration to be outputted inside Flat_MaxProjection(*)
 //------------------------------------------------------------------------------
-// Elapsed time: 141.26462
+// Elapsed time: 164.04878
 // Number of iterations: 4
-// Computed objective value: 464.753154364924114361202
+// Computed objective value: 464.753142869325699848559
 // Maximal objective value:  464.753142857142847788054
-// Relative error = 2.48e-08 
+// Relative error = 2.62e-11 
 //------------------------------------------------------------------------------
 
 /*============================== beaconfd LP problem ===========================*
@@ -83,7 +83,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 // Relative error = 0.00659
 // //--------------------------------------------------------------------------
 
-/*============================== blend LP problem ==============================*
+/*============================== blend LP problem ==============================*/
 // Number of equations: 43
 // Subspace dimension: 40
 #define PP_PROBLEM_NAME		"blend"
@@ -92,13 +92,19 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_KK 11480		// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
 #define PP_MAX_OBJ_VALUE 30.812149845828220173774356124984	// Exact maximum value of objective function
 //------------------------------------------------------------------------------
-#define PP_EPS_ZERO					1E-11				// Accuracy for comparison with zero
-#define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*100)	// Accuracy of belonging to hyperplane
-#define PP_EPS_PROJECTION			(PP_EPS_ZERO*100)	// Precision to calculate projection
-#define PP_OBJECTIVE_VECTOR_LENGTH	1E+7				// Length of Objective Vector
+#define PP_EPS_ZERO					1E-11			// Accuracy for comparison with zero
+#define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*10)// Accuracy of belonging to hyperplane
+#define PP_EPS_PROJECTION			PP_EPS_ZERO		// Precision to calculate projection
+#define PP_OBJECTIVE_VECTOR_LENGTH	1E+7			// Length of Objective Vector
 //------------------------------ ifdef PP_DEBUG --------------------------------
-#define PP_ITER_COUNT				1					// Each PP_ITER_COUNT-th iteration to be outputted inside PC_bsf_MapF(*)
-#define PP_PROJECTION_COUNT			1000				// Each PP_PROJECTION_COUNT iteration to be outputted inside Flat_MaxProjection(*)
+//#define PP_ITER_COUNT				10000				// Each PP_ITER_COUNT-th iteration to be outputted inside PC_bsf_MapF(*)
+//#define PP_PROJECTION_COUNT		100000				// Each PP_PROJECTION_COUNT iteration to be outputted inside Flat_MaxProjection(*)
+//------------------------------------------------------------------------------
+// Elapsed time: 0.0777482
+// Number of iterations: 0
+// Computed objective value: 7.49259008557472672151789
+// Maximal objective value:  30.8121498458282196963864
+// Relative error = 0.757
 //------------------------------------------------------------------------------
 
 /*============================== kb2 LP problem ============================*

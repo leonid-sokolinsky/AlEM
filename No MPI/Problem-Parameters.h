@@ -53,7 +53,7 @@ This source code has been produced with using BSF-skeleton
 #define PP_EPS_RELATIVE_ERROR			1E-3			// Used if defined PP_CHECK_MAX_OBJ_VALUE 
 //------------------------------ ifdef PP_DEBUG --------------------------------
 #define PP_ITER_COUNT					10000			// Each PP_ITER_COUNT-th iteration to be outputted inside PC_bsf_MapF(*)
-#define PP_PROJECTION_COUNT				100000			// Each PP_PROJECTION_COUNT-th iteration to be outputted inside Flat_MaxProjection(*)
+//#define PP_PROJECTION_COUNT			100000			// Each PP_PROJECTION_COUNT-th iteration to be outputted inside Flat_MaxProjection(*)
 //-------------------------- Input/Outpoot Parameters --------------------------
 #define PP_OUTPUT_LIMIT	30	// Number of Elements to output
 #define PP_SETW 16

@@ -550,6 +550,13 @@ namespace SF {
 			dist = Vector_Norm(r);
 			delta_dist = fabs(dist - dist_prev);
 			dist_prev = dist;
+
+			/*DEBUG Flat_MaxProjection*/
+			#ifdef PP_DEBUG
+			if (iterCount % PP_PROJECTION_COUNT == 0)
+				cout << "Worker " << BSF_sv_mpiRank << ": \tdelta_dist = " << delta_dist << endl;
+			#endif // PP_DEBUG /**/
+
 		} while (delta_dist >= eps_zero);
 		/*DEBUG PC_bsf_MapF**
 #ifdef PP_DEBUG
@@ -584,9 +591,9 @@ namespace SF {
 
 			if (max_i < 0) {
 				/*DEBUG Flat_MaxProjection**
-#ifdef PP_DEBUG
+				#ifdef PP_DEBUG
 				cout << "Flat_MaxProjection: iterCount = " << iterCount << endl;
-#endif // PP_DEBUG /**/
+				#endif // PP_DEBUG /**/
 				return;
 			}
 
@@ -602,10 +609,10 @@ namespace SF {
 			max_dist_prev = max_dist;
 
 			/*DEBUG Flat_MaxProjection*/
-#ifdef PP_DEBUG
+			#ifdef PP_DEBUG
 			if (iterCount % PP_PROJECTION_COUNT == 0)
 				cout << "Worker " << BSF_sv_mpiRank << ": \tdelta_dist = " << delta_dist << endl;
-#endif // PP_DEBUG /**/
+			#endif // PP_DEBUG /**/
 
 		} while (delta_dist >= eps_zero);
 
@@ -613,6 +620,10 @@ namespace SF {
 		#ifdef PP_DEBUG
 		cout << "Flat_MaxProjection: iterCount = " << iterCount << endl;
 		#endif // PP_DEBUG /**/
+	}
+
+	static inline double FloatValueÑlipping(double x) {
+		return round(x * 1E+5) * 1E-5;
 	}
 
 	static inline void JumpingOnPolytope(PT_vector_T startPoint, PT_vector_T directionVector, PT_vector_T finishPoint, double eps_on_hyperplane, double eps_zero) {
@@ -1460,7 +1471,7 @@ namespace SF {
 				cout << "MPS_ReadRHS_line: Unexpected end of line!\n";
 			return false;
 		}
-		row[rowIndex].RHS_value = (double)RHS_value;
+		row[rowIndex].RHS_value = FloatValueÑlipping((double)RHS_value);
 
 		MPS_SkipSpaces(stream);
 
@@ -1499,7 +1510,7 @@ namespace SF {
 				cout << "MPS_ReadRHS_line: Unexpected end of line!\n";
 			return false;
 		}
-		row[rowIndex].RHS_value = (double)RHS_value;
+		row[rowIndex].RHS_value = FloatValueÑlipping((double)RHS_value);
 
 		MPS_SkipSpaces(stream);
 
@@ -1525,7 +1536,7 @@ namespace SF {
 			return false;
 		}
 
-		*value = (double)floatValue;
+		*value = FloatValueÑlipping((double)floatValue);
 		return true;
 	}
 
@@ -2151,7 +2162,7 @@ namespace SF {
 		return s;
 	}
 
-	static inline void	ObliqueProjectingVectorOntoHalfspace_i(PT_vector_T z, int i, PT_vector_T d, PT_vector_T o, double eps_zero, int* exitCode) {
+	static inline void	ObliqueProjectingVectorOntoHalfspace_i(PT_vector_T z, int i, PT_vector_T d, PT_vector_T o, double eps_on_hyperplane, double eps_zero, int* exitCode) {
 		// Oblique projecting vector o of point z onto Half-space H_i with respect to vector d
 		double a_DoT_d;	// <a,d>
 		double norm_a_DoT_norm_d; // <a,d>/(||a||*||d||)
@@ -2160,7 +2171,7 @@ namespace SF {
 
 		Vector_Zeroing(o);
 
-		*exitCode = PointLocation_i(z, i, eps_zero, &a_DoT_z_MinuS_b);
+		*exitCode = PointLocation_i(z, i, eps_on_hyperplane, &a_DoT_z_MinuS_b);
 		a_DoT_d = Vector_DotProduct(PD_A[i], d); // <a,d>
 
 		a_DoT_d = Vector_DotProduct(PD_A[i], d);
@@ -2239,7 +2250,7 @@ namespace SF {
 		double dist = Distance_PointToHyperplane_i(x, i);
 
 #ifdef PP_DEBUG
-		if (dist > PP_EPS_ON_HYPERPLANE && dist < PP_EPS_ON_HYPERPLANE * 100) {
+		if (dist > eps_on_hyperplane && dist < eps_on_hyperplane * 100) {
 			cout << "Distance from testing point is less than PP_EPS_ON_HYPERPLANE*100, but greater than PP_EPS_ON_HYPERPLANE!\n";
 			//system("pause");
 		}
@@ -2296,11 +2307,11 @@ namespace SF {
 			return false;
 	}
 
-	static inline int PointLocation_i(PT_vector_T x, int i, double eps_zero, double* a_DoT_x_MinuS_b) {
+	static inline int PointLocation_i(PT_vector_T x, int i, double eps_on_hyperplane, double* a_DoT_x_MinuS_b) {
 		*a_DoT_x_MinuS_b = Vector_DotProduct(PD_A[i], x) - PD_b[i];
 		double dist = fabs(*a_DoT_x_MinuS_b) / PD_norm_a[i];
 
-		if (dist < eps_zero)// <a,x> = b
+		if (dist < eps_on_hyperplane)// <a,x> = b
 			return PP_ON_HYPERPLANE;
 
 		if (*a_DoT_x_MinuS_b < 0)								// <a,x> < b
