@@ -11,8 +11,8 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #pragma once
 
 //-------------------------- Compilation Modes ---------------------------------
-#define PP_GRADIENT
-//#define PP_BIPROJECTION
+//#define PP_GRADIENT
+#define PP_BIPROJECTION
 //------------------------------------------------------------------------------
 
 //=========================== problem Parameters ===============================*/
@@ -40,7 +40,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_MPS_FORMAT
 #define PP_M 4		// Number of constrains
 #define PP_N 5		// Number of variables
-#define PP_MAX_OBJ_VALUE 21.4549729091012650883386
+#define PP_MAX_OBJ_VALUE 21.4549732313109053905009
 //------------------------------------------------------------------------------
 
 /*============================== simpleCube LP problem =========================*

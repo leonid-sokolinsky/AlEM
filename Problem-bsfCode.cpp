@@ -622,21 +622,17 @@ namespace SF {
 		#endif // PP_DEBUG /**/
 	}
 
-	static inline double FloatValueÑlipping(double x) {
-		return round(x * 1E+5) * 1E-5;
-	}
-
 	static inline void JumpingOnPolytope(PT_vector_T startPoint, PT_vector_T directionVector, PT_vector_T finishPoint, double eps_on_hyperplane, double eps_zero) {
 		PT_vector_T o; // Oblique projection vector
 		PT_vector_T o_min; // Oblique projection vector with minimum length
-		double lengthSQR_o;
+		double length_o;
 		double* z = startPoint;
 		double* d = directionVector;
 		double a_DoT_d;
 		double norm_a_DoT_norm_d;
 		int location_z;
 		double a_DoT_z_MinuS_b;
-		double minLengthSQR = PP_INFINITY;
+		double minLength_o = PP_INFINITY;
 
 		Vector_Zeroing(o_min);
 
@@ -664,9 +660,9 @@ namespace SF {
 				// norm_a_DoT_norm_d > 0
 				// Oblique projection vector: o = -(<a,z> - b)d/<a, d>
 				Vector_MultiplyByNumber(d, -a_DoT_z_MinuS_b / a_DoT_d, o);
-				lengthSQR_o = Vector_NormSquare(o);
-				if (minLengthSQR > lengthSQR_o) {
-					minLengthSQR = lengthSQR_o;
+				length_o = Vector_Norm(o);
+				if (minLength_o > length_o) {
+					minLength_o = length_o;
 					Vector_Copy(o, o_min);
 				}
 				break;
@@ -707,6 +703,64 @@ namespace SF {
 				(*mneh_u)++;
 			}
 		}
+	}
+
+	static inline void MovingToPolytope(PT_vector_T startPoint, PT_vector_T directionVector, PT_vector_T finishPoint, double eps_on_hyperplane, double epsMoving) {
+		double leftBound = 0;
+		double rightBound = PP_DBL_MAX;
+		double factor = 1;
+		double delta;
+		static int outerHalspace_i[PP_MM];	// Index of out half-spaces
+		int mo;								// Number of out half-spaces
+		bool pointInsideCone;
+
+		assert(Vector_Norm(directionVector) >= PP_EPS_ZERO);
+
+		mo = 0;
+		for (int i = 0; i < PD_m; i++)
+			if (!PointBelongsHalfspace_i(startPoint, i, eps_on_hyperplane)) {
+				outerHalspace_i[mo] = i;
+				mo++;
+			}
+
+		delta = factor / 2;
+
+		while (rightBound - leftBound >= PP_EPS_ZERO && delta > 0) {
+			Shift(startPoint, directionVector, factor, finishPoint);
+
+			pointInsideCone = true;
+			for (int i = 0; i < mo; i++)
+				if (PointBelongsHalfspace_i(finishPoint, outerHalspace_i[i], eps_on_hyperplane)) {
+					pointInsideCone = false;
+					break;
+				}
+			if (pointInsideCone) {
+				leftBound = factor;
+				delta *= 2;
+				factor += delta;
+			}
+			else {
+				rightBound = factor;
+				delta /= 2;
+				factor -= delta;
+				assert(factor > 0);
+			}
+		}
+
+		Shift(startPoint, directionVector, factor, finishPoint);
+		delta = epsMoving;
+		do {
+			pointInsideCone = false;
+			for (int i = 0; i < mo; i++)
+				if (!PointBelongsHalfspace_i(finishPoint, outerHalspace_i[i], epsMoving)) {
+					pointInsideCone = true;
+					factor -= delta;
+					delta *= 2;
+					assert(factor > 0);
+					Shift(startPoint, directionVector, factor, finishPoint);
+					break;
+				}
+		} while (pointInsideCone && delta > 0);
 	}
 
 	static bool MPS___Load_Problem() {
@@ -1466,12 +1520,12 @@ namespace SF {
 
 		MPS_SkipSpaces(stream);
 
-		if (fscanf(stream, "%f", &RHS_value) < 1) {
+		if (fscanf(stream, "%lf", &RHS_value) < 1) {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
 				cout << "MPS_ReadRHS_line: Unexpected end of line!\n";
 			return false;
 		}
-		row[rowIndex].RHS_value = FloatValueÑlipping((double)RHS_value);
+		row[rowIndex].RHS_value = (double)RHS_value;
 
 		MPS_SkipSpaces(stream);
 
@@ -1505,12 +1559,12 @@ namespace SF {
 
 		MPS_SkipSpaces(stream);
 
-		if (fscanf(stream, "%f", &RHS_value) < 1) {
+		if (fscanf(stream, "%lf", &RHS_value) < 1) {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
 				cout << "MPS_ReadRHS_line: Unexpected end of line!\n";
 			return false;
 		}
-		row[rowIndex].RHS_value = FloatValueÑlipping((double)RHS_value);
+		row[rowIndex].RHS_value = (double)RHS_value;
 
 		MPS_SkipSpaces(stream);
 
@@ -1528,15 +1582,15 @@ namespace SF {
 	}
 
 	static inline bool MPS_ReadValue(FILE* stream, double* value) {
-		float floatValue;
+		double floatValue;
 
-		if (fscanf(stream, "%f", &floatValue) < 1) {
+		if (fscanf(stream, "%lf", &floatValue) < 1) {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
 				cout << "MPS_ReadValue: Error: Non-ASCII character.\n";
 			return false;
 		}
 
-		*value = FloatValueÑlipping((double)floatValue);
+		*value = (double)floatValue;
 		return true;
 	}
 
