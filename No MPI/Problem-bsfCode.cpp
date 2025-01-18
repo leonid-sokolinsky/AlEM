@@ -550,6 +550,13 @@ namespace SF {
 			dist = Vector_Norm(r);
 			delta_dist = fabs(dist - dist_prev);
 			dist_prev = dist;
+
+			/*DEBUG Flat_MaxProjection**
+#ifdef PP_DEBUG
+			if (iterCount % PP_PROJECTION_COUNT == 0)
+				cout << "Worker " << BSF_sv_mpiRank << ": \tdelta_dist = " << delta_dist << endl;
+#endif // PP_DEBUG /**/
+
 		} while (delta_dist >= eps_zero);
 		/*DEBUG PC_bsf_MapF**
 #ifdef PP_DEBUG
@@ -639,17 +646,16 @@ namespace SF {
 			location_z = PointLocation_i(z, i, eps_on_hyperplane, &a_DoT_z_MinuS_b);
 			switch (location_z) {
 			case PP_ON_HYPERPLANE:
-				if (fabs(norm_a_DoT_norm_d) < eps_zero) {
-#ifdef PP_MOVING_ON_POLYTOPE
-					MovingOnPolytope(startPoint, directionVector, finishPoint, eps_on_hyperplane, eps_zero);
-#endif // PP_MOVING_ON_POLYTOPE
+				if (fabs(norm_a_DoT_norm_d) < eps_zero)
 					continue;
-				}
 				if (norm_a_DoT_norm_d < 0)
 					continue;
 				// norm_a_DoT_norm_d > 0
+				#ifdef PP_MOVING_ON_POLYTOPE
+				MovingOnPolytope(startPoint, directionVector, finishPoint, eps_on_hyperplane, eps_zero);
+				#endif // PP_MOVING_ON_POLYTOPE
 				Vector_Copy(startPoint, finishPoint);
-				//return;
+				return;
 			case PP_INSIDE_HALFSPACE:
 				if (fabs(norm_a_DoT_norm_d) < eps_zero)
 					continue;
@@ -1536,7 +1542,7 @@ namespace SF {
 				cout << "MPS_ReadRHS_line: Unexpected end of line!\n";
 			return false;
 		}
-		row[rowIndex].RHS_value = (double)RHS_value;
+		row[rowIndex].RHS_value = RHS_value;
 
 		MPS_SkipSpaces(stream);
 

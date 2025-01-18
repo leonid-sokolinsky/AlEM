@@ -39,7 +39,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+7			// Length of Objective Vector
 //------------------------------------------------------------------------------
 
-/*============================== afiro LP problem ==========================*
+/*============================== afiro LP problem ==========================*/
 // Number of equations : 8
 // Subspace dimension : 24
 #define PP_PROBLEM_NAME	"afiro"
@@ -53,7 +53,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)	// Precision to calculate projection
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+7				// Length of Objective Vector
 //------------------------------ ifdef PP_DEBUG --------------------------------
-//#define PP_ITER_COUNT				10000				// Each PP_ITER_COUNT-th iteration to be outputted inside PC_bsf_MapF(*)
+#define PP_ITER_COUNT				10000				// Each PP_ITER_COUNT-th iteration to be outputted inside PC_bsf_MapF(*)
 //#define PP_PROJECTION_COUNT		100000				// Each PP_PROJECTION_COUNT iteration to be outputted inside Flat_MaxProjection(*)
 //------------------------------------------------------------------------------
 // Elapsed time: 164.04878
@@ -83,7 +83,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 // Relative error = 0.00659
 // //--------------------------------------------------------------------------
 
-/*============================== blend LP problem ==============================*/
+/*============================== blend LP problem ==============================*
 // Number of equations: 43
 // Subspace dimension: 40
 #define PP_PROBLEM_NAME		"blend"
@@ -96,6 +96,8 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*10)// Accuracy of belonging to hyperplane
 #define PP_EPS_PROJECTION			PP_EPS_ZERO		// Precision to calculate projection
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+7			// Length of Objective Vector
+//-------------------------- Compilation Modes ---------------------------------
+#define PP_MOVING_ON_POLYTOPE
 //------------------------------ ifdef PP_DEBUG --------------------------------
 #define PP_ITER_COUNT				10000				// Each PP_ITER_COUNT-th iteration to be outputted inside PC_bsf_MapF(*)
 //#define PP_PROJECTION_COUNT		100000				// Each PP_PROJECTION_COUNT iteration to be outputted inside Flat_MaxProjection(*)

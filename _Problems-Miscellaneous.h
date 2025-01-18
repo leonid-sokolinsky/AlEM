@@ -35,7 +35,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_PROJECTION_COUNT			1000				// Each PP_PROJECTION_COUNT iteration to be outputted inside Flat_MaxProjection(*)
 //==============================================================================
 
-/*============================== nguyen5 LP problem ============================*/
+/*============================== nguyen5 LP problem ============================*
 #define PP_PROBLEM_NAME	"nguyen5"
 #define PP_MPS_FORMAT
 #define PP_M 4		// Number of constrains
@@ -56,7 +56,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_MAX_OBJ_VALUE 		60000
 //------------------------------------------------------------------------------
 
-/*============================== cubeInHyperplane LP problem ===================*
+/*============================== cubeInHyperplane LP problem ===================*/
 #define PP_MPS_FORMAT
 #define PP_PROBLEM_NAME	"cubeInHyperplane"
 #define PP_M 4		// Number of constrains

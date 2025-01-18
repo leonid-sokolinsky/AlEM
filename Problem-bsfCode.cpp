@@ -124,12 +124,13 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 	PT_vector_T d;	// direction vector
 	int edgeCode = *mapElem->edgeCode;
 
+	/*DEBUG PC_bsf_MapF**
 	#ifdef PP_DEBUG
 	static int map_counter;
 	map_counter++;
 	if (map_counter % PP_ITER_COUNT == 0) 
 		cout << "Worker " << BSF_sv_mpiRank << ": number of iterations = " << map_counter << endl;
-	#endif // PP_DEBUG
+	#endif // PP_DEBUG /**/
 
 	if (edgeCode == -1) {
 		*success = false;
@@ -637,6 +638,8 @@ namespace SF {
 		Vector_Zeroing(o_min);
 
 		for (int i = 0; i < PD_m; i++) {
+			if (PD_isEquation[i])
+				continue;
 
 			a_DoT_d = Vector_DotProduct(PD_A[i], d);
 			norm_a_DoT_norm_d = a_DoT_d / (PD_norm_a[i] * Vector_Norm(d));
@@ -705,36 +708,17 @@ namespace SF {
 		}
 	}
 
-	static inline void MovingToPolytope(PT_vector_T startPoint, PT_vector_T directionVector, PT_vector_T finishPoint, double eps_on_hyperplane, double epsMoving) {
+	static inline void MovingOnPolytope(PT_vector_T startPoint, PT_vector_T directionVector, PT_vector_T finishPoint, double eps_on_hyperplane, double epsMoving) {
 		double leftBound = 0;
 		double rightBound = PP_DBL_MAX;
 		double factor = 1;
 		double delta;
-		static int outerHalspace_i[PP_MM];	// Index of out half-spaces
-		int mo;								// Number of out half-spaces
-		bool pointInsideCone;
-
-		assert(Vector_Norm(directionVector) >= PP_EPS_ZERO);
-
-		mo = 0;
-		for (int i = 0; i < PD_m; i++)
-			if (!PointBelongsHalfspace_i(startPoint, i, eps_on_hyperplane)) {
-				outerHalspace_i[mo] = i;
-				mo++;
-			}
 
 		delta = factor / 2;
 
 		while (rightBound - leftBound >= PP_EPS_ZERO && delta > 0) {
 			Shift(startPoint, directionVector, factor, finishPoint);
-
-			pointInsideCone = true;
-			for (int i = 0; i < mo; i++)
-				if (PointBelongsHalfspace_i(finishPoint, outerHalspace_i[i], eps_on_hyperplane)) {
-					pointInsideCone = false;
-					break;
-				}
-			if (pointInsideCone) {
+			if (PointBelongsPolytope(finishPoint, eps_on_hyperplane)) {
 				leftBound = factor;
 				delta *= 2;
 				factor += delta;
@@ -743,24 +727,16 @@ namespace SF {
 				rightBound = factor;
 				delta /= 2;
 				factor -= delta;
-				assert(factor > 0);
 			}
 		}
 
 		Shift(startPoint, directionVector, factor, finishPoint);
 		delta = epsMoving;
-		do {
-			pointInsideCone = false;
-			for (int i = 0; i < mo; i++)
-				if (!PointBelongsHalfspace_i(finishPoint, outerHalspace_i[i], epsMoving)) {
-					pointInsideCone = true;
-					factor -= delta;
-					delta *= 2;
-					assert(factor > 0);
-					Shift(startPoint, directionVector, factor, finishPoint);
-					break;
-				}
-		} while (pointInsideCone && delta > 0);
+		while (!PointBelongsPolytope(finishPoint, epsMoving) && delta > 0) {
+			factor -= delta;
+			delta *= 2;
+			Shift(startPoint, directionVector, factor, finishPoint);
+		}
 	}
 
 	static bool MPS___Load_Problem() {
@@ -1459,7 +1435,7 @@ namespace SF {
 		char ch;
 		PT_MPS_name_T next_RHS_name;
 		PT_MPS_name_T rowName;
-		float RHS_value;
+		double RHS_value;
 		int rowIndex;
 
 		for (int p = 0; p < PP_MPS_NAME_LENGTH; p++)
@@ -1525,7 +1501,7 @@ namespace SF {
 				cout << "MPS_ReadRHS_line: Unexpected end of line!\n";
 			return false;
 		}
-		row[rowIndex].RHS_value = (double)RHS_value;
+		row[rowIndex].RHS_value = RHS_value;
 
 		MPS_SkipSpaces(stream);
 
@@ -1564,7 +1540,7 @@ namespace SF {
 				cout << "MPS_ReadRHS_line: Unexpected end of line!\n";
 			return false;
 		}
-		row[rowIndex].RHS_value = (double)RHS_value;
+		row[rowIndex].RHS_value = RHS_value;
 
 		MPS_SkipSpaces(stream);
 
@@ -1582,15 +1558,11 @@ namespace SF {
 	}
 
 	static inline bool MPS_ReadValue(FILE* stream, double* value) {
-		double floatValue;
-
-		if (fscanf(stream, "%lf", &floatValue) < 1) {
+		if (fscanf(stream, "%lf", value) < 1) {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
 				cout << "MPS_ReadValue: Error: Non-ASCII character.\n";
 			return false;
 		}
-
-		*value = (double)floatValue;
 		return true;
 	}
 
