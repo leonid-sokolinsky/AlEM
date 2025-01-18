@@ -639,8 +639,12 @@ namespace SF {
 			location_z = PointLocation_i(z, i, eps_on_hyperplane, &a_DoT_z_MinuS_b);
 			switch (location_z) {
 			case PP_ON_HYPERPLANE:
-				if (fabs(norm_a_DoT_norm_d) < eps_zero)
+				if (fabs(norm_a_DoT_norm_d) < eps_zero) {
+#ifdef PP_MOVING_ON_POLYTOPE
+					MovingOnPolytope(startPoint, directionVector, finishPoint, eps_on_hyperplane, eps_zero);
+#endif // PP_MOVING_ON_POLYTOPE
 					continue;
+				}
 				if (norm_a_DoT_norm_d < 0)
 					continue;
 				// norm_a_DoT_norm_d > 0
@@ -700,36 +704,17 @@ namespace SF {
 		}
 	}
 
-	static inline void MovingToPolytope(PT_vector_T startPoint, PT_vector_T directionVector, PT_vector_T finishPoint, double eps_on_hyperplane, double epsMoving) {
+	static inline void MovingOnPolytope(PT_vector_T startPoint, PT_vector_T directionVector, PT_vector_T finishPoint, double eps_on_hyperplane, double epsMoving) {
 		double leftBound = 0;
 		double rightBound = PP_DBL_MAX;
 		double factor = 1;
 		double delta;
-		static int outerHalspace_i[PP_MM];	// Index of out half-spaces
-		int mo;								// Number of out half-spaces
-		bool pointInsideCone;
-
-		assert(Vector_Norm(directionVector) >= PP_EPS_ZERO);
-
-		mo = 0;
-		for (int i = 0; i < PD_m; i++)
-			if (!PointBelongsHalfspace_i(startPoint, i, eps_on_hyperplane)) {
-				outerHalspace_i[mo] = i;
-				mo++;
-			}
 
 		delta = factor / 2;
 
 		while (rightBound - leftBound >= PP_EPS_ZERO && delta > 0) {
 			Shift(startPoint, directionVector, factor, finishPoint);
-
-			pointInsideCone = true;
-			for (int i = 0; i < mo; i++)
-				if (PointBelongsHalfspace_i(finishPoint, outerHalspace_i[i], eps_on_hyperplane)) {
-					pointInsideCone = false;
-					break;
-				}
-			if (pointInsideCone) {
+			if (PointBelongsPolytope(finishPoint, eps_on_hyperplane)) {
 				leftBound = factor;
 				delta *= 2;
 				factor += delta;
@@ -738,24 +723,16 @@ namespace SF {
 				rightBound = factor;
 				delta /= 2;
 				factor -= delta;
-				assert(factor > 0);
 			}
 		}
 
 		Shift(startPoint, directionVector, factor, finishPoint);
 		delta = epsMoving;
-		do {
-			pointInsideCone = false;
-			for (int i = 0; i < mo; i++)
-				if (!PointBelongsHalfspace_i(finishPoint, outerHalspace_i[i], epsMoving)) {
-					pointInsideCone = true;
-					factor -= delta;
-					delta *= 2;
-					assert(factor > 0);
-					Shift(startPoint, directionVector, factor, finishPoint);
-					break;
-				}
-		} while (pointInsideCone && delta > 0);
+		while (!PointBelongsPolytope(finishPoint, epsMoving) && delta > 0) {
+			factor -= delta;
+			delta *= 2;
+			Shift(startPoint, directionVector, factor, finishPoint);
+		}
 	}
 
 	static bool MPS___Load_Problem() {
