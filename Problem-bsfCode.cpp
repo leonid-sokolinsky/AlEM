@@ -2383,12 +2383,10 @@ namespace SF {
 
 	static inline bool PointIsVertex(PT_vector_T x, double eps_on_hyperplane) {
 		int count_x = 0; // The number of inequality hyperplanes including the point x
-		int count_ne = 0; // The number of constraints that are inequalities
 
 		for (int i = 0; i < PD_m; i++) {
 			if (PD_isEquation[i])
 				continue;
-			count_ne++;
 			if (PointBelongsHyperplane_i(x, i, eps_on_hyperplane))
 				count_x++;
 		}

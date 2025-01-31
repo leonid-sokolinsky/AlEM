@@ -705,7 +705,7 @@ namespace SF {
 				/*DEBUG Flat_MaxProjection*/
 				#ifdef PP_DEBUG
 				if (norm_a_DoT_norm_d >= eps_cos)
-					cout << "Worker " << BSF_sv_mpiRank << ": constraint " << i << ":\t\t\t\tnorm_a_DoT_norm_d = " << norm_a_DoT_norm_d << endl;
+					cout << "Worker " << BSF_sv_mpiRank << ": constraint " << i << ":\t\t\tnorm_a_DoT_norm_d = " << norm_a_DoT_norm_d << endl;
 #endif // PP_DEBUG /**/
 
 				if (fabs(norm_a_DoT_norm_d) < eps_cos)

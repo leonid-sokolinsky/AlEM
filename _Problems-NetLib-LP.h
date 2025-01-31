@@ -70,18 +70,18 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_M 173	// Number of constraints in mps-file
 #define PP_N 262	// Number of variables in mps-file
 #define PP_MAX_OBJ_VALUE -33592.4858072
-//--------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 #define PP_EPS_ZERO					1E-7			// Precision for comparison with zero
 #define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*10)// Accuracy of belonging to hyperplane
 #define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)// Precision to calculate projection
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+7			// Length of Objective Vector
-//--------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 // Elapsed time: 37318.432
 // Number of iterations: 2
 // Computed objective value: -33813.86407276181
 // Maximal objective value:  -33592.4858072
 // Relative error = 0.00659
-// //--------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 /*============================== blend LP problem ==============================*/
 // Number of equations: 43
@@ -93,9 +93,9 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_MAX_OBJ_VALUE 30.812149845828220173774356124984	// Exact maximum value of objective function
 //------------------------------------------------------------------------------
 #define PP_EPS_ZERO					1E-11				// Accuracy for comparison with zero
-#define PP_EPS_ON_HYPERPLANE		0.0003				// Accuracy of belonging to hyperplane
+#define PP_EPS_ON_HYPERPLANE		1E-4				// Accuracy of belonging to hyperplane
 #define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)	// Precision to calculate projection
-#define PP_EPS_COS					PP_EPS_ON_HYPERPLANE// Precision to calculate COS
+#define PP_EPS_COS					1E-3				// Precision to calculate COS
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+7				// Length of Objective Vector
 //-------------------------- Compilation Modes ---------------------------------
 #define PP_BIPROJECTION
@@ -103,11 +103,9 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_ITER_COUNT			1				// Each PP_ITER_COUNT-th iteration to be outputted inside PC_bsf_MapF(*)
 #define PP_PROJECTION_COUNT		1000000			// Each PP_PROJECTION_COUNT iteration to be outputted inside Flat_MaxProjection(*)
 //------------------------------------------------------------------------------
-// Elapsed time: 0.0777482
-// Number of iterations: 0
-// Computed objective value: 7.49259008557472672151789
+// Computed objective value: 30.77211
 // Maximal objective value:  30.8121498458282196963864
-// Relative error = 0.757
+// Relative error = 0.001299
 //------------------------------------------------------------------------------
 
 /*============================== kb2 LP problem ============================*
