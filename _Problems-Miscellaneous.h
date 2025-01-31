@@ -23,11 +23,14 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 //						calculating pseudoprojection.
 #define PP_EPS_ZERO					1E-11			// Precision for comparison with zero
 #define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*10)// Accuracy of belonging to hyperplane
+
 #ifdef PP_BIPROJECTION
-	#define PP_EPS_PROJECTION		PP_EPS_ZERO		// Precision to calculate pseudoprojection
+#define PP_EPS_PROJECTION		PP_EPS_ZERO		// Precision to calculate pseudoprojection
 #else
-	#define PP_EPS_PROJECTION		(PP_EPS_ZERO*1000)// Precision to calculate pseudoprojection
+#define PP_EPS_PROJECTION		(PP_EPS_ZERO*1000)// Precision to calculate pseudoprojection
 #endif // PP_BIPROJECTION
+
+#define PP_EPS_COS					PP_EPS_ZERO		// Precision to calculate COS
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+8			// Length of Objective Vector
 #define PP_KK						10				// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
 //------------------------------ ifdef PP_DEBUG --------------------------------

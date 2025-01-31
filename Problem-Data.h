@@ -22,6 +22,9 @@ static int PD_TWIDDLE_nextEdgeI;	// Next index of edge in TWIDDLE algorithm
 static int PD_TWIDDLE_x;			// Auxiliary TWIDDLE variable
 static int PD_TWIDDLE_y;			// Auxiliary TWIDDLE variable
 static int PD_TWIDDLE_z;			// Auxiliary TWIDDLE variable
+#ifdef PP_DEBUG
+static int PD_map_counter;			// Used for debugging in PC_bsf_MapF(*)
+#endif // PP_DEBUG /**/
 //========================== Problem structures ====================================
 static PT_matrix_T PD_A;			// Matrix of constraint coefficients
 static bool PD_isEquation[PP_MM];	// Constraint is equation

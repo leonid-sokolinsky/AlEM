@@ -23,7 +23,7 @@ namespace SF {
 	double	DistanceSQR_PointToPoint(PT_vector_T x, PT_vector_T y);
 	void	Flat_BipProjection(int* flatHyperplanes, int m_flat, PT_vector_T v, double eps_zero, int maxProjectingIter, PT_vector_T w, int* success);
 	void	Flat_MaxProjection(int* flatHyperplanes, int m_flat, PT_vector_T v, double eps_zero, int maxProjectingIter, PT_vector_T w, int* success);
-	void	JumpingOnPolytope(PT_vector_T startPoint, PT_vector_T directionVector, PT_vector_T finishPoint, double eps_on_hyperplane, double eps);
+	void	JumpingOnPolytope(PT_vector_T startPoint, PT_vector_T directionVector, PT_vector_T finishPoint, double eps_on_hyperplane, double eps_cos);
 	void	MakeColumnOfNorms(PT_matrix_T A, PT_column_T norm_a);
 	void	MakeListOfNotIncludingHalfspaces(PT_vector_T x, int* notIncludingHalfspacesList, double eps);
 	void	MakeNeHyperplaneList(PT_vector_T u, int* neHyperplanes_u, int* mneh_u, double eps);
@@ -65,7 +65,7 @@ namespace SF {
 	void	MTX_SkipComments(FILE* stream);
 	int		Number_IncludingNeHyperplanes(PT_vector_T x, double eps);
 	double	ObjF(PT_vector_T x);
-	void	ObliqueProjectingVectorOntoHalfspace_i(PT_vector_T z, int i, PT_vector_T d, PT_vector_T o, double eps_on_hyperplane, double eps, int* exitCode);
+	void	ObliqueProjectingVectorOntoHalfspace_i(PT_vector_T z, int i, PT_vector_T d, PT_vector_T o, double eps_on_hyperplane, double eps_cos, int* exitCode);
 	void	OrthogonalProjectingVectorOntoHalfspace_i(PT_vector_T z, int i, PT_vector_T r, double eps, int* exitcode);
 	void	OrthogonalProjectingVectorOntoHyperplane_i(PT_vector_T x, int i, PT_vector_T p);
 	bool	PointBelongsHalfspace_i(PT_vector_T point, int i, double eps);
@@ -74,7 +74,7 @@ namespace SF {
 	bool	PointBelongsPolytope(PT_vector_T x, double eps);
 	void	PointHomothety(PT_vector_T x, PT_vector_T center, double ratio);
 	bool	PointInsideHalfspace_i(PT_vector_T x, int i, double eps);
-	bool	PointIsVertex_i(PT_vector_T x, double  eps);
+	bool	PointIsVertex(PT_vector_T x, double eps_on_hyperplane);
 	int		PointLocation_i(PT_vector_T x, int i, double eps, double* a_DoT_x_MinuS_b);
 	void	PolytopeHomothety(PT_vector_T center, double ratio);
 	void	Print_Constraints();
@@ -85,6 +85,7 @@ namespace SF {
 	void	Print_Vector(PT_vector_T x);
 	double	RelativeError(double trueValue, double calculatedValue);
 	void	Shift(PT_vector_T point, PT_vector_T shiftVector, double factor, PT_vector_T shiftedPoint);
+	void	SmallStep(PT_vector_T point, PT_vector_T direction, double stepLength, PT_vector_T stepPoint);
 	void	TWIDDLE(int* x, int* y, int* z, int* p, bool* done);
 	void	TWIDDLE_CodeToSubset(int code, int* a, int* c, int n, int m, int* x, int* y, int* z, int* p, bool* done, int* nextI);
 	void	TWIDDLE_Make_p(int* p, int n, int m);
