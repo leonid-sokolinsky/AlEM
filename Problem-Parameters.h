@@ -15,7 +15,7 @@ This source code has been produced with using BSF-skeleton
 #include "_Problems10-1.h"
 #define PP_PATH "../../Set-of-LP-Problems/Rnd-LP/"
 
-/**/
+/**
 #include "_Problems100_1000-0.h"
 #define PP_PATH "../../Set-of-LP-Problems/Rnd-LP/"
 
@@ -23,7 +23,7 @@ This source code has been produced with using BSF-skeleton
 #include "_Problems-Miscellaneous.h"
 #define PP_PATH "../../Set-of-LP-Problems/Miscellaneous-LP/"
 
-/**
+/**/
 #include "_Problems-NetLib-LP.h"
 #define PP_PATH "../../Set-of-LP-Problems/NetLib-LP/"
 

@@ -106,6 +106,7 @@ namespace SF {
 	void	Vector_SetValue(PT_vector_T x, double v);
 	void	Vector_Subtraction(PT_vector_T x, PT_vector_T y, PT_vector_T z);
 	void	Vector_Zeroing(PT_vector_T x);
+	void	Vector_ZeroingNegativeCoordinates(PT_vector_T x);
 }
 //====================== Macros ================================
 #define PF_MIN(x,y) (x<y?x:y)

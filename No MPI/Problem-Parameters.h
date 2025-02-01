@@ -11,7 +11,7 @@ This source code has been produced with using BSF-skeleton
 
 //#define PP_PATH "Problems/"
 
-/**/
+/**
 #include "../_Problems05-1.h"
 #define PP_PATH "../../Set-of-LP-Problems/Rnd-LP/"
 
@@ -19,7 +19,7 @@ This source code has been produced with using BSF-skeleton
 #include "../_Problems-Klee-Minty-Cube.h"
 #define PP_PATH "../../Set-of-LP-Problems/Klee-Minty-Cube/"
 
-/**
+/**/
 #include "../_Problems-Miscellaneous.h"
 #define PP_PATH "../../Set-of-LP-Problems/Miscellaneous-LP/"
 
@@ -35,7 +35,7 @@ This source code has been produced with using BSF-skeleton
 //#define PP_DEBUG
 //#define PP_MATRIX_OUTPUT
 //#define PP_SAVE_RESULT
-//#define PP_SAVE_ITER_RESULT
+#define PP_SAVE_ITER_RESULT
 #define PP_CHECK_MAX_OBJ_VALUE // Exit if relative error of computed maximum of objective function is less than PP_EPS_RELATIVE_ERROR (demands #define PP_MAX_OBJ_VALUE)
 //#define MPS_MIN_OF_OBJECTIVE_FUNCTION
 
