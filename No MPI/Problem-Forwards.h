@@ -86,6 +86,7 @@ namespace SF {
 	double	RelativeError(double trueValue, double calculatedValue);
 	void	Shift(PT_vector_T point, PT_vector_T shiftVector, double factor, PT_vector_T shiftedPoint);
 	void	SmallStep(PT_vector_T point, PT_vector_T direction, double stepLength, PT_vector_T stepPoint);
+	void	Tuning_Eps_PointBelongsPolytope(PT_vector_T x, double* eps);
 	void	TWIDDLE(int* x, int* y, int* z, int* p, bool* done);
 	void	TWIDDLE_CodeToSubset(int code, int* a, int* c, int n, int m, int* x, int* y, int* z, int* p, bool* done, int* nextI);
 	void	TWIDDLE_Make_p(int* p, int n, int m);

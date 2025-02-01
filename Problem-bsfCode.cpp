@@ -24,6 +24,8 @@ void PC_bsf_CopyParameter(PT_bsf_parameter_T parameterIn, PT_bsf_parameter_T* pa
 
 void PC_bsf_Init(bool* success) {
 
+	PD_eps_on_hyperplane = PP_EPS_ZERO;
+
 	PD_problemName = PP_PROBLEM_NAME;
 	PD_m = 0;
 	PD_n = 0;
@@ -63,13 +65,6 @@ void PC_bsf_Init(bool* success) {
 			return;
 		}
 
-	if (!PointBelongsPolytope(PD_u_cur, PP_EPS_ON_HYPERPLANE)) {
-		if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-			cout << "Starting point does not belong to the feasible polytope with precision PP_EPS_ON_HYPERPLANE = "
-			<< PP_EPS_ON_HYPERPLANE << "!!!\n";
-		*success = false;
-		return;
-	}
 	PD_iterNo = 0;
 	Vector_MakeLike(PD_c, PP_OBJECTIVE_VECTOR_LENGTH, PD_objVector);
 	PD_objF_cur = ObjF(PD_u_cur);
@@ -208,7 +203,7 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 		return;
 	}
 
-	JumpingOnPolytope(u_cur, d, u_nex, PP_EPS_ON_HYPERPLANE, PP_EPS_COS);
+	JumpingOnPolytope(u_cur, d, u_nex, PD_eps_on_hyperplane, PP_EPS_COS);
 
 	if (Distance_PointToPoint(u_cur, u_nex) < PP_EPS_ZERO) {
 
@@ -226,9 +221,9 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 		return;
 	}
 
-	if (!PointIsVertex(u_nex, PP_EPS_ON_HYPERPLANE)) {
+	if (!PointIsVertex(u_nex, PD_eps_on_hyperplane)) {
 
-		/*DEBUG PC_bsf_MapF*/
+		/*DEBUG PC_bsf_MapF**
 #ifdef PP_DEBUG
 		cout << "Worker " << BSF_sv_mpiRank << ":";
 		cout << "\t u_nex is not vertex ===>>> movement is impossible.\n";
@@ -326,7 +321,6 @@ void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
 #endif // PP_BIPROJECTION
 
 	cout << "PP_EPS_ZERO\t\t\t" << PP_EPS_ZERO << endl;
-	cout << "PP_EPS_ON_HYPERPLANE\t\t" << PP_EPS_ON_HYPERPLANE << endl;
 	cout << "PP_EPS_PROJECTION\t\t" << PP_EPS_PROJECTION << endl;
 	cout << "PP_EPS_COS\t\t\t" << PP_EPS_COS << endl;
 	cout << "PP_EPS_RELATIVE_ERROR\t\t" << PP_EPS_RELATIVE_ERROR << endl;
@@ -342,13 +336,13 @@ void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
 #endif // PP_MATRIX_OUTPUT
 
 #ifdef PP_DEBUG
-	if (!PointBelongsPolytope(PD_u_cur, PP_EPS_ON_HYPERPLANE))
+	if (!PointBelongsPolytope(PD_u_cur, PD_eps_on_hyperplane))
 		cout << "u0 is outside feasible polytope!!!\n";
 	else
 		cout << "u0 belongs to feasible polytope.\n";
-	// cout << "Including hyperplanes:\t"; Print_HyperplanesIncludingPoint(PD_u_cur, PP_EPS_ON_HYPERPLANE); cout << endl;
-	cout << "// Number of inequality hyperplanes including u0: " << Number_IncludingNeHyperplanes(PD_u_cur, PP_EPS_ON_HYPERPLANE) << endl;
-	cout << "Number of edges:\t"; Print_Number_of_edges(PD_u_cur, PP_EPS_ON_HYPERPLANE);
+	// cout << "Including hyperplanes:\t"; Print_HyperplanesIncludingPoint(PD_u_cur, PD_eps_on_hyperplane); cout << endl;
+	cout << "// Number of inequality hyperplanes including u0: " << Number_IncludingNeHyperplanes(PD_u_cur, PD_eps_on_hyperplane) << endl;
+	cout << "Number of edges:\t"; Print_Number_of_edges(PD_u_cur, PD_eps_on_hyperplane);
 #endif // PP_DEBUG
 }
 
@@ -364,6 +358,7 @@ void PC_bsf_ProblemOutput(PT_bsf_reduceElem_T* reduceResult, int reduceCounter, 
 	cout << "================================================" << endl;
 
 #ifdef PP_SAVE_RESULT
+	Vector_ZeroingNegativeCoordinates(PD_u_cur);
 	if (MTX_SavePoint(PD_u_cur, PP_MTX_POSTFIX_SO))
 		cout << "Calculated solution point is saved into file *.so" << endl;
 #endif // PP_SAVE_RESULT
@@ -371,6 +366,7 @@ void PC_bsf_ProblemOutput(PT_bsf_reduceElem_T* reduceResult, int reduceCounter, 
 #ifdef PP_DEBUG
 	// cout << "Solution point:\t"; Print_Vector(PD_u_cur);	cout << endl;
 	cout << "Distance to polytope: " << Distance_PointToPolytope(PD_u_cur) << endl;
+	cout << "PD_eps_on_hyperplane = " << PD_eps_on_hyperplane << endl;
 #endif // PP_DEBUG
 
 } // end PC_bsf_ProblemOutput
@@ -431,7 +427,6 @@ void PC_bsf_ProcessResults(PT_bsf_reduceElem_T* reduceResult, int reduceCounter,
 	Vector_Copy(reduceResult->u_nex, PD_u_cur);
 	PD_objF_cur = reduceResult->objF_nex;
 	Vector_Copy(reduceResult->u_nex, parameter->u_cur);
-	Vector_Round(parameter->u_cur, PP_EPS_ZERO * 10);
 	Vector_ZeroingNegativeCoordinates(parameter->u_cur);
 
 	PD_iterNo++;
@@ -440,9 +435,10 @@ void PC_bsf_ProcessResults(PT_bsf_reduceElem_T* reduceResult, int reduceCounter,
 	cout << "_________________________________________________ " << PD_iterNo << " _____________________________________________________" << endl;
 	//cout << "u_nex:\t"; Print_Vector(reduceResult->u_nex);  cout << "\t";
 	cout << "F(u_nex) = " << ObjF(parameter->u_cur) << endl;
-	cout << "Number of hyperplanes including u_nex: " << Number_IncludingNeHyperplanes(reduceResult->u_nex, PP_EPS_ON_HYPERPLANE) << endl;
-	cout << "Number of edges:\t"; Print_Number_of_edges(PD_u_cur, PP_EPS_ON_HYPERPLANE);
-	//cout << "u_nex hyperplanes:\t"; Print_HyperplanesIncludingPoint(reduceResult->u_nex, PP_EPS_ON_HYPERPLANE); cout << endl;
+	cout << "Number of hyperplanes including u_nex: " << Number_IncludingNeHyperplanes(reduceResult->u_nex, PD_eps_on_hyperplane) << endl;
+	cout << "Number of edges:\t"; Print_Number_of_edges(PD_u_cur, PD_eps_on_hyperplane);
+	cout << "PD_eps_on_hyperplane = " << PD_eps_on_hyperplane << endl;
+	//cout << "u_nex hyperplanes:\t"; Print_HyperplanesIncludingPoint(reduceResult->u_nex, PD_eps_on_hyperplane); cout << endl;
 #endif // PP_DEBUG
 
 #ifdef PP_SAVE_ITER_RESULT
@@ -450,12 +446,6 @@ void PC_bsf_ProcessResults(PT_bsf_reduceElem_T* reduceResult, int reduceCounter,
 		cout << "\tCurrent approximation is saved into file *_v.mtx\n";
 #endif // PP_SAVE_ITER_RESULT
 
-	if (!PointBelongsPolytope(parameter->u_cur, PP_EPS_ON_HYPERPLANE)) {
-		cout << "PC_bsf_ProcessResults Error: Resulting point does not belong to the feasible polytope with precision of PP_EPS_ON_HYPERPLANE = "
-			<< PP_EPS_ON_HYPERPLANE << "!!!\n";
-		*toExit = true;
-		return;
-	}
 }
 
 void PC_bsf_ProcessResults_1(PT_bsf_reduceElem_T_1* reduceResult, int reduceCounter, PT_bsf_parameter_T* parameter, int* nextJob, bool* toExit) {
@@ -2347,7 +2337,7 @@ namespace SF {
 		/*DEBUG PointBelongsHyperplane_i**
 #ifdef PP_DEBUG
 		if (dist > eps_on_hyperplane && dist < eps_on_hyperplane * 10) {
-			cout << "Distance from testing point is less than PP_EPS_ON_HYPERPLANE*10, but greater than PP_EPS_ON_HYPERPLANE!\n";
+			cout << "Distance from testing point is less than " << PD_eps_on_hyperplane*10 << ", but greater than " << PD_eps_on_hyperplane << "!\n";
 			//system("pause");
 		}
 #endif // PP_DEBUG /**/
@@ -2529,6 +2519,11 @@ namespace SF {
 			return fabs(calculatedValue - trueValue) / fabs(trueValue);
 	}
 
+	static inline void Tuning_Eps_PointBelongsPolytope(PT_vector_T x, double* eps) {
+		while (!PointBelongsPolytope(x, *eps))
+			(*eps) *= 2;
+	}
+
 	static inline void TWIDDLE // https://doi.org/10.1145/362384.362502
 	(int* x, int* y, int* z, int* p, bool* done) {
 		int i, j, k;
@@ -2706,6 +2701,9 @@ namespace SF {
 		double sign;
 		double absValue;
 
+		if (eps_round == 0)
+			return;
+
 		for (int j = 0; j < PD_n; j++) {
 			if (fabs(x[j]) < eps_round) {
 				x[j] = 0;
@@ -2827,21 +2825,22 @@ namespace PF {
 	static inline void PreparationForIteration(PT_vector_T u) {
 		int med_u;
 
+		Tuning_Eps_PointBelongsPolytope(u, &PD_eps_on_hyperplane);
+
 #ifdef PP_DEBUG
 		PD_map_counter = 0; // Used for debugging in PC_bsf_MapF(*)
 #endif // PP_DEBUG /**/
 
-		MakeNeHyperplaneList(u, PD_neHyperplanes_u, &PD_mneh_u, PP_EPS_ON_HYPERPLANE);
+		MakeNeHyperplaneList(u, PD_neHyperplanes_u, &PD_mneh_u, PD_eps_on_hyperplane);
 		assert(PD_mneh_u <= PP_MM);
 
 		if (PD_mneh_u < PD_neq) {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-				cout << "\nPreparationForIteration error: Starting point u is not vertex with prescision " << PP_EPS_ON_HYPERPLANE << ". Number of including inequality-hyperplanes = " << PD_mneh_u
+				cout << "\nPreparationForIteration error: Starting point u is not vertex with prescision " << PD_eps_on_hyperplane << ". Number of including inequality-hyperplanes = " << PD_mneh_u
 				<< " < neq = " << PD_neq << "\n";
 			cout << "PD_u_cur: ";
 			Print_Vector(PD_u_cur);
 			cout << "\tObjF(u) = " << ObjF(PD_u_cur) << endl;
-			cout << "\nPerhaps you should decrease parameter PP_EPS_ON_HYPERPLANE or increase parameter PP_OBJECTIVE_VECTOR_LENGTH.\n";
 			exit(1);
 		}
 

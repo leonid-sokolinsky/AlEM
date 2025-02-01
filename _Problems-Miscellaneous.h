@@ -22,7 +22,6 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 //						This parameter affects terminate condition when 
 //						calculating pseudoprojection.
 #define PP_EPS_ZERO					1E-11			// Precision for comparison with zero
-#define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*10)// Accuracy of belonging to hyperplane
 
 #ifdef PP_BIPROJECTION
 #define PP_EPS_PROJECTION		PP_EPS_ZERO		// Precision to calculate pseudoprojection
@@ -38,7 +37,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_PROJECTION_COUNT			1000				// Each PP_PROJECTION_COUNT iteration to be outputted inside Flat_MaxProjection(*)
 //==============================================================================
 
-/*============================== nguyen5 LP problem ============================*/
+/*============================== nguyen5 LP problem ============================*
 #define PP_PROBLEM_NAME	"nguyen5"
 #define PP_MPS_FORMAT
 #define PP_M 4		// Number of constrains
@@ -201,7 +200,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_MAX_OBJ_VALUE 998.193448648739376949379
 //------------------------------------------------------------------------------
 
-/*============================== rnd3-10 LP problem ============================*
+/*============================== rnd3-10 LP problem ============================*/
 #define PP_PROBLEM_NAME	"rnd3-10"
 #define PP_M 13		// Number of equations (number of rows in *.mtx)
 #define PP_N 16		// Number of variables (number of cols in *.mtx)
@@ -212,7 +211,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_PROBLEM_NAME	"rnd5-100"
 #define PP_M 105		// Number of equations (number of rows in *.mtx)
 #define PP_N 110		// Number of variables (number of cols in *.mtx)
-#define PP_MAX_OBJ_VALUE 1848.43708056809737172443
+#define PP_MAX_OBJ_VALUE 1848.43708056818968543666
 //-------------------------- Compilation Modes ---------------------------------
 
 /*==============================================================================*/
