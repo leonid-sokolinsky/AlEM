@@ -44,7 +44,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_PROBLEM_NAME	"afiro"
 #define PP_M 27			// Number of constraints in mps-file
 #define PP_N 32			// Number of variables in mps-file
-#define PP_KK 475020	// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
+#define PP_KK 17550		// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
 #define PP_MAX_OBJ_VALUE 464.75314285714285714285714285714
 //------------------------------------------------------------------------------
 #define PP_EPS_ZERO					1E-11				// Accuracy for comparison with zero

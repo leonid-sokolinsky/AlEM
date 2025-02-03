@@ -246,14 +246,14 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 #endif // PP_GRADIENT
 
 	/*DEBUG PC_bsf_MapF**
-#ifdef PP_DEBUG
+	#ifdef PP_DEBUG
 	//cout << "\nu_nex = "; Print_Vector(u_nex);
 	cout << "Worker " << BSF_sv_mpiRank << ": ";
-#ifdef PP_GRADIENT
+	#ifdef PP_GRADIENT
 	cout << PF_MAP_LIST_INDEX << "\tF(u_grd) = " << reduceElem->objF_grd << "\t\t\t\t---> Movement is possible." << endl;
-#else
+	#else
 	cout << "\tF(u_nex) = " << setw(PP_SETW) << reduceElem->objF_nex << "\t\t\t\t---> Movement is possible." << endl;
-#endif // PP_GRADIENT
+	#endif // PP_GRADIENT
 	#endif // PP_DEBUG /**/
 
 } // end PC_bsf_MapF
