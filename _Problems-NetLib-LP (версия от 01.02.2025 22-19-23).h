@@ -44,11 +44,10 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_PROBLEM_NAME	"afiro"
 #define PP_M 27			// Number of constraints in mps-file
 #define PP_N 32			// Number of variables in mps-file
-#define PP_KK 17550		// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
+#define PP_KK 475020	// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
 #define PP_MAX_OBJ_VALUE 464.75314285714285714285714285714
 //------------------------------------------------------------------------------
 #define PP_EPS_ZERO					1E-11				// Accuracy for comparison with zero
-#define PP_EPS_ON_HYPERPLANE		PP_EPS_ZERO			// Accuracy of belonging to hyperplane (starting value)
 #define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)	// Precision to calculate projection
 #define PP_EPS_COS					PP_EPS_ZERO			// Precision to calculate COS
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+7				// Length of Objective Vector
@@ -94,15 +93,14 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_KK 123410	// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
 #define PP_MAX_OBJ_VALUE 30.812149845828220173774356124984	// Exact maximum value of objective function
 //------------------------------------------------------------------------------
-#define PP_EPS_ZERO					1E-11			// Accuracy for comparison with zero
-#define PP_EPS_ON_HYPERPLANE		1E-4			// Accuracy of belonging to hyperplane (starting value)
-#define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)// Precision to calculate projection
-#define PP_EPS_COS					1E-3			// Precision to calculate COS
-#define PP_OBJECTIVE_VECTOR_LENGTH	1E+7			// Length of Objective Vector
+#define PP_EPS_ZERO					1E-11				// Accuracy for comparison with zero
+#define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)	// Precision to calculate projection
+#define PP_EPS_COS					1E-3				// Precision to calculate COS
+#define PP_OBJECTIVE_VECTOR_LENGTH	1E+7				// Length of Objective Vector
 //-------------------------- Compilation Modes ---------------------------------
 #define PP_BIPROJECTION
 //------------------------------ ifdef PP_DEBUG --------------------------------
-#define PP_ITER_COUNT			10				// Each PP_ITER_COUNT-th iteration to be outputted inside PC_bsf_MapF(*)
+#define PP_ITER_COUNT			1				// Each PP_ITER_COUNT-th iteration to be outputted inside PC_bsf_MapF(*)
 #define PP_PROJECTION_COUNT		1000000			// Each PP_PROJECTION_COUNT iteration to be outputted inside Flat_MaxProjection(*)
 //------------------------------------------------------------------------------
 // Computed objective value: 30.77211

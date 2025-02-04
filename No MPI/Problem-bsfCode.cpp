@@ -24,7 +24,7 @@ void PC_bsf_CopyParameter(PT_bsf_parameter_T parameterIn, PT_bsf_parameter_T* pa
 
 void PC_bsf_Init(bool* success) {
 
-	PD_eps_on_hyperplane = PP_EPS_ZERO;
+	PD_eps_on_hyperplane = PP_EPS_ON_HYPERPLANE;
 
 	PD_problemName = PP_PROBLEM_NAME;
 	PD_m = 0;
@@ -119,7 +119,7 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 	PT_vector_T d;	// direction vector
 	int edgeCode = *mapElem->edgeCode;
 
-	/*DEBUG PC_bsf_MapF**
+	/*DEBUG PC_bsf_MapF*/
 	#ifdef PP_DEBUG
 	static int map_counter;
 	map_counter++;
@@ -131,21 +131,6 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 		*success = false;
 		return;
 	}
-
-	/*DEBUG PC_bsf_MapF**
-#ifdef PP_DEBUG
-	PD_map_counter++;
-	if (PD_map_counter == PP_ITER_COUNT + 1)
-		cout << "Worker " << BSF_sv_mpiRank << " is terminated!" << endl;
-	if (PD_map_counter > PP_ITER_COUNT) {
-		reduceElem->objF_nex = -PP_INFINITY;
-		#ifdef PP_GRADIENT
-		reduceElem->objF_grd = -PP_INFINITY;
-		#endif // PP_GRADIENT
-		return;
-	}
-#endif // PP_DEBUG /**/
-
 
 /*DEBUG PC_bsf_MapF**
 #ifdef PP_DEBUG
@@ -321,6 +306,7 @@ void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
 #endif // PP_BIPROJECTION
 
 	cout << "PP_EPS_ZERO\t\t\t" << PP_EPS_ZERO << endl;
+	cout << "PP_EPS_ON_HYPERPLANE\t\t" << PP_EPS_ON_HYPERPLANE << endl;
 	cout << "PP_EPS_PROJECTION\t\t" << PP_EPS_PROJECTION << endl;
 	cout << "PP_EPS_COS\t\t\t" << PP_EPS_COS << endl;
 	cout << "PP_EPS_RELATIVE_ERROR\t\t" << PP_EPS_RELATIVE_ERROR << endl;
@@ -2827,20 +2813,19 @@ namespace PF {
 
 		Tuning_Eps_PointBelongsPolytope(u, &PD_eps_on_hyperplane);
 
-#ifdef PP_DEBUG
+		#ifdef PP_DEBUG
 		PD_map_counter = 0; // Used for debugging in PC_bsf_MapF(*)
-#endif // PP_DEBUG /**/
+		#endif // PP_DEBUG /**/
 
 		MakeNeHyperplaneList(u, PD_neHyperplanes_u, &PD_mneh_u, PD_eps_on_hyperplane);
 		assert(PD_mneh_u <= PP_MM);
 
 		if (PD_mneh_u < PD_neq) {
-			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
+			if (BSF_sv_mpiRank == BSF_sv_mpiMaster) {
 				cout << "\nPreparationForIteration error: Starting point u is not vertex with prescision " << PD_eps_on_hyperplane << ". Number of including inequality-hyperplanes = " << PD_mneh_u
-				<< " < neq = " << PD_neq << "\n";
-			cout << "PD_u_cur: ";
-			Print_Vector(PD_u_cur);
-			cout << "\tObjF(u) = " << ObjF(PD_u_cur) << endl;
+					<< " < neq = " << PD_neq << "\n";
+				//cout << "PD_u_cur: "; Print_Vector(PD_u_cur); cout << "\tObjF(u) = " << ObjF(PD_u_cur) << endl;
+			}
 			exit(1);
 		}
 
