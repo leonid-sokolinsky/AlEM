@@ -355,7 +355,6 @@ void PC_bsf_ProblemOutput(PT_bsf_reduceElem_T* reduceResult, int reduceCounter, 
 	cout << "================================================" << endl;
 
 #ifdef PP_SAVE_RESULT
-	Vector_ZeroingNegativeCoordinates(PD_u_cur);
 	if (MTX_SavePoint(PD_u_cur, PP_MTX_POSTFIX_SO))
 		cout << "Calculated solution point is saved into file *.so" << endl;
 #endif // PP_SAVE_RESULT
@@ -420,7 +419,6 @@ void PC_bsf_ProcessResults(PT_bsf_reduceElem_T* reduceResult, int reduceCounter,
 	}
 #endif // PP_CHECK_MAX_OBJ_VALUE
 
-	Vector_ZeroingNegativeCoordinates(reduceResult->u_nex);
 	Vector_Copy(reduceResult->u_nex, PD_u_cur);
 	PD_objF_cur = reduceResult->objF_nex;
 	Vector_Copy(PD_u_cur, parameter->u_cur);

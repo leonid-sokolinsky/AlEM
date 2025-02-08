@@ -53,7 +53,6 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_EPS_PROJECTION			(PP_EPS_ZERO*100)	// Precision to calculate projection
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+7				// Length of Objective Vector
 //----------------------------- Compilation Modes ------------------------------
-//#define PP_BIPROJECTION
 #undef PP_BIPROJECTION
 //------------------------------ ifdef PP_DEBUG --------------------------------
 #define PP_ITER_COUNT				10000				// Each PP_ITER_COUNT-th iteration to be outputted inside PC_bsf_MapF(*)
