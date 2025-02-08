@@ -37,32 +37,33 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_EPS_PROJECTION	(PP_EPS_ZERO*10)// Precision to calculate projection
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+7			// Length of Objective Vector
 //------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
-/*============================== afiro LP problem ==========================*/
+/*============================== afiro LP problem ==============================*/
 // Number of equations : 8
 // Subspace dimension : 24
 #define PP_PROBLEM_NAME	"afiro"
 #define PP_M 27			// Number of constraints in mps-file
 #define PP_N 32			// Number of variables in mps-file
-#define PP_KK 17550		// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
+#define PP_KK 475020		// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
 #define PP_MAX_OBJ_VALUE 464.75314285714285714285714285714
 //------------------------------------------------------------------------------
 #define PP_EPS_ZERO					1E-11				// Accuracy for comparison with zero
-#define PP_EPS_ON_HYPERPLANE		PP_EPS_ZERO			// Accuracy of belonging to hyperplane (starting value)
-#define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)	// Precision to calculate projection
-#define PP_EPS_COS					PP_EPS_ZERO			// Precision to calculate COS
+#define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*100)	// Accuracy of belonging to hyperplane
+#define PP_EPS_PROJECTION			(PP_EPS_ZERO*100)	// Precision to calculate projection
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+7				// Length of Objective Vector
 //----------------------------- Compilation Modes ------------------------------
+//#define PP_BIPROJECTION
 #undef PP_BIPROJECTION
 //------------------------------ ifdef PP_DEBUG --------------------------------
 #define PP_ITER_COUNT				10000				// Each PP_ITER_COUNT-th iteration to be outputted inside PC_bsf_MapF(*)
 #define PP_PROJECTION_COUNT			100000				// Each PP_PROJECTION_COUNT iteration to be outputted inside Flat_MaxProjection(*)
 //------------------------------------------------------------------------------
-// Elapsed time: 8.8687336
+// Elapsed time: 37.120433
 // Number of iterations: 4
-// Computed objective value: 464.753142856903707524907
+// Computed objective value: 464.753142855546514056186
 // Maximal objective value:  464.753142857142847788054
-// Relative error = 5.15e-13 
+// Relative error = 3.43e-12 
 //------------------------------------------------------------------------------
 
 /*============================== beaconfd LP problem ===========================*
@@ -75,14 +76,8 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 //------------------------------------------------------------------------------
 #define PP_EPS_ZERO					1E-7				// Precision for comparison with zero
 #define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)	// Precision to calculate projection
-#define PP_EPS_COS					1E-3				// Precision to calculate COS
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+7				// Length of Objective Vector
 //------------------------------------------------------------------------------
-// Elapsed time: 37318.432
-// Number of iterations: 2
-// Computed objective value: -33813.86407276181
-// Maximal objective value:  -33592.4858072
-// Relative error = 0.00659
 //------------------------------------------------------------------------------
 
 /*============================== blend LP problem ==============================*
@@ -95,9 +90,8 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_MAX_OBJ_VALUE 30.812149845828220173774356124984	// Exact maximum value of objective function
 //------------------------------------------------------------------------------
 #define PP_EPS_ZERO					1E-11			// Accuracy for comparison with zero
-#define PP_EPS_ON_HYPERPLANE		1E-4			// Accuracy of belonging to hyperplane (starting value)
+#define PP_EPS_ON_HYPERPLANE		1E-4			// Accuracy of belonging to hyperplane
 #define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)// Precision to calculate projection
-#define PP_EPS_COS					1E-3			// Precision to calculate COS
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+7			// Length of Objective Vector
 //-------------------------- Compilation Modes ---------------------------------
 #define PP_BIPROJECTION
@@ -110,20 +104,27 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 // Relative error = 0.001299
 //------------------------------------------------------------------------------
 
-/*============================== kb2 LP problem ============================*
+/*============================== kb2 LP problem ================================*
 // Number of equations: 16
 // Subspace dimension: 25
 #define PP_PROBLEM_NAME		"kb2"
 #define PP_M 43	// Number of equations (after conversion to standard form)
 #define PP_N 41	// Number of variables in mps-file (after conversion to standard form)
-#define PP_KK 2925	// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
+#define PP_KK 20475 // Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
 #define PP_MAX_OBJ_VALUE 1749.9001299062057129526866493726
 //--------------------------------------------------------------------------
 #define PP_EPS_ZERO					1E-11			// Precision for comparison with zero
+#define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*10)// Accuracy of belonging to hyperplane
 #define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)// Precision to calculate projection
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+7			// Length of Objective Vector
+//-------------------------- Compilation Modes ---------------------------------
+#define PP_BIPROJECTION
+//------------------------------ ifdef PP_DEBUG --------------------------------
+#define PP_ITER_COUNT				100				// Each PP_ITER_COUNT-th iteration to be outputted inside PC_bsf_MapF(*)
+#define PP_PROJECTION_COUNT			10000000				// Each PP_PROJECTION_COUNT iteration to be outputted inside Flat_MaxProjection(*)
 //--------------------------------------------------------------------------
-#define PP_ITER_COUNT				1					// Each PP_ITER_COUNT-th iteration to be outputted inside PC_bsf_MapF(*)
+// F(x) = 1740.423
+// Relative error = 0.005
 //--------------------------------------------------------------------------
 
 /*============================== recipe LP problem =========================*

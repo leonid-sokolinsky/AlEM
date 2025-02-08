@@ -12,8 +12,8 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #pragma once
 
 //-------------------------- Compilation Modes ---------------------------------
-#define PP_GRADIENT
-//#define PP_BIPROJECTION
+//#define PP_GRADIENT
+#define PP_BIPROJECTION
 //------------------------------------------------------------------------------
 
 //=========================== Problem Parameters ===============================
@@ -23,50 +23,52 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 //						This parameter affects terminate condition when 
 //						calculating pseudoprojection.
 //------------------------------------------------------------------------------
-#define PP_EPS_ZERO					1E-10				// Accuracy for comparison with zero
-#define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*100)	// Accuracy of belonging to hyperplane
-#define PP_EPS_PROJECTION			(PP_EPS_ZERO*1000)	// Precision to calculate pseudoprojection
-#define PP_EPS_COS					PP_EPS_ZERO			// Precision to calculate COS
-#define PP_OBJECTIVE_VECTOR_LENGTH	1E+9				// Length of Objective Vector
+#define PP_EPS_ZERO					1E-11				// Accuracy for comparison with zero
+#define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*10)	// Accuracy of belonging to hyperplane
+#define PP_EPS_PROJECTION			PP_EPS_ZERO			// Precision to calculate pseudoprojection
+#define PP_OBJECTIVE_VECTOR_LENGTH	1E+7				// Length of Objective Vector
 //------------------------------------------------------------------------------
 #define PP_KK						5		// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
 #define PP_M						6		// Number of equations (number of rows in *.mtx)
 #define PP_N						11		// Number of variables (number of cols in *.mtx)
+//------------------------------ ifdef PP_DEBUG --------------------------------
+#define PP_ITER_COUNT				10					// Each PP_ITER_COUNT-th iteration to be outputted inside PC_bsf_MapF(*)
+#define PP_PROJECTION_COUNT			100000				// Each PP_PROJECTION_COUNT iteration to be outputted inside Flat_MaxProjection(*)
 //------------------------------------------------------------------------------
 
-/*============================== rnd5-0 LP problem =============================*
+/*============================== rnd5-0 LP problem =============================*/
 #define PP_PROBLEM_NAME	"rnd5-0"
 #define PP_MAX_OBJ_VALUE 		2900
 //------------------------------------------------------------------------------
 
 /*============================== rnd5-1-1 LP problem ===========================*
 #define PP_PROBLEM_NAME	"rnd5-1-1"
-#define PP_MAX_OBJ_VALUE 2584.34948970921050204197
+#define PP_MAX_OBJ_VALUE 2584.34948970919685962144
 //------------------------------------------------------------------------------
 
 /*============================== rnd5-1-2 LP problem ===========================*
 #define PP_PROBLEM_NAME	"rnd5-1-2"
-#define PP_MAX_OBJ_VALUE 2657.52561253995372680947
+#define PP_MAX_OBJ_VALUE 2657.52561253995099832537
 //------------------------------------------------------------------------------
 
 /*============================== rnd5-1-3 LP problem ===========================*
 #define PP_PROBLEM_NAME	"rnd5-1-3"
-#define PP_MAX_OBJ_VALUE 2424.91915381191120104631
+#define PP_MAX_OBJ_VALUE 2424.91915381191074629896
 //------------------------------------------------------------------------------
 
-/*============================== rnd5-1-4 LP problem ===========================*/
+/*============================== rnd5-1-4 LP problem ===========================*
 #define PP_PROBLEM_NAME	"rnd5-1-4"
 #define PP_MAX_OBJ_VALUE 2300.11275869818382489029
 //------------------------------------------------------------------------------
 
 /*============================== rnd5-1-5 LP problem ===========================*
 #define PP_PROBLEM_NAME	"rnd5-1-5"
-#define PP_MAX_OBJ_VALUE 2626.47323620733186544385
+#define PP_MAX_OBJ_VALUE 2626.47323620731231130776
 //------------------------------------------------------------------------------
 
 /*============================== rnd5-1-6 LP problem ===========================*
 #define PP_PROBLEM_NAME	"rnd5-1-6"
-#define PP_MAX_OBJ_VALUE 2675.35199418665160919772
+#define PP_MAX_OBJ_VALUE 2675.35199418665024495567
 //------------------------------------------------------------------------------
 
 /*===============================================================================*/

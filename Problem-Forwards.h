@@ -23,11 +23,10 @@ namespace SF {
 	double	DistanceSQR_PointToPoint(PT_vector_T x, PT_vector_T y);
 	void	Flat_BipProjection(int* flatHyperplanes, int m_flat, PT_vector_T v, double eps_zero, int maxProjectingIter, PT_vector_T w, int* success);
 	void	Flat_MaxProjection(int* flatHyperplanes, int m_flat, PT_vector_T v, double eps_zero, int maxProjectingIter, PT_vector_T w, int* success);
-	void	JumpingOnPolytope(PT_vector_T startPoint, PT_vector_T directionVector, PT_vector_T finishPoint, double eps_on_hyperplane, double eps_cos);
+	void	JumpingOnPolytope(PT_vector_T startPoint, PT_vector_T directionVector, PT_vector_T finishPoint, double eps_on_hyperplane);
 	void	MakeColumnOfNorms(PT_matrix_T A, PT_column_T norm_a);
 	void	MakeListOfNotIncludingHalfspaces(PT_vector_T x, int* notIncludingHalfspacesList, double eps);
 	void	MakeNeHyperplaneList(PT_vector_T u, int* neHyperplanes_u, int* mneh_u, double eps);
-	void	MovingOnPolytope(PT_vector_T startPoint, PT_vector_T directionVector, PT_vector_T finishPoint, double eps_on_hyperplane, double epsMoving);
 	bool	MPS___Load_Problem();
 	bool	MPS__MakeProblem(PT_MPS_row_T* row, int n_row, PT_MPS_column_T* column, int n_col, double* loBound, PT_MPS_upBound_T* upBounds, int n_up, PT_MPS_fxVariable_T* fxVariable, int n_fx);
 	bool	MPS__ReadBounds(FILE* stream, PT_MPS_column_T* column, int n_col, double* loBound, PT_MPS_upBound_T* upBound, int* n_up, PT_MPS_fxVariable_T* fxVariable, int* n_fx);
@@ -68,10 +67,10 @@ namespace SF {
 	void	ObliqueProjectingVectorOntoHalfspace_i(PT_vector_T z, int i, PT_vector_T d, PT_vector_T o, double eps_on_hyperplane, double eps_cos, int* exitCode);
 	void	OrthogonalProjectingVectorOntoHalfspace_i(PT_vector_T z, int i, PT_vector_T r, double eps, int* exitcode);
 	void	OrthogonalProjectingVectorOntoHyperplane_i(PT_vector_T x, int i, PT_vector_T p);
-	bool	PointBelongsHalfspace_i(PT_vector_T point, int i, double eps);
-	bool	PointBelongsHyperplane_i(PT_vector_T z, int i, double eps_on_hyperplane);
-	bool	PointBelongsOuterCone(PT_vector_T x, int* notIncludingHalfspacesList, double eps);
-	bool	PointBelongsPolytope(PT_vector_T x, double eps);
+	bool	PointBelongsToFlat(PT_vector_T x, int* hyperplaneList, int hyperplaneCount, double eps_on_hyperplane);
+	bool	PointBelongsToHalfspace_i(PT_vector_T point, int i, double eps);
+	bool	PointBelongsToHyperplane_i(PT_vector_T z, int i, double eps_on_hyperplane);
+	bool	PointBelongsToPolytope(PT_vector_T x, double eps);
 	void	PointHomothety(PT_vector_T x, PT_vector_T center, double ratio);
 	bool	PointInsideHalfspace_i(PT_vector_T x, int i, double eps);
 	bool	PointIsVertex(PT_vector_T x, double eps_on_hyperplane);
@@ -86,7 +85,8 @@ namespace SF {
 	double	RelativeError(double trueValue, double calculatedValue);
 	void	Shift(PT_vector_T point, PT_vector_T shiftVector, double factor, PT_vector_T shiftedPoint);
 	void	SmallStep(PT_vector_T point, PT_vector_T direction, double stepLength, PT_vector_T stepPoint);
-	void	Tuning_Eps_PointBelongsPolytope(PT_vector_T x, double* eps);
+	void	Tuning_Eps_PointBelongsToFlat(PT_vector_T x, int* hyperplaneList, int hyperplaneCount, double* eps);
+	void	Tuning_Eps_PointBelongsToPolytope(PT_vector_T x, double* eps);
 	void	TWIDDLE(int* x, int* y, int* z, int* p, bool* done);
 	void	TWIDDLE_CodeToSubset(int code, int* a, int* c, int n, int m, int* x, int* y, int* z, int* p, bool* done, int* nextI);
 	void	TWIDDLE_Make_p(int* p, int n, int m);

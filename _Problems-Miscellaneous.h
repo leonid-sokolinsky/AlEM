@@ -12,7 +12,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 
 //-------------------------- Compilation Modes ---------------------------------
 #define PP_GRADIENT
-//#define PP_BIPROJECTION
+#define PP_BIPROJECTION
 //------------------------------------------------------------------------------
 
 //=========================== problem Parameters ===============================*/
@@ -21,28 +21,22 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 // PP_EPS_PROJECTION - inverse dependence on PP_OBJECTIVE_VECTOR_LENGTH. 
 //						This parameter affects terminate condition when 
 //						calculating pseudoprojection.
-#define PP_EPS_ZERO					1E-11			// Precision for comparison with zero
-
-#ifdef PP_BIPROJECTION
-#define PP_EPS_PROJECTION		PP_EPS_ZERO		// Precision to calculate pseudoprojection
-#else
-#define PP_EPS_PROJECTION		(PP_EPS_ZERO*1000)// Precision to calculate pseudoprojection
-#endif // PP_BIPROJECTION
-
-#define PP_EPS_COS					PP_EPS_ZERO		// Precision to calculate COS
-#define PP_OBJECTIVE_VECTOR_LENGTH	1E+8			// Length of Objective Vector
-#define PP_KK						10				// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
+#define PP_EPS_ZERO					1E-11				// Precision for comparison with zero
+#define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*10)	// Accuracy of belonging to hyperplane
+#define PP_EPS_PROJECTION			PP_EPS_ZERO			// Precision to calculate pseudoprojection
+#define PP_OBJECTIVE_VECTOR_LENGTH	1E+7				// Length of Objective Vector
+#define PP_KK						10					// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
 //------------------------------ ifdef PP_DEBUG --------------------------------
 #define PP_ITER_COUNT				10					// Each PP_ITER_COUNT-th iteration to be outputted inside PC_bsf_MapF(*)
-#define PP_PROJECTION_COUNT			1000				// Each PP_PROJECTION_COUNT iteration to be outputted inside Flat_MaxProjection(*)
+#define PP_PROJECTION_COUNT			100000				// Each PP_PROJECTION_COUNT iteration to be outputted inside Flat_MaxProjection(*)
 //==============================================================================
 
-/*============================== nguyen5 LP problem ============================*
+/*============================== nguyen5 LP problem ============================*/
 #define PP_PROBLEM_NAME	"nguyen5"
 #define PP_MPS_FORMAT
 #define PP_M 4		// Number of constrains
 #define PP_N 5		// Number of variables
-#define PP_MAX_OBJ_VALUE 21.454973231310837888941
+#define PP_MAX_OBJ_VALUE 21.4549732313100882663548
 //------------------------------------------------------------------------------
 
 /*============================== simpleCube LP problem =========================*
@@ -122,12 +116,20 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #endif
 #define PP_MAX_OBJ_VALUE 		55000
 //------------------------------------------------------------------------------
+#ifndef PP_BIPROJECTION
+#undef PP_EPS_PROJECTION
+#define PP_EPS_PROJECTION (PP_EPS_ZERO*10) // Precision to calculate pseudoprojection
+#endif // !PP_BIPROJECTION
+//------------------------------------------------------------------------------
 
 /*============================== simple1min LP problem =========================*
 #define PP_PROBLEM_NAME	"simple1min"
 #define PP_M 5		// Number of equations (number of rows in *.mtx)
 #define PP_N 8		// Number of variables (number of cols in *.mtx)
 #define PP_MAX_OBJ_VALUE 		-5000
+//------------------------------------------------------------------------------
+#undef PP_EPS_PROJECTION
+#define PP_EPS_PROJECTION (PP_EPS_ZERO*10) // Precision to calculate pseudoprojection
 //------------------------------------------------------------------------------
 
 /*============================== simple_zcv LP problem =========================*
@@ -164,6 +166,10 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_N 7		// Number of variables (number of cols in *.mtx)
 #define PP_MAX_OBJ_VALUE 		3300
 //------------------------------------------------------------------------------
+#ifndef PP_BIPROJECTION
+#define PP_BIPROJECTION
+#endif
+//------------------------------------------------------------------------------
 
 /*============================== cone3-0 LP problem ============================*
 #define PP_PROBLEM_NAME	"cone3-0"
@@ -183,7 +189,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_PROBLEM_NAME	"rnd3_3_Olkhovsky289"
 #define PP_M 6		// Number of equations (number of rows in *.mtx)
 #define PP_N 9		// Number of variables (number of cols in *.mtx)
-#define PP_MAX_OBJ_VALUE 671.952494859800253834692
+#define PP_MAX_OBJ_VALUE 671.952494859796161108534
 //------------------------------------------------------------------------------
 
 /*============================== rnd3_3_Olkhovsky331 LP problem ================*
@@ -191,6 +197,11 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_M 6		// Number of equations (number of rows in *.mtx)
 #define PP_N 9		// Number of variables (number of cols in *.mtx)
 #define PP_MAX_OBJ_VALUE 714.535477965318250426208
+//------------------------------------------------------------------------------
+#ifndef PP_BIPROJECTION
+#undef PP_EPS_PROJECTION
+#define PP_EPS_PROJECTION (PP_EPS_ZERO*10) // Precision to calculate pseudoprojection
+#endif // !PP_BIPROJECTION
 //------------------------------------------------------------------------------
 
 /*============================== rnd3_3_Olkhovsky336 LP problem ================*
@@ -200,7 +211,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_MAX_OBJ_VALUE 998.193448648739376949379
 //------------------------------------------------------------------------------
 
-/*============================== rnd3-10 LP problem ============================*/
+/*============================== rnd3-10 LP problem ============================*
 #define PP_PROBLEM_NAME	"rnd3-10"
 #define PP_M 13		// Number of equations (number of rows in *.mtx)
 #define PP_N 16		// Number of variables (number of cols in *.mtx)
@@ -211,7 +222,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_PROBLEM_NAME	"rnd5-100"
 #define PP_M 105		// Number of equations (number of rows in *.mtx)
 #define PP_N 110		// Number of variables (number of cols in *.mtx)
-#define PP_MAX_OBJ_VALUE 1848.43708056818968543666
+#define PP_MAX_OBJ_VALUE 1846.4986335806295301154
 //-------------------------- Compilation Modes ---------------------------------
 
 /*==============================================================================*/

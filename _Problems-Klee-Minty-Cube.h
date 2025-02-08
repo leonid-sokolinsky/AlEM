@@ -18,11 +18,16 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 //						This parameter affects terminate condition when 
 //						calculating pseudoprojection.
 //------------------------------------------------------------------------------
-#define PP_EPS_ZERO					1E-9			// Accuracy for comparison with zero
+#define PP_EPS_ZERO					1E-11			// Accuracy for comparison with zero
 #define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*10)// Accuracy of belonging to hyperplane
-#define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)// Precision of rounding pseudoprojecting vectors
-#define PP_EPS_COS					PP_EPS_ZERO		// Precision to calculate COS
+#define PP_EPS_PROJECTION			PP_EPS_ZERO		// Precision of rounding pseudoprojecting vectors
+//#define PP_EPS_ZERO					1E-9			// Accuracy for comparison with zero
+//#define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*10)// Accuracy of belonging to hyperplane
+//#define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)// Precision of rounding pseudoprojecting vectors
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+7			// Length of Objective Vector
+//------------------------------ ifdef PP_DEBUG --------------------------------
+#define PP_ITER_COUNT				10				// Each PP_ITER_COUNT-th iteration to be outputted inside PC_bsf_MapF(*)
+#define PP_PROJECTION_COUNT			100000000		// Each PP_PROJECTION_COUNT iteration to be outputted inside Flat_MaxProjection(*)
 //------------------------------------------------------------------------------
 
 /*============================== Klee-Minty5 LP problem ========================*
@@ -33,11 +38,10 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_KK PP_D		// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
 #define PP_MAX_OBJ_VALUE 3125
 //------------------------------------------------------------------------------
-// Elapsed time: 0
-// Number of iterations: 1
-// Computed objective value: 3125
-// Maximal objective value:  3125
-// Relative error = 0
+#ifdef PP_GRADIENT
+#undef PP_EPS_ON_HYPERPLANE
+#define PP_EPS_ON_HYPERPLANE 1E-8 // Accuracy of belonging to hyperplane
+#endif
 //------------------------------------------------------------------------------
 
 /*============================== Klee-Minty6 LP problem ========================*
@@ -48,14 +52,13 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_KK PP_D		// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
 #define PP_MAX_OBJ_VALUE 15625
 //------------------------------------------------------------------------------
-// Elapsed time: 0
-// Number of iterations: 1
-// Computed objective value: 15625
-// Maximal objective value:  15625
-// Relative error = 0
+#ifdef PP_GRADIENT
+#undef PP_EPS_ON_HYPERPLANE
+#define PP_EPS_ON_HYPERPLANE 1E-7 // Accuracy of belonging to hyperplane
+#endif
 //------------------------------------------------------------------------------
 
-/*============================== Klee-Minty7 LP problem ========================*/
+/*============================== Klee-Minty7 LP problem ========================*
 #define PP_PROBLEM_NAME	"Klee-Minty7"
 #define PP_D 7			// Space dimension
 #define PP_M PP_D		// Number of equations (number of rows in *.mtx)
@@ -63,11 +66,10 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_KK PP_D		// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
 #define PP_MAX_OBJ_VALUE 78125
 //------------------------------------------------------------------------------
-// Elapsed time: 0
-// Number of iterations: 1
-// Computed objective value: 78125
-// Maximal objective value:  78125
-// Relative error = 0
+#ifdef PP_GRADIENT
+#undef PP_EPS_ON_HYPERPLANE
+#define PP_EPS_ON_HYPERPLANE 1E-5 // Accuracy of belonging to hyperplane
+#endif
 //------------------------------------------------------------------------------
 
 /*============================== Klee-Minty8 LP problem ========================*
@@ -78,14 +80,13 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_KK PP_D		// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
 #define PP_MAX_OBJ_VALUE 390625
 //------------------------------------------------------------------------------
-// Elapsed time: 1
-// Number of iterations: 1
-// Computed objective value: 390625
-// Maximal objective value:  390625
-// Relative error = 0
+#ifdef PP_GRADIENT
+#undef PP_EPS_ON_HYPERPLANE
+#define PP_EPS_ON_HYPERPLANE 1E-2 // Accuracy of belonging to hyperplane
+#endif
 //------------------------------------------------------------------------------
 
-/*============================== Klee-Minty9 LP problem ========================*
+/*============================== Klee-Minty9 LP problem ========================*/
 #define PP_PROBLEM_NAME	"Klee-Minty9"
 #define PP_D 9			// Space dimension
 #define PP_M PP_D		// Number of equations (number of rows in *.mtx)
@@ -93,11 +94,10 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_KK 511		// Maximal number of faces that include surface point 2^m-1
 #define PP_MAX_OBJ_VALUE 1953125
 //------------------------------------------------------------------------------
-// Elapsed time: 0
-// Number of iterations: 1
-// Computed objective value: 1953125
-// Maximal objective value:  1953125
-// Relative error = 0
+#ifdef PP_GRADIENT
+#undef PP_EPS_ON_HYPERPLANE
+#define PP_EPS_ON_HYPERPLANE 1 // Accuracy of belonging to hyperplane
+#endif
 //------------------------------------------------------------------------------
 
 /*==============================================================================*/

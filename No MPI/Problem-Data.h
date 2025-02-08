@@ -17,7 +17,6 @@ static int PD_mneh_u;				// Number of inequality-hyperplanes that include point 
 static int PD_mne_p;				// Number of inequality-hyperplanes used for pseudoprojection
 static int PD_iterNo;				// Number of iterations
 static double PD_objF_cur;			// Objective function value in curerent point
-static double PD_eps_on_hyperplane;	// Accuracy of belonging to hyperplane
 static bool PD_TWIDDLE_done;		// Done indicator for TWIDDLE algorithm
 static int PD_TWIDDLE_nextEdgeI;	// Next index of edge in TWIDDLE algorithm
 static int PD_TWIDDLE_x;			// Auxiliary TWIDDLE variable
