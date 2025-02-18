@@ -11,22 +11,11 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 ================================================================================*/
 #pragma once
 
-//-------------------------- Compilation Modes ---------------------------------
-//#define PP_GRADIENT
-#define PP_BIPROJECTION
-//------------------------------------------------------------------------------
-
 //=========================== Problem Parameters ===============================
 // PP_OBJECTIVE_VECTOR_LENGTH - direct dependence on dimension PD_n.
 // P_EPS_ZERO - inverse dependence on PP_OBJECTIVE_VECTOR_LENGTH.
-// PP_EPS_PROJECTION - inverse dependence on PP_OBJECTIVE_VECTOR_LENGTH. 
-//						This parameter affects terminate condition when 
-//						calculating pseudoprojection.
 //------------------------------------------------------------------------------
-#define PP_EPS_ZERO					1E-11				// Accuracy for comparison with zero
-#define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*10)	// Accuracy of belonging to hyperplane
-#define PP_EPS_PROJECTION			PP_EPS_ZERO			// Precision to calculate pseudoprojection
-#define PP_OBJECTIVE_VECTOR_LENGTH	1E+7				// Length of Objective Vector
+
 //------------------------------------------------------------------------------
 #define PP_KK						5		// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
 #define PP_M						6		// Number of equations (number of rows in *.mtx)
@@ -36,39 +25,76 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_PROJECTION_COUNT			100000				// Each PP_PROJECTION_COUNT iteration to be outputted inside Flat_MaxProjection(*)
 //------------------------------------------------------------------------------
 
-/*============================== rnd5-0 LP problem =============================*/
+/*============================== rnd5-0 LP problem =============================*
 #define PP_PROBLEM_NAME	"rnd5-0"
 #define PP_MAX_OBJ_VALUE 		2900
+//------------------------------------------------------------------------------
+#define PP_EPS_ZERO					1E-11				// Accuracy for comparison with zero
+#define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*100)	// Accuracy of belonging to hyperplane
+#define PP_EPS_PROJECTION			PP_EPS_ZERO			// Accuracy of belonging to hyperplane
+#define PP_OBJECTIVE_VECTOR_LENGTH	1E+7				// Length of Objective Vector
 //------------------------------------------------------------------------------
 
 /*============================== rnd5-1-1 LP problem ===========================*
 #define PP_PROBLEM_NAME	"rnd5-1-1"
 #define PP_MAX_OBJ_VALUE 2584.34948970919685962144
 //------------------------------------------------------------------------------
+#define PP_EPS_ZERO					1E-11				// Accuracy for comparison with zero
+#define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*100)	// Accuracy of belonging to hyperplane
+#define PP_EPS_PROJECTION			PP_EPS_ZERO			// Accuracy of belonging to hyperplane
+#define PP_OBJECTIVE_VECTOR_LENGTH	1E+7				// Length of Objective Vector
+//------------------------------------------------------------------------------
 
 /*============================== rnd5-1-2 LP problem ===========================*
 #define PP_PROBLEM_NAME	"rnd5-1-2"
-#define PP_MAX_OBJ_VALUE 2657.52561253995099832537
+#define PP_MAX_OBJ_VALUE 2657.52561253995372680947
+//------------------------------------------------------------------------------
+#define PP_EPS_ZERO					1E-11				// Accuracy for comparison with zero
+#define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*100)	// Accuracy of belonging to hyperplane
+#define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)	// Accuracy of belonging to hyperplane
+#define PP_OBJECTIVE_VECTOR_LENGTH	1E+6				// Length of Objective Vector
 //------------------------------------------------------------------------------
 
 /*============================== rnd5-1-3 LP problem ===========================*
 #define PP_PROBLEM_NAME	"rnd5-1-3"
 #define PP_MAX_OBJ_VALUE 2424.91915381191074629896
 //------------------------------------------------------------------------------
+#define PP_EPS_ZERO					1E-11				// Accuracy for comparison with zero
+#define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*100)	// Accuracy of belonging to hyperplane
+#define PP_EPS_PROJECTION			PP_EPS_ZERO			// Accuracy of belonging to hyperplane
+#define PP_OBJECTIVE_VECTOR_LENGTH	1E+7				// Length of Objective Vector
+//------------------------------------------------------------------------------
 
 /*============================== rnd5-1-4 LP problem ===========================*
 #define PP_PROBLEM_NAME	"rnd5-1-4"
 #define PP_MAX_OBJ_VALUE 2300.11275869818382489029
 //------------------------------------------------------------------------------
+#define PP_EPS_ZERO					1E-11				// Accuracy for comparison with zero
+#define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*100)	// Accuracy of belonging to hyperplane
+#define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)	// Accuracy of belonging to hyperplane
+#define PP_OBJECTIVE_VECTOR_LENGTH	1E+6				// Length of Objective Vector
+//------------------------------------------------------------------------------
 
 /*============================== rnd5-1-5 LP problem ===========================*
 #define PP_PROBLEM_NAME	"rnd5-1-5"
-#define PP_MAX_OBJ_VALUE 2626.47323620731231130776
+#define PP_MAX_OBJ_VALUE 2626.47323620733004645444
+//------------------------------------------------------------------------------
+#define PP_EPS_ZERO					1E-11				// Accuracy for comparison with zero
+#define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*100)	// Accuracy of belonging to hyperplane
+#define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)	// Accuracy of belonging to hyperplane
+#define PP_OBJECTIVE_VECTOR_LENGTH	1E+6				// Length of Objective Vector
 //------------------------------------------------------------------------------
 
-/*============================== rnd5-1-6 LP problem ===========================*
+/*============================== rnd5-1-6 LP problem ===========================*/
 #define PP_PROBLEM_NAME	"rnd5-1-6"
 #define PP_MAX_OBJ_VALUE 2675.35199418665024495567
+//------------------------------------------------------------------------------
+#define PP_OBJECTIVE_VECTOR_LENGTH	1E+7				// Length of Objective Vector
+#define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*10)	// Accuracy of belonging to hyperplane
+#define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)	// Accuracy of belonging to hyperplane
+#define PP_EPS_ZERO					1E-11				// Accuracy for comparison with zero
+//-------------------------- Compilation Modes ---------------------------------
+#define PP_MAXPROJECTION // It can cause a stuck in the loop. In this case, you should increase PP_EPS_PROJECTION or decrease PP_OBJECTIVE_VECTOR_LENGTH.
 //------------------------------------------------------------------------------
 
 /*===============================================================================*/

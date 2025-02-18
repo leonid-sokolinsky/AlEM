@@ -15,19 +15,16 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_GRADIENT
 //#define PP_BIPROJECTION
 //------------------------------------------------------------------------------
+#define PP_EPS_RELATIVE_ERROR			1E-6			// Used if defined PP_CHECK_MAX_OBJ_VALUE 
 
 //============================== Problem Parameters ============================
 // PP_OBJECTIVE_VECTOR_LENGTH - direct dependence on dimension PD_n.
 // P_EPS_ZERO - inverse dependence on PP_OBJECTIVE_VECTOR_LENGTH.
-// PP_EPS_PROJECTION - inverse dependence on PP_OBJECTIVE_VECTOR_LENGTH. 
-//						This parameter affects terminate condition when 
-//						calculating pseudoprojection.
 //------------------------------------------------------------------------------
-#define PP_EPS_ZERO					1E-6			// Accuracy for comparison with zero
-#define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*10)// Accuracy of belonging to hyperplane
-#define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)// Precision of rounding pseudoprojecting vectors
-#define PP_EPS_COS					PP_EPS_ZERO		// Precision to calculate COS
-#define PP_OBJECTIVE_VECTOR_LENGTH	1E+9			// Length of Objective Vector
+#define PP_EPS_ZERO					1E-13			// Accuracy for comparison with zero
+#define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*100)// Accuracy of belonging to hyperplane
+#define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)// Accuracy of belonging to hyperplane
+#define PP_OBJECTIVE_VECTOR_LENGTH	1E+7			// Length of Objective Vector
 //==============================================================================
 
 /*============================== rnd100-0 LP problem ===========================*/

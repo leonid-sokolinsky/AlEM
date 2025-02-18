@@ -19,10 +19,8 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 //=========================== Problem Parameters ===============================
 // PP_OBJECTIVE_VECTOR_LENGTH - direct dependence on dimension PD_n.
 // P_EPS_ZERO - inverse dependence on PP_OBJECTIVE_VECTOR_LENGTH.
-// PP_EPS_PROJECTION - inverse dependence on PP_OBJECTIVE_VECTOR_LENGTH. 
-//						This parameter affects terminate condition when 
-//						calculating pseudoprojection.
 //------------------------------------------------------------------------------
+#define PP_EPS_RELATIVE_ERROR			1E-3			// Used if defined PP_CHECK_MAX_OBJ_VALUE 
 
 /*============================== adlittle LP problem ===========================*
 // Number of equations : 15
@@ -34,7 +32,6 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 //------------------------------------------------------------------------------
 #define PP_EPS_ZERO					1E-7			// Precision for comparison with zero
 #define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*10)// Accuracy of belonging to hyperplane
-#define PP_EPS_PROJECTION	(PP_EPS_ZERO*10)// Precision to calculate projection
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+7			// Length of Objective Vector
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
@@ -50,19 +47,19 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 //------------------------------------------------------------------------------
 #define PP_EPS_ZERO					1E-11				// Accuracy for comparison with zero
 #define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*100)	// Accuracy of belonging to hyperplane
-#define PP_EPS_PROJECTION			(PP_EPS_ZERO*100)	// Precision to calculate projection
-#define PP_OBJECTIVE_VECTOR_LENGTH	1E+7				// Length of Objective Vector
-//----------------------------- Compilation Modes ------------------------------
-#undef PP_BIPROJECTION
+#define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)	// Accuracy of calculating pseudoprojection
+#define PP_OBJECTIVE_VECTOR_LENGTH	1E+6				// Length of Objective Vector
+//-------------------------- Compilation Modes ---------------------------------
+#define PP_MAXPROJECTION // It can cause a stuck in the loop. In this case, you should increase PP_EPS_PROJECTION or decrease PP_OBJECTIVE_VECTOR_LENGTH.
 //------------------------------ ifdef PP_DEBUG --------------------------------
 #define PP_ITER_COUNT				10000				// Each PP_ITER_COUNT-th iteration to be outputted inside PC_bsf_MapF(*)
 #define PP_PROJECTION_COUNT			100000				// Each PP_PROJECTION_COUNT iteration to be outputted inside Flat_MaxProjection(*)
 //------------------------------------------------------------------------------
-// Elapsed time: 37.120433
-// Number of iterations: 4
-// Computed objective value: 464.753142855546514056186
+// Elapsed time: 893.01104
+// Number of iterations: 5
+// Computed objective value: 464.753142857168825230474
 // Maximal objective value:  464.753142857142847788054
-// Relative error = 3.43e-12 
+// Relative error = 5.59e-14
 //------------------------------------------------------------------------------
 
 /*============================== beaconfd LP problem ===========================*
@@ -74,7 +71,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_MAX_OBJ_VALUE -33592.4858072
 //------------------------------------------------------------------------------
 #define PP_EPS_ZERO					1E-7				// Precision for comparison with zero
-#define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)	// Precision to calculate projection
+#define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*100)	// Accuracy of belonging to hyperplane
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+7				// Length of Objective Vector
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
@@ -90,7 +87,6 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 //------------------------------------------------------------------------------
 #define PP_EPS_ZERO					1E-11			// Accuracy for comparison with zero
 #define PP_EPS_ON_HYPERPLANE		1E-4			// Accuracy of belonging to hyperplane
-#define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)// Precision to calculate projection
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+7			// Length of Objective Vector
 //-------------------------- Compilation Modes ---------------------------------
 #define PP_BIPROJECTION
@@ -112,10 +108,9 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_KK 20475 // Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
 #define PP_MAX_OBJ_VALUE 1749.9001299062057129526866493726
 //--------------------------------------------------------------------------
-#define PP_EPS_ZERO					1E-11			// Precision for comparison with zero
-#define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*10)// Accuracy of belonging to hyperplane
-#define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)// Precision to calculate projection
-#define PP_OBJECTIVE_VECTOR_LENGTH	1E+7			// Length of Objective Vector
+#define PP_EPS_ZERO					1E-11		// Precision for comparison with zero
+#define PP_EPS_ON_HYPERPLANE		1E-4		// Accuracy of belonging to hyperplane
+#define PP_OBJECTIVE_VECTOR_LENGTH	1			// Length of Objective Vector
 //-------------------------- Compilation Modes ---------------------------------
 #define PP_BIPROJECTION
 //------------------------------ ifdef PP_DEBUG --------------------------------
@@ -135,7 +130,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_MAX_OBJ_VALUE 266.616 // Exact maximum value of objective function
 //--------------------------------------------------------------------------
 #define PP_EPS_ZERO					1E-9			// Precision for comparison with zero
-#define PP_EPS_PROJECTION		PP_EPS_ZERO		// Precision to calculate projection
+#define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*100)	// Accuracy of belonging to hyperplane
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+7			// Length of Objective Vector
 
 //--------------------------------------------------------------------------
@@ -149,7 +144,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_MAX_OBJ_VALUE 64.575077058564509026860413914575	// Exact maximum value of objective function
 //-------------------------------------------------------------------------
 #define PP_EPS_ZERO					1E-7			// Precision for comparison with zero
-#define PP_EPS_PROJECTION		PP_EPS_ZERO		// Precision to calculate projection
+#define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*100)	// Accuracy of belonging to hyperplane
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+7			// Length of Objective Vector
 
 //----------------------------------------------------------------------------
@@ -169,7 +164,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_MAX_OBJ_VALUE 70	// Exact maximum value of objective function
 //--------------------------------------------------------------------------
 #define PP_EPS_ZERO					1E-7			// Precision for comparison with zero
-#define PP_EPS_PROJECTION		PP_EPS_ZERO		// Precision to calculate projection
+#define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*100)	// Accuracy of belonging to hyperplane
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+7			// Length of Objective Vector
 
 
@@ -197,6 +192,6 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_MAX_OBJ_VALUE 415.732240741419486545199108738 // Exact maximum value of objective function
 //--------------------------------------------------------------------------
 #define PP_EPS_ZERO					1E-9				// Precision for comparison with zero
-#define PP_EPS_PROJECTION		PP_EPS_ZERO			// Precision to calculate projection
+#define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*100)	// Accuracy of belonging to hyperplane
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+7				// Length of Objective Vector
 //----------------------------------------------------------------------------/**/

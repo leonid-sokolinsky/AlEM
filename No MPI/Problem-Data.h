@@ -38,6 +38,7 @@ static PT_vector_T PD_objVector;	// Used for pseudoprojecting
 static int PD_neHyperplanes_u[PP_MM];		// Index of inequality-hyperplanes that include point u
 static int PD_edgeNeHyperplanes[PP_N - 1];	// Index of inequality-hyperplanes used for pseudoprojection
 static int PD_edgeAlHyperplanes[PP_N - 1];	// Index of all hyperplanes used for pseudoprojection
+static PT_bitscale_T PD_edgeBitscale;		// Bit scale that tags all hyperplanes forming the edge
 static int PD_edgeCodes[PP_KK];				// Edge codes
 static int PD_TWIDDLE_p[PP_MM + 2];			// Auxiliary array for TWIDDLE algorithm
 //========================== Input/Output ====================================

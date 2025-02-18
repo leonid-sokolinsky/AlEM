@@ -11,26 +11,27 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 ================================================================================*/
 #pragma once
 
+//#define PP_GRADIENT
+
 //============================== Problem Parameters ============================
 // PP_OBJECTIVE_VECTOR_LENGTH - direct dependence on dimension PD_n.
 // P_EPS_ZERO - inverse dependence on PP_OBJECTIVE_VECTOR_LENGTH.
-// PP_EPS_PROJECTION - inverse dependence on PP_OBJECTIVE_VECTOR_LENGTH. 
-//						This parameter affects terminate condition when 
-//						calculating pseudoprojection.
 //------------------------------------------------------------------------------
-#define PP_EPS_ZERO					1E-11			// Accuracy for comparison with zero
-#define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*10)// Accuracy of belonging to hyperplane
-#define PP_EPS_PROJECTION			PP_EPS_ZERO		// Precision of rounding pseudoprojecting vectors
-//#define PP_EPS_ZERO					1E-9			// Accuracy for comparison with zero
-//#define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*10)// Accuracy of belonging to hyperplane
-//#define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)// Precision of rounding pseudoprojecting vectors
-#define PP_OBJECTIVE_VECTOR_LENGTH	1E+7			// Length of Objective Vector
+#ifndef PP_GRADIENT
+#define PP_EPS_ZERO					1E-11				// Accuracy for comparison with zero
+#define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*10)	// Accuracy of belonging to hyperplane
+#define PP_EPS_PROJECTION			PP_EPS_ZERO			// Accuracy of belonging to hyperplane
+#define PP_OBJECTIVE_VECTOR_LENGTH	1E+7				// Length of Objective Vector
+//-------------------------- Compilation Modes ---------------------------------
+#define PP_MAXPROJECTION // It can cause a stuck in the loop. In this case, you should increase PP_EPS_PROJECTION or decrease PP_OBJECTIVE_VECTOR_LENGTH.
+//------------------------------------------------------------------------------
+#endif
 //------------------------------ ifdef PP_DEBUG --------------------------------
-#define PP_ITER_COUNT				10				// Each PP_ITER_COUNT-th iteration to be outputted inside PC_bsf_MapF(*)
-#define PP_PROJECTION_COUNT			100000000		// Each PP_PROJECTION_COUNT iteration to be outputted inside Flat_MaxProjection(*)
+#define PP_ITER_COUNT				10					// Each PP_ITER_COUNT-th iteration to be outputted inside PC_bsf_MapF(*)
+#define PP_PROJECTION_COUNT			100000000			// Each PP_PROJECTION_COUNT iteration to be outputted inside Flat_MaxProjection(*)
 //------------------------------------------------------------------------------
 
-/*============================== Klee-Minty5 LP problem ========================*
+/*============================== Klee-Minty5 LP problem ========================*/
 #define PP_PROBLEM_NAME	"Klee-Minty5"
 #define PP_D 5			// Space dimension
 #define PP_M PP_D		// Number of equations (number of rows in *.mtx)
@@ -39,8 +40,10 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_MAX_OBJ_VALUE 3125
 //------------------------------------------------------------------------------
 #ifdef PP_GRADIENT
-#undef PP_EPS_ON_HYPERPLANE
-#define PP_EPS_ON_HYPERPLANE 1E-8 // Accuracy of belonging to hyperplane
+#define PP_EPS_ZERO					1E-11				// Accuracy for comparison with zero
+#define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*10000)	// Accuracy of belonging to hyperplane
+#define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)	// Accuracy of belonging to hyperplane
+#define PP_OBJECTIVE_VECTOR_LENGTH	1E+7				// Length of Objective Vector
 #endif
 //------------------------------------------------------------------------------
 
@@ -53,8 +56,10 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_MAX_OBJ_VALUE 15625
 //------------------------------------------------------------------------------
 #ifdef PP_GRADIENT
-#undef PP_EPS_ON_HYPERPLANE
-#define PP_EPS_ON_HYPERPLANE 1E-7 // Accuracy of belonging to hyperplane
+#define PP_EPS_ZERO					1E-11				// Accuracy for comparison with zero
+#define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*10000)	// Accuracy of belonging to hyperplane
+#define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)	// Accuracy of belonging to hyperplane
+#define PP_OBJECTIVE_VECTOR_LENGTH	1E+7				// Length of Objective Vector
 #endif
 //------------------------------------------------------------------------------
 
@@ -67,8 +72,10 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_MAX_OBJ_VALUE 78125
 //------------------------------------------------------------------------------
 #ifdef PP_GRADIENT
-#undef PP_EPS_ON_HYPERPLANE
-#define PP_EPS_ON_HYPERPLANE 1E-5 // Accuracy of belonging to hyperplane
+#define PP_EPS_ZERO					1E-11				// Accuracy for comparison with zero
+#define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*10000)	// Accuracy of belonging to hyperplane
+#define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)	// Accuracy of belonging to hyperplane
+#define PP_OBJECTIVE_VECTOR_LENGTH	1E+7				// Length of Objective Vector
 #endif
 //------------------------------------------------------------------------------
 
@@ -81,12 +88,14 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_MAX_OBJ_VALUE 390625
 //------------------------------------------------------------------------------
 #ifdef PP_GRADIENT
-#undef PP_EPS_ON_HYPERPLANE
-#define PP_EPS_ON_HYPERPLANE 1E-2 // Accuracy of belonging to hyperplane
+#define PP_EPS_ZERO					1E-11				// Accuracy for comparison with zero
+#define PP_EPS_ON_HYPERPLANE		1e-06				// Accuracy of belonging to hyperplane
+#define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)	// Accuracy of belonging to hyperplane
+#define PP_OBJECTIVE_VECTOR_LENGTH	1E+7				// Length of Objective Vector
 #endif
 //------------------------------------------------------------------------------
 
-/*============================== Klee-Minty9 LP problem ========================*/
+/*============================== Klee-Minty9 LP problem ========================*
 #define PP_PROBLEM_NAME	"Klee-Minty9"
 #define PP_D 9			// Space dimension
 #define PP_M PP_D		// Number of equations (number of rows in *.mtx)
@@ -95,8 +104,10 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_MAX_OBJ_VALUE 1953125
 //------------------------------------------------------------------------------
 #ifdef PP_GRADIENT
-#undef PP_EPS_ON_HYPERPLANE
-#define PP_EPS_ON_HYPERPLANE 1 // Accuracy of belonging to hyperplane
+#define PP_EPS_ZERO					1E-11				// Accuracy for comparison with zero
+#define PP_EPS_ON_HYPERPLANE		1e-06				// Accuracy of belonging to hyperplane
+#define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)	// Accuracy of belonging to hyperplane
+#define PP_OBJECTIVE_VECTOR_LENGTH	1E+7				// Length of Objective Vector
 #endif
 //------------------------------------------------------------------------------
 
