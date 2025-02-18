@@ -214,9 +214,12 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 	}
 	#endif // PP_DEBUG /**/
 
-	//cout << "w =\t"; Print_Vector(w); cout << endl;//////////////////////////////////
-	JumpingOnPolytope(u_cur, w, u_nex, PP_EPS_ON_HYPERPLANE, PP_EPS_ZERO, success);//
-	//cout << "u_nex =\t"; Print_Vector(u_nex); cout << endl;//////////////////////////
+	PT_vector_T directionVector;
+	Vector_Subtraction(w, u_cur, directionVector);
+
+	//cout << "w =\t"; Print_Vector(w); cout << endl;/////////////////////////////////////////////////////////////////
+	JumpingOnPolytope(u_cur, directionVector, u_nex, PP_EPS_ON_HYPERPLANE, PP_EPS_ZERO, PD_edgeBitscale, success);//
+	//cout << "u_nex =\t"; Print_Vector(u_nex); cout << endl;/////////////////////////////////////////////////////////
 
 	if (!*success)
 		return;
@@ -717,22 +720,20 @@ namespace SF {
 		#endif // PP_DEBUG /**/
 	}
 
-	static inline void JumpingOnPolytope(PT_vector_T startPoint, PT_vector_T directionPoint, PT_vector_T finishPoint, double eps_on_hyperplane, double eps_zero, int* success) {
+	static inline void JumpingOnPolytope(PT_vector_T startPoint, PT_vector_T direcionVector, PT_vector_T finishPoint, double eps_on_hyperplane, double eps_zero, bool* parallelHPlanes, int* success) {
 		PT_vector_T o;		// Oblique projection vector
 		PT_vector_T o_min;	// Oblique projection vector with minimum length
-		PT_vector_T d;		// Direction vector
 		double length_o;
-		double* z = startPoint;
 		double a_DoT_d;
 		double norm_d;
 		double norm_a_DoT_norm_d;
 		int location_z;
 		double a_DoT_z_MinuS_b;
+		double* d = direcionVector;		// Direction vector
+		double* z = startPoint;
 		double minLength_o = PP_INFINITY;
 
 		*success = true;
-
-		Vector_Subtraction(directionPoint, startPoint, d);
 
 		/*DEBUG JumpingOnPolytope**
 		#ifdef PP_DEBUG
@@ -753,7 +754,7 @@ namespace SF {
 		Vector_Zeroing(o_min);
 
 		for (int i = 0; i < PD_m; i++) {
-			if (PD_edgeBitscale[i])
+			if (parallelHPlanes[i])
 				continue;
 
 			a_DoT_d = Vector_DotProduct(PD_A[i], d);
