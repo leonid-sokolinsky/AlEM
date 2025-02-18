@@ -176,7 +176,7 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 	cout << PD_edgeAlHyperplanes[PD_n - 2] << "}.\n";
 	#endif // PP_DEBUG /**/
 
-	Bitscale_Create(PD_edgeBitscale, PD_edgeAlHyperplanes, PD_n - 1);
+	Bitscale_Create(PD_edgeBitscale, PD_m, PD_edgeAlHyperplanes, PD_n - 1);
 
 	Vector_Addition(u_cur, PD_objVector, v);
 
@@ -576,8 +576,8 @@ namespace SF {
 		return res;
 	}
 
-	static inline void Bitscale_Create(PT_bitscale_T bitscale, int* hyperplanes, int mh) {
-		for (int i = 0; i < PD_m; i++)
+	static inline void Bitscale_Create(bool* bitscale, int m, int* hyperplanes, int mh) {
+		for (int i = 0; i < m; i++)
 			bitscale[i] = false;
 		for (int ih = 0; ih < mh; ih++)
 			bitscale[hyperplanes[ih]] = true;

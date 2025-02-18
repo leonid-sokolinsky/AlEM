@@ -16,7 +16,7 @@ namespace PF {
 //====================== Shared Functions ===========================
 namespace SF {
 	unsigned long long BinomialCoefficient(int n, int k);
-	void	Bitscale_Create(PT_bitscale_T bitscale, int* hyperplanes, int mh);
+	void	Bitscale_Create(bool* bitscale, int m, int* hyperplanes, int mh);
 	double	Distance_PointToHalfspace_i(PT_vector_T x, int i);
 	double	Distance_PointToHyperplane_i(PT_vector_T x, int i);
 	double	Distance_PointToPoint(PT_vector_T x, PT_vector_T y);

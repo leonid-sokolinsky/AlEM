@@ -13,7 +13,7 @@ This source code has been produced with using BSF-skeleton
 typedef double PT_matrix_T[PP_MM][PP_N];
 typedef double PT_vector_T[PP_N];
 typedef double PT_column_T[PP_MM];
-typedef double PT_bitscale_T[PP_MM];
+typedef bool PT_bitscale_T[PP_MM];
 
 typedef char PT_MPS_name_T[PP_MPS_NAME_LENGTH];
 
