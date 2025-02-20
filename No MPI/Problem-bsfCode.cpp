@@ -610,7 +610,10 @@ namespace SF {
 		double distance;
 
 		for (int i = 0; i < PD_m; i++) {
-			distance = Distance_PointToHalfspace_i(x, i);
+			if (PD_isEquation[i])
+				distance = Distance_PointToHyperplane_i(x, i);
+			else
+				distance = Distance_PointToHalfspace_i(x, i);
 			if (distance > 0)
 				maxDistance = PF_MAX(maxDistance, distance);
 		}
