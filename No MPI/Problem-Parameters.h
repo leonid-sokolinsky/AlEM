@@ -11,11 +11,11 @@ This source code has been produced with using BSF-skeleton
 
 //#define PP_PATH "Problems/"
 
-/**/
+/**
 #include "../_Problems05-1.h"
 #define PP_PATH "../../Set-of-LP-Problems/Rnd-LP/"
 
-/**/
+/**
 #include "../_Problems10-1.h"
 #define PP_PATH "../../Set-of-LP-Problems/Rnd-LP/"
 

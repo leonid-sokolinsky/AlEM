@@ -28,9 +28,9 @@ void PC_bsf_Init(bool* success) {
 	PD_n = 0;
 
 #ifdef PP_MPS_FORMAT
-	* success = MPS___Load_Problem();
+	*success = MPS___Load_Problem();
 #else
-	* success = MTX__Load_Problem();
+	*success = MTX__Load_Problem();
 #endif // PP_MPS_FORMAT
 
 	if (*success == false)
@@ -118,7 +118,7 @@ void PC_bsf_IterOutput_3(PT_bsf_reduceElem_T_3* reduceResult, int reduceCounter,
 	// Not used
 }
 
-void PC_bsf_JobDispatcher(PT_bsf_parameter_T* parameter, int* job, bool* toExit, double t) {
+void PC_bsf_JobDispatcher(PT_bsf_parameter_T* parameter, int* job, bool* exit, double t) {
 	// Not used
 }
 
@@ -396,7 +396,7 @@ void PC_bsf_ProblemOutput_3(PT_bsf_reduceElem_T_3* reduceResult, int reduceCount
 	// Not used
 }
 
-void PC_bsf_ProcessResults(PT_bsf_reduceElem_T* reduceResult, int reduceCounter, PT_bsf_parameter_T* parameter, int* nextJob, bool* toExit) {
+void PC_bsf_ProcessResults(PT_bsf_reduceElem_T* reduceResult, int reduceCounter, PT_bsf_parameter_T* parameter, int* nextJob, bool* exit) {
 
 	if (reduceCounter == 0) {
 
@@ -405,7 +405,7 @@ void PC_bsf_ProcessResults(PT_bsf_reduceElem_T* reduceResult, int reduceCounter,
 		cout << "reduceCounter = 0 => exit" << endl;
 #endif // PP_DEBUG /**/
 
-		* toExit = true;
+		* exit = true;
 		return;
 	}
 
@@ -416,7 +416,7 @@ void PC_bsf_ProcessResults(PT_bsf_reduceElem_T* reduceResult, int reduceCounter,
 		cout << "F(u_nex) ==  -PP_INFINITY == " << -PP_INFINITY << endl;
 #endif // PP_DEBUG /**/
 
-		* toExit = true;
+		* exit = true;
 		return;
 	}
 
@@ -429,7 +429,7 @@ void PC_bsf_ProcessResults(PT_bsf_reduceElem_T* reduceResult, int reduceCounter,
 		cout << "|PP_MAX_OBJ_VALUE-F(u_nex)|/|PP_MAX_OBJ_VALUE| = " << RelativeError(PP_MAX_OBJ_VALUE, reduceResult->objF_nex) << " < PP_EPS_RELATIVE_ERROR = " << PP_EPS_RELATIVE_ERROR << endl;
 #endif // PP_DEBUG /**/
 
-		* toExit = true;
+		* exit = true;
 		return;
 	}
 #else
@@ -443,7 +443,7 @@ void PC_bsf_ProcessResults(PT_bsf_reduceElem_T* reduceResult, int reduceCounter,
 		cout << "|F(u_cur)-F(u_nex)|/|F(F(u_cur))| = " << RelativeError(PD_objF_cur, reduceResult->objF_nex) << " < PP_EPS_ZERO = " << PP_EPS_ZERO << endl;
 #endif // PP_DEBUG /**/
 
-		* toExit = true;
+		* exit = true;
 		return;
 	}
 #endif // PP_CHECK_MAX_OBJ_VALUE
@@ -466,7 +466,7 @@ void PC_bsf_ProcessResults(PT_bsf_reduceElem_T* reduceResult, int reduceCounter,
 #ifdef PP_SAVE_ITER_RESULT
 	if (MTX_SavePoint(PD_u_cur, PP_MTX_POSTFIX_V))
 		cout << "\tCurrent approximation is saved into file *_v.mtx\n";
-	*toExit = true;
+	*exit = true;
 	return;
 #endif // PP_SAVE_ITER_RESULT
 
@@ -481,27 +481,27 @@ void PC_bsf_ProcessResults(PT_bsf_reduceElem_T* reduceResult, int reduceCounter,
 		cout << "Minimum PP_EPS_ON_HYPERPLANE should be " << eps_on_polytope << endl;
 #endif // PP_DEBUG /**/
 
-		* toExit = true;
+		* exit = true;
 		return;
 	}
 
 	if (!PointIsVertex(PD_u_cur, PP_EPS_ON_HYPERPLANE)) {
 		cout << "PC_bsf_ProcessResults error: u_nex is NOT vertex with precision of PP_EPS_ON_HYPERPLANE = "
 			<< PP_EPS_ON_HYPERPLANE << endl;
-		*toExit = true;
+		*exit = true;
 		return;
 	}
 }
 
-void PC_bsf_ProcessResults_1(PT_bsf_reduceElem_T_1* reduceResult, int reduceCounter, PT_bsf_parameter_T* parameter, int* nextJob, bool* toExit) {
+void PC_bsf_ProcessResults_1(PT_bsf_reduceElem_T_1* reduceResult, int reduceCounter, PT_bsf_parameter_T* parameter, int* nextJob, bool* exit) {
 	// Not used
 }
 
-void PC_bsf_ProcessResults_2(PT_bsf_reduceElem_T_2* reduceResult, int reduceCounter, PT_bsf_parameter_T* parameter, int* nextJob, bool* toExit) {
+void PC_bsf_ProcessResults_2(PT_bsf_reduceElem_T_2* reduceResult, int reduceCounter, PT_bsf_parameter_T* parameter, int* nextJob, bool* exit) {
 	// Not used
 }
 
-void PC_bsf_ProcessResults_3(PT_bsf_reduceElem_T_3* reduceResult, int reduceCounter, PT_bsf_parameter_T* parameter, int* nextJob, bool* toExit) {
+void PC_bsf_ProcessResults_3(PT_bsf_reduceElem_T_3* reduceResult, int reduceCounter, PT_bsf_parameter_T* parameter, int* nextJob, bool* exit) {
 	// Not used
 }
 
@@ -780,7 +780,7 @@ namespace SF {
 						<< ") \tStart point belong to hyperplane, finish point is outside half-space. => return\n";
 					#endif // PP_DEBUG /**/
 					Vector_Copy(startPoint, finishPoint);
-					* success = false;
+					*success = false;
 					return;
 				}
 
@@ -2306,71 +2306,19 @@ namespace SF {
 		return s;
 	}
 
-	static inline void	ObliqueProjectingVectorOntoHalfspace_i(PT_vector_T z, int i, PT_vector_T d, PT_vector_T o, double eps_on_hyperplane, double eps_cos, int* exitCode) {
-		// Oblique projecting vector o of point z onto Half-space H_i with respect to vector d
-		double a_DoT_d;	// <a,d>
-		double norm_a_DoT_norm_d; // <a,d>/(||a||*||d||)
-		double a_DoT_z_MinuS_b;	// <a,z> - b
-		double factor;	// (b - <a,z>) / <a,d>
-
-		Vector_Zeroing(o);
-
-		*exitCode = PointLocation_i(z, i, eps_on_hyperplane, &a_DoT_z_MinuS_b);
-		a_DoT_d = Vector_DotProduct(PD_A[i], d); // <a,d>
-
-		a_DoT_d = Vector_DotProduct(PD_A[i], d);
-		norm_a_DoT_norm_d = a_DoT_d / (PD_norm_a[i] * Vector_Norm(d));
-
-		switch (*exitCode) {
-		case PP_ON_HYPERPLANE:
-		case PP_INSIDE_HALFSPACE:
-			Vector_Copy(z, o);
-			return;
-		case PP_OUTSIDE_HALFSPACE:
-			if (fabs(norm_a_DoT_norm_d) < eps_cos) {
-				*exitCode = PP_PARALLEL;
-				Vector_SetValue(o, PP_INFINITY);
-				return;
-			}
-			if (norm_a_DoT_norm_d > 0) {
-				*exitCode = PP_RECESSIVE;
-				Vector_SetValue(o, -PP_INFINITY);
-				return;
-			}
-		default:
-			assert(false);
-		}
-
-		factor = a_DoT_z_MinuS_b / a_DoT_d; // (<a,z> - b) / <a,d>
-
-		// Oblique projection vector: o = -(<a,z> - b)d/<a, d> = -factor * d
-		Vector_MultiplyByNumber(d, -factor, o);
-
-		*exitCode = PP_NONDEGENERATE_PROJECTING;
-		return;
-	}
-
-	static inline void OrthogonalProjectingVectorOntoHalfspace_i(PT_vector_T z, int i, PT_vector_T r, double eps_zero, int* exitCode) {
+	static inline void OrthogonalProjectingVectorOntoHalfspace_i(PT_vector_T z, int i, PT_vector_T r, int* success) {
 		double factor;
 		double a_DoT_z_MinuS_b = Vector_DotProduct(PD_A[i], z) - PD_b[i]; // <a,z> - b
-		double distance = fabs(a_DoT_z_MinuS_b) / PD_norm_a[i];
-
-		Vector_Zeroing(r);
-
-		if (distance < eps_zero) {
-			*exitCode = PP_ON_HYPERPLANE;
-			return;
-		}
 
 		if (!PD_isEquation[i])
 			if (a_DoT_z_MinuS_b < 0) { // <a,z> - b < 0
-				*exitCode = PP_INSIDE_HALFSPACE;
+				*success = false;
 				return;
 			}
 
 		factor = -a_DoT_z_MinuS_b / (PD_norm_a[i] * PD_norm_a[i]); // (b - <z,a>) / ||a||^2
 		Vector_MultiplyByNumber(PD_A[i], factor, r); // r = a(b - <z,a>) / ||a||^2
-		*exitCode = PP_NONDEGENERATE_PROJECTING;
+		*success = true;
 	}
 
 	static inline void OrthogonalProjectingVectorOntoHyperplane_i(PT_vector_T x, int i, PT_vector_T p) {
@@ -2403,7 +2351,7 @@ namespace SF {
 		/*DEBUG PointBelongsToHyperplane_i**
 #ifdef PP_DEBUG
 		if (dist > eps_on_hyperplane && dist < eps_on_hyperplane * 10) {
-			cout << "Distance from testing point is less than " << PP_EPS_ON_HYPERPLANE*10 << ", but greater than " << PP_EPS_ON_HYPERPLANE << "!\n";
+			cout << "Distance from testing point is less than " << PD_eps_on_hyperplane*10 << ", but greater than " << PD_eps_on_hyperplane << "!\n";
 			//system("pause");
 		}
 #endif // PP_DEBUG /**/
@@ -2436,6 +2384,19 @@ namespace SF {
 			return false;
 		if (a_DoT_x_MinuS_b < 0)
 			return true;
+		return false;
+	}
+
+	static inline bool PointIsBoundary(PT_vector_T x, double eps_on_hyperplane) {
+		if (!PointBelongsToPolytope(x, eps_on_hyperplane))
+			return false;
+
+		for (int i = 0; i < PD_m; i++) {
+			if (PD_isEquation[i])
+				continue;
+			if (PointBelongsToHyperplane_i(x, i, eps_on_hyperplane))
+				return true;
+		}
 		return false;
 	}
 
@@ -2676,13 +2637,6 @@ namespace SF {
 	static inline void Shift(PT_vector_T point, PT_vector_T shiftVector, double factor, PT_vector_T shiftedPoint) {
 		for (int j = 0; j < PD_n; j++)
 			shiftedPoint[j] = point[j] + shiftVector[j] * factor;
-	}
-
-	static inline void SmallStep(PT_vector_T point, PT_vector_T direction, double stepLength, PT_vector_T stepPoint) {
-		PT_vector_T stepVector;
-		Vector_Copy(direction, stepVector);
-		Vector_MultiplyEquals(stepVector, stepLength / Vector_Norm(direction));
-		Vector_Addition(point, stepVector, stepPoint);
 	}
 
 	static inline void Vector_Addition(PT_vector_T x, PT_vector_T y, PT_vector_T z) {  // z = x + y

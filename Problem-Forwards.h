@@ -65,8 +65,7 @@ namespace SF {
 	void	MTX_SkipComments(FILE* stream);
 	int		Number_IncludingNeHyperplanes(PT_vector_T x, double eps);
 	double	ObjF(PT_vector_T x);
-	void	ObliqueProjectingVectorOntoHalfspace_i(PT_vector_T z, int i, PT_vector_T d, PT_vector_T o, double eps_on_hyperplane, double eps_cos, int* exitCode);
-	void	OrthogonalProjectingVectorOntoHalfspace_i(PT_vector_T z, int i, PT_vector_T r, double eps, int* exitcode);
+	void	OrthogonalProjectingVectorOntoHalfspace_i(PT_vector_T z, int i, PT_vector_T r, int* success);
 	void	OrthogonalProjectingVectorOntoHyperplane_i(PT_vector_T x, int i, PT_vector_T p);
 	bool	PointBelongsToFlat(PT_vector_T x, int* hyperplaneList, int hyperplaneCount, double eps_on_hyperplane);
 	bool	PointBelongsToHalfspace_i(PT_vector_T point, int i, double eps);
@@ -74,6 +73,7 @@ namespace SF {
 	bool	PointBelongsToPolytope(PT_vector_T x, double eps);
 	void	PointHomothety(PT_vector_T x, PT_vector_T center, double ratio);
 	bool	PointInsideHalfspace_i(PT_vector_T x, int i, double eps);
+	bool	PointIsBoundary(PT_vector_T x, double eps_on_hyperplane);
 	bool	PointIsVertex(PT_vector_T x, double eps_on_hyperplane);
 	int		PointLocation_i(PT_vector_T x, int i, double eps, double* a_DoT_x_MinuS_b);
 	void	PolytopeHomothety(PT_vector_T center, double ratio);
@@ -85,7 +85,6 @@ namespace SF {
 	void	Print_Vector(PT_vector_T x);
 	double	RelativeError(double trueValue, double calculatedValue);
 	void	Shift(PT_vector_T point, PT_vector_T shiftVector, double factor, PT_vector_T shiftedPoint);
-	void	SmallStep(PT_vector_T point, PT_vector_T direction, double stepLength, PT_vector_T stepPoint);
 	void	Tuning_Eps_PointBelongsToFlat(PT_vector_T x, int* hyperplaneList, int hyperplaneCount, double* eps);
 	void	Tuning_Eps_PointBelongsToPolytope(PT_vector_T x, double* eps);
 	void	TWIDDLE(int* x, int* y, int* z, int* p, bool* done);
