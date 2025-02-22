@@ -27,6 +27,15 @@ void PC_bsf_Init(bool* success) {
 	PD_m = 0;
 	PD_n = 0;
 
+	if (!EpsilonsAreOK(PP_EPS_ZERO, PP_EPS_PROJECTION, PP_EPS_ON_HYPERPLANE)) {
+		if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
+			cout << "PC_bsf_Init error: The following condition must be satisfied:\n"
+			<< "PP_EPS_ON_HYPERPLANE >  PP_EPS_PROJECTION > PP_EPS_ZERO > DBL_EPSILON = "
+			<< DBL_EPSILON << endl;
+		*success = false;
+		return;
+	}
+
 #ifdef PP_MPS_FORMAT
 	*success = MPS___Load_Problem();
 #else
@@ -624,6 +633,10 @@ namespace SF {
 		PT_vector_T z;
 		Vector_Subtraction(x, y, z);
 		return Vector_NormSquare(z);
+	}
+
+	static inline bool EpsilonsAreOK(double eps_zero, double eps_projection, double eps_on_hyperplane) {
+		return (eps_zero > DBL_EPSILON && eps_projection > eps_zero && eps_on_hyperplane > eps_projection);
 	}
 
 	static inline void Flat_BipProjection(int* flatHyperplanes, int m_flat, PT_vector_T v, double eps_projection, int maxProjectingIter, PT_vector_T w, int* success) {
@@ -2370,14 +2383,6 @@ namespace SF {
 			if (!PointBelongsToHalfspace_i(x, i, eps_on_hyperplane))
 				return false;
 		return true;
-	}
-
-	static inline void PointHomothety(PT_vector_T x, PT_vector_T center, double ratio) { // https://en.wikipedia.org/wiki/Homothety
-		if (ratio == 1)
-			return;
-		assert(ratio > 0);
-		for (int j = 0; j < PD_n; j++)
-			x[j] = ratio * x[j] - (ratio - 1) * center[j];
 	}
 
 	static inline bool PointInsideHalfspace_i(PT_vector_T x, int i, double eps_on_hyperplane) {

@@ -22,6 +22,7 @@ namespace SF {
 	double	Distance_PointToPoint(PT_vector_T x, PT_vector_T y);
 	double	Distance_PointToPolytope(PT_vector_T x);
 	double	DistanceSQR_PointToPoint(PT_vector_T x, PT_vector_T y);
+	bool	EpsilonsAreOK(double eps_zero, double eps_projection, double eps_on_hyperplane);
 	void	Flat_BipProjection(int* flatHyperplanes, int m_flat, PT_vector_T v, double eps_projection, int maxProjectingIter, PT_vector_T w, int* success);
 	void	Flat_MaxProjection(int* flatHyperplanes, int m_flat, PT_vector_T v, double eps_projection, int maxProjectingIter, PT_vector_T w, int* success);
 	void	JumpingOnPolytope(PT_vector_T startPoint, PT_vector_T direcionVector, PT_vector_T finishPoint, double eps_on_hyperplane, double eps_zero, bool* parallelHPlanes, int* success);
@@ -71,7 +72,6 @@ namespace SF {
 	bool	PointBelongsToHalfspace_i(PT_vector_T point, int i, double eps);
 	bool	PointBelongsToHyperplane_i(PT_vector_T z, int i, double eps_on_hyperplane);
 	bool	PointBelongsToPolytope(PT_vector_T x, double eps);
-	void	PointHomothety(PT_vector_T x, PT_vector_T center, double ratio);
 	bool	PointInsideHalfspace_i(PT_vector_T x, int i, double eps);
 	bool	PointIsBoundary(PT_vector_T x, double eps_on_hyperplane);
 	bool	PointIsVertex(PT_vector_T x, double eps_on_hyperplane);
