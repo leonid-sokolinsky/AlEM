@@ -2327,7 +2327,7 @@ namespace SF {
 		double a_DoT_z_MinuS_b = Vector_DotProduct(PD_A[i], z) - PD_b[i]; // <a,z> - b
 
 		if (!PD_isEquation[i])
-			if (a_DoT_z_MinuS_b <= 0) { // <a,z> - b < 0
+			if (a_DoT_z_MinuS_b <= 0) { // <a,z> - b <= 0
 				*success = false;
 				return;
 			}
