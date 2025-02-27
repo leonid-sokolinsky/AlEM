@@ -17,7 +17,6 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
-#define PP_KK						5		// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
 #define PP_M						6		// Number of equations (number of rows in *.mtx)
 #define PP_N						11		// Number of variables (number of cols in *.mtx)
 //------------------------------ ifdef PP_DEBUG --------------------------------

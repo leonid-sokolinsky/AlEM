@@ -26,7 +26,6 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+7			// Length of Objective Vector
 #define PP_EPS_RELATIVE_ERROR		1E-3			// Used if defined PP_CHECK_MAX_OBJ_VALUE 
 //-----------------------------------------------------------------------------
-#define PP_KK	10		// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
 #define PP_M	11		// Number of equations (number of rows in *.mtx)
 #define PP_N	21		// Number of variables (number of cols in *.mtx)
 //-----------------------------------------------------------------------------

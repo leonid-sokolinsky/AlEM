@@ -42,15 +42,14 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_PROBLEM_NAME	"afiro"
 #define PP_M 27			// Number of constraints in mps-file
 #define PP_N 32			// Number of variables in mps-file
-#define PP_KK 475020		// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
 #define PP_MAX_OBJ_VALUE 464.75314285714285714285714285714
 //------------------------------------------------------------------------------
-#define PP_EPS_ZERO					1E-11				// Accuracy for comparison with zero
-#define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*100)	// Accuracy of belonging to hyperplane
-#define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)	// Accuracy of calculating pseudoprojection
-#define PP_OBJECTIVE_VECTOR_LENGTH	1E+6				// Length of Objective Vector
+#define PP_EPS_ZERO					1E-11					// Accuracy for comparison with zero
+#define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)		// Accuracy of calculating pseudoprojection
+#define PP_EPS_ON_HYPERPLANE		(PP_EPS_PROJECTION*10)	// Accuracy of belonging to hyperplane
+#define PP_OBJECTIVE_VECTOR_LENGTH	1E+6					// Length of Objective Vector
 //-------------------------- Compilation Modes ---------------------------------
-#define PP_MAXPROJECTION // It can cause a stuck in the loop. In this case, you should increase PP_EPS_PROJECTION or decrease PP_OBJECTIVE_VECTOR_LENGTH.
+#define PP_MAXPROJECTION
 //------------------------------ ifdef PP_DEBUG --------------------------------
 #define PP_ITER_COUNT				10000				// Each PP_ITER_COUNT-th iteration to be outputted inside PC_bsf_MapF(*)
 #define PP_PROJECTION_COUNT			100000				// Each PP_PROJECTION_COUNT iteration to be outputted inside Flat_MaxProjection(*)
@@ -82,14 +81,14 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_PROBLEM_NAME		"blend"
 #define PP_M 74			// Number of constraints in mps-file
 #define PP_N 83			// Number of variables in mps-file
-#define PP_KK 123410	// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
 #define PP_MAX_OBJ_VALUE 30.812149845828220173774356124984	// Exact maximum value of objective function
 //------------------------------------------------------------------------------
-#define PP_EPS_ZERO					1E-11			// Accuracy for comparison with zero
-#define PP_EPS_ON_HYPERPLANE		1E-4			// Accuracy of belonging to hyperplane
-#define PP_OBJECTIVE_VECTOR_LENGTH	1E+7			// Length of Objective Vector
+#define PP_EPS_ZERO					1E-11					// Accuracy for comparison with zero
+#define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)		// Accuracy of calculating pseudoprojection
+#define PP_EPS_ON_HYPERPLANE		(PP_EPS_PROJECTION*10)	// Accuracy of belonging to hyperplane
+#define PP_OBJECTIVE_VECTOR_LENGTH	1E+6					// Length of Objective Vector
 //-------------------------- Compilation Modes ---------------------------------
-#define PP_BIPROJECTION
+#define PP_MAXPROJECTION
 //------------------------------ ifdef PP_DEBUG --------------------------------
 #define PP_ITER_COUNT			10				// Each PP_ITER_COUNT-th iteration to be outputted inside PC_bsf_MapF(*)
 #define PP_PROJECTION_COUNT		1000000			// Each PP_PROJECTION_COUNT iteration to be outputted inside Flat_MaxProjection(*)
@@ -105,17 +104,17 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_PROBLEM_NAME		"kb2"
 #define PP_M 43	// Number of equations (after conversion to standard form)
 #define PP_N 41	// Number of variables in mps-file (after conversion to standard form)
-#define PP_KK 20475 // Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
 #define PP_MAX_OBJ_VALUE 1749.9001299062057129526866493726
 //--------------------------------------------------------------------------
-#define PP_EPS_ZERO					1E-11		// Precision for comparison with zero
-#define PP_EPS_ON_HYPERPLANE		1E-4		// Accuracy of belonging to hyperplane
-#define PP_OBJECTIVE_VECTOR_LENGTH	1			// Length of Objective Vector
+#define PP_EPS_ZERO					1E-11					// Accuracy for comparison with zero
+#define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)		// Accuracy of calculating pseudoprojection
+#define PP_EPS_ON_HYPERPLANE		(PP_EPS_PROJECTION*10)	// Accuracy of belonging to hyperplane
+#define PP_OBJECTIVE_VECTOR_LENGTH	1E+6					// Length of Objective Vector
 //-------------------------- Compilation Modes ---------------------------------
 #define PP_BIPROJECTION
 //------------------------------ ifdef PP_DEBUG --------------------------------
 #define PP_ITER_COUNT				100				// Each PP_ITER_COUNT-th iteration to be outputted inside PC_bsf_MapF(*)
-#define PP_PROJECTION_COUNT			10000000				// Each PP_PROJECTION_COUNT iteration to be outputted inside Flat_MaxProjection(*)
+#define PP_PROJECTION_COUNT			100000000		// Each PP_PROJECTION_COUNT iteration to be outputted inside Flat_MaxProjection(*)
 //--------------------------------------------------------------------------
 // F(x) = 1740.423
 // Relative error = 0.005

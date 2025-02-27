@@ -21,8 +21,8 @@ This source code has been produced with using BSF-skeleton
 
 //--------------- BSF Lists parameters (For "No MPI" only) ----------------
 #include "Problem-Parameters.h"
-#define PP_BSF_MAP_LIST_LENGTH		PP_KK
-#define PP_BSF_REDUCE_LIST_LENGTH	PP_KK
+#define PP_BSF_MAP_LIST_LENGTH		PP_BSF_MAX_MPI_SIZE
+#define PP_BSF_REDUCE_LIST_LENGTH	PP_BSF_MAX_MPI_SIZE
 #define PP_BSF_REDUCE_LIST_1_LENGTH	1
 #define PP_BSF_REDUCE_LIST_2_LENGTH	1
 #define PP_BSF_REDUCE_LIST_3_LENGTH	1

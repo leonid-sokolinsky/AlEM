@@ -27,10 +27,10 @@ void PC_bsf_Init(bool* success) {
 	PD_m = 0;
 	PD_n = 0;
 
-	if (!EpsilonsAreOK(PP_EPS_ZERO, PP_EPS_PROJECTION, PP_EPS_ON_HYPERPLANE)) {
+	if (!CheckEpsilons(PP_EPS_ZERO, PP_EPS_PROJECTION, PP_EPS_ON_HYPERPLANE)) {
 		if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
 			cout << "PC_bsf_Init error: The following condition must be satisfied:\n"
-			<< "PP_EPS_ON_HYPERPLANE >  PP_EPS_PROJECTION > PP_EPS_ZERO > DBL_EPSILON = "
+			<< "PP_EPS_ON_HYPERPLANE >=  PP_EPS_PROJECTION >= PP_EPS_ZERO >= DBL_EPSILON = "
 			<< DBL_EPSILON << endl;
 		*success = false;
 		return;
@@ -136,148 +136,194 @@ void PC_bsf_MainArguments(int argc, char* argv[]) {
 }
 
 void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int* success) {
+	int firstEdge_i;
+	int edgesCount;
 	double* u_cur = BSF_sv_parameter.u_cur;	// Current vertex
-	double* u_nex = reduceElem->u_nex;		// Next vertex
-	PT_vector_T v;	// v = u + PD_objVector (||PD_objVector|| = PP_OBJECTIVE_VECTOR_LENGTH)
-	PT_vector_T w;	// pseudiprojection of v
-	int edgeCode = *mapElem->edgeCode;
+	PT_vector_T u_nex_max;
+	double objF_nex_max = -PP_INFINITY;
+	#ifdef PP_GRADIENT
+	double objF_grd_max = -PP_INFINITY;
+	#endif // PP_GRADIENT
 
 	/*DEBUG PC_bsf_MapF**
 	#ifdef PP_DEBUG
-	static int map_counter;
-	map_counter++;
-	if (map_counter % PP_ITER_COUNT == 0)
-		cout << "Worker " << BSF_sv_mpiRank << ": number of iterations = " << map_counter << endl;
-	#endif // PP_DEBUG /**/
-
-	if (edgeCode == -1) {
-		*success = false;
-		return;
-	}
-
-	/*DEBUG PC_bsf_MapF*-*
-	#ifdef PP_DEBUG
-	if (BSF_sv_numberInSublist > 0) {
-		*success = false;
-		if (BSF_sv_numberInSublist == 1)
-			cout << "Worker " << BSF_sv_mpiRank << ":" << "\t\t numberInSublist == 1 ===>>> worker is terminated!\n";
-		return;
-	}
-	#endif // PP_DEBUG /**/
-
-	/*DEBUG PC_bsf_MapF**
-	#ifdef PP_DEBUG
-			cout << "------------------------------------ Map(" << PF_MAP_LIST_INDEX << ") ------------------------------------" << endl;
+	cout << "------------------------------------ Map(" << PF_MAP_LIST_INDEX << ") ------------------------------------" << endl;
 	#endif // PP_DEBUG /**/
 	// Condition for breakpoint: PD_iterNo == 2 && (BSF_sv_addressOffset + BSF_sv_numberInSublist == 2)
 
-	TWIDDLE_CodeToSubset(edgeCode, PD_neHyperplanes_u, PD_edgeNeHyperplanes, PD_mneh_u, PD_neq - 1,
-		&PD_TWIDDLE_x, &PD_TWIDDLE_y, &PD_TWIDDLE_z, PD_TWIDDLE_p, &PD_TWIDDLE_done, &PD_TWIDDLE_nextEdgeI);
-
-	for (int i = PD_meq; i < PD_n - 1; i++)
-		PD_edgeAlHyperplanes[i] = PD_edgeNeHyperplanes[i - PD_meq];
+	EdgesToProcess(BSF_sv_mpiRank, &firstEdge_i, &edgesCount, PD_med_u);
 
 	/*DEBUG PC_bsf_MapF**
 	#ifdef PP_DEBUG
-	cout << "Edge hyperplanes: {";
-	for (int i = 0; i < PD_n - 2; i++) 
-			cout << PD_edgeAlHyperplanes[i] << ", ";
-	cout << PD_edgeAlHyperplanes[PD_n - 2] << "}.\n";
+	cout << "Worker " << BSF_sv_mpiRank << ": First i = " << firstEdge_i << "\t Last i = " << firstEdge_i + edgesCount - 1 << endl;
 	#endif // PP_DEBUG /**/
 
-	Bitscale_Create(PD_edgeBitscale, PD_m, PD_edgeAlHyperplanes, PD_n - 1);
 
-	Vector_Addition(u_cur, PD_objVector, v);
 
-#ifndef PP_MAXPROJECTION
-	Flat_BipProjection(PD_edgeAlHyperplanes, PD_n - 1, v, PP_EPS_PROJECTION, PP_MAX_PSEUDOPROJECTING_ITER, w, success);
-#else
-	Flat_MaxProjection(PD_edgeAlHyperplanes, PD_n - 1, v, PP_EPS_PROJECTION, PP_MAX_PSEUDOPROJECTING_ITER, w, success);
-#endif // PP_MAXPROJECTION
+	for (int edge_i = firstEdge_i; edge_i < firstEdge_i + edgesCount; edge_i++) {
+		PT_vector_T  u_nex;		// Next vertex
+		double objF_nex;
+		#ifdef PP_GRADIENT
+		double objF_grd;
+		#endif // PP_GRADIENT
+		PT_vector_T v;	// v = u + PD_objVector (||PD_objVector|| = PP_OBJECTIVE_VECTOR_LENGTH)
+		PT_vector_T w;	// pseudiprojection of v
 
-	if (*success == -1) {
-		cout << "Worker " << BSF_sv_mpiRank
-			<< ": PC_bsf_MapF error: Significand bit depth is exceeded! You should increase PP_EPS_PROJECTION or decrease PP_OBJECTIVE_VECTOR_LENGTH.\n";
-	}
+		#ifdef PP_DEBUG
+		PD_sublist_index = edge_i - firstEdge_i + 1;
+		#endif // PP_DEBUG /**/
 
-	if (*success == -3) {
-		cout << "Worker " << BSF_sv_mpiRank
-			<< ": PC_bsf_MapF error: Floating-point underflow! You should increase PP_EPS_PROJECTION or decrease PP_OBJECTIVE_VECTOR_LENGTH.\n";
-	}
+		/*DEBUG PC_bsf_MapF*-*
+		#ifdef PP_DEBUG
+		if (BSF_sv_numberInSublist > 0) {
+			*success = false;
+			if (BSF_sv_numberInSublist == 1)
+				cout << "Worker " << BSF_sv_mpiRank << ":" << "\t\t numberInSublist == 1 ===>>> worker is terminated!\n";
+			return;
+		}
+		#endif // PP_DEBUG /**/
 
-	if (*success == -2) {
-		cout << "Worker " << BSF_sv_mpiRank
-			<< ": PC_bsf_MapF warning: Exceeded the maximum number of iterations PP_MAX_PSEUDOPROJECTING_ITER = "
-			<< PP_MAX_PSEUDOPROJECTING_ITER << " when calculating pseudoprojection!" << endl;
-	}
+		TWIDDLE_CodeToSubset(edge_i, PD_neHyperplanes_u, PD_edgeNeHyperplanes, PD_mneh_u, PD_neq - 1,
+			&PD_TWIDDLE_x, &PD_TWIDDLE_y, &PD_TWIDDLE_z, PD_TWIDDLE_p, &PD_TWIDDLE_done, &PD_TWIDDLE_nextEdgeI);
 
-	/*DEBUG PC_bsf_MapF**
-	#ifdef PP_DEBUG
-	if (!PointBelongsToFlat(w, PD_edgeAlHyperplanes, PD_n - 1, PP_EPS_ON_HYPERPLANE)) {
-		cout << "Worker " << BSF_sv_mpiRank << ": PC_bsf_MapF warning: w does not belong to flat with precision of PP_EPS_ON_HYPERPLANE = "
-			<< PP_EPS_ON_HYPERPLANE << endl;
-
-		double eps_on_flat = PP_EPS_ON_HYPERPLANE;
-		Tuning_Eps_PointBelongsToFlat(w, PD_edgeAlHyperplanes, PD_n - 1, &eps_on_flat);
-		cout << "Minimum PP_EPS_ON_HYPERPLANE should be " << eps_on_flat << endl;
-	}
-	#endif // PP_DEBUG /**/
-
-	PT_vector_T directionVector;
-	Vector_Subtraction(w, u_cur, directionVector);
-
-	//cout << "w =\t"; Print_Vector(w); cout << endl;/////////////////////////////////////////////////////////////////
-	JumpingOnPolytope(u_cur, directionVector, u_nex, PP_EPS_ON_HYPERPLANE, PP_EPS_ZERO, PD_edgeBitscale, success);//
-	//cout << "u_nex =\t"; Print_Vector(u_nex); cout << endl;/////////////////////////////////////////////////////////
-
-	if (!*success) 
-		return;
-
-	if (Distance_PointToPoint(u_cur, u_nex) < PP_EPS_ZERO) {
+		for (int i = PD_meq; i < PD_n - 1; i++)
+			PD_edgeAlHyperplanes[i] = PD_edgeNeHyperplanes[i - PD_meq];
 
 		/*DEBUG PC_bsf_MapF**
 		#ifdef PP_DEBUG
-		cout << "Worker " << BSF_sv_mpiRank << ":\t||u_nex - u_cur|| < PP_EPS_ZERO ===>>> movement is impossible.\n";
+		cout << "Edge hyperplanes: {";
+		for (int i = 0; i < PD_n - 2; i++)
+				cout << PD_edgeAlHyperplanes[i] << ", ";
+		cout << PD_edgeAlHyperplanes[PD_n - 2] << "}.\n";
 		#endif // PP_DEBUG /**/
 
-		reduceElem->objF_nex = -PP_INFINITY;
+		Bitscale_Create(PD_edgeBitscale, PD_m, PD_edgeAlHyperplanes, PD_n - 1);
 
-#ifdef PP_GRADIENT
-		reduceElem->objF_grd = -PP_INFINITY;
-#endif // PP_GRADIENT
+		Vector_Addition(u_cur, PD_objVector, v);
 
+		#ifndef PP_MAXPROJECTION
+		Flat_BipProjection(PD_edgeAlHyperplanes, PD_n - 1, v, PP_EPS_PROJECTION, PP_MAX_PSEUDOPROJECTING_ITER, w, success);
+		#else
+		Flat_MaxProjection(PD_edgeAlHyperplanes, PD_n - 1, v, PP_EPS_PROJECTION, PP_MAX_PSEUDOPROJECTING_ITER, w, success);
+		#endif // PP_MAXPROJECTION
+
+		if (*success == -1) {
+			cout << "Worker " << BSF_sv_mpiRank
+				<< ": PC_bsf_MapF error: Significand bit depth is exceeded! You should increase PP_EPS_PROJECTION or decrease PP_OBJECTIVE_VECTOR_LENGTH.\n";
+		}
+
+		if (*success == -3) {
+			cout << "Worker " << BSF_sv_mpiRank
+				<< ": PC_bsf_MapF error: Floating-point underflow! You should increase PP_EPS_PROJECTION or decrease PP_OBJECTIVE_VECTOR_LENGTH.\n";
+		}
+
+		if (*success == -2) {
+			cout << "Worker " << BSF_sv_mpiRank
+				<< ": PC_bsf_MapF warning: Exceeded the maximum number of iterations PP_MAX_PSEUDOPROJECTING_ITER = "
+				<< PP_MAX_PSEUDOPROJECTING_ITER << " when calculating pseudoprojection!" << endl;
+		}
+
+		/*DEBUG PC_bsf_MapF**
+		#ifdef PP_DEBUG
+		if (!PointBelongsToFlat(w, PD_edgeAlHyperplanes, PD_n - 1, PP_EPS_ON_HYPERPLANE)) {
+			cout << "Worker " << BSF_sv_mpiRank << ": PC_bsf_MapF warning: w does not belong to flat with precision of PP_EPS_ON_HYPERPLANE = "
+				<< PP_EPS_ON_HYPERPLANE << endl;
+			double eps_on_flat = PP_EPS_ON_HYPERPLANE;
+			Tuning_Eps_PointBelongsToFlat(w, PD_edgeAlHyperplanes, PD_n - 1, &eps_on_flat);
+			cout << "Minimum PP_EPS_ON_HYPERPLANE should be " << eps_on_flat << endl;
+		}
+		#endif // PP_DEBUG /**/
+
+		PT_vector_T directionVector;
+		Vector_Subtraction(w, u_cur, directionVector);
+
+		//cout << "w =\t"; Print_Vector(w); cout << endl;/////////////////////////////////////////////////////////////////
+		JumpingOnPolytope(u_cur, directionVector, u_nex, PP_EPS_ON_HYPERPLANE, PP_EPS_ZERO, PD_edgeBitscale, success);//
+		//cout << "u_nex =\t"; Print_Vector(u_nex); cout << endl;/////////////////////////////////////////////////////////
+
+		if (!*success) {
+			/*DEBUG PC_bsf_MapF**
+			#ifdef PP_DEBUG
+			cout << "Worker " << BSF_sv_mpiRank << ": ===>>> Movement is impossible.\n";
+			#endif // PP_DEBUG /**/
+			continue;
+		}
+
+		if (Distance_PointToPoint(u_cur, u_nex) < PP_EPS_ZERO) {
+
+			/*DEBUG PC_bsf_MapF**
+			#ifdef PP_DEBUG
+			cout << "Worker " << BSF_sv_mpiRank << ":\t||u_nex - u_cur|| < PP_EPS_ZERO ===>>> movement is impossible.\n";
+			#endif // PP_DEBUG /**/
+
+			continue;
+		}
+
+		#ifdef PP_DEBUG
+		if (!PointBelongsToPolytope(u_nex, PP_EPS_ON_HYPERPLANE)) {
+			cout << "Worker " << BSF_sv_mpiRank << ": PC_bsf_MapF warning: u_nex does not belong to polytope with precision of PP_EPS_ON_HYPERPLANE = "
+				<< PP_EPS_ON_HYPERPLANE << endl;
+			double eps_on_polytope = PP_EPS_ON_HYPERPLANE;
+			Tuning_Eps_PointBelongsToPolytope(u_nex, &eps_on_polytope);
+			cout << "Minimum PP_EPS_ON_HYPERPLANE should be " << eps_on_polytope << endl;
+		}
+		#endif // PP_DEBUG /**/
+
+		objF_nex = ObjF(u_nex);
+
+		#ifdef PP_GRADIENT
+		PT_vector_T u_grd;
+		PT_vector_T d;
+		Vector_Subtraction(u_nex, u_cur, d);
+		Shift(u_cur, d, 1 / Vector_Norm(d), u_grd);
+		objF_grd = ObjF(u_grd);
+
+		if (objF_grd > objF_grd_max) {
+			objF_grd_max = objF_grd;
+			objF_nex_max = objF_nex;
+			Vector_Copy(u_nex, u_nex_max);
+		}
+		#else
+		if (objF_nex > objF_nex_max) {
+			objF_nex_max = objF_nex;
+			Vector_Copy(u_nex, u_nex_max);
+		}
+		#endif // PP_GRADIENT
+
+		/*DEBUG PC_bsf_MapF**
+		#ifdef PP_DEBUG
+		cout << "Worker " << BSF_sv_mpiRank << ": "
+		#ifdef PP_GRADIENT
+			<< " F(u_grd) = " << objF_grd
+		#endif // PP_GRADIENT
+			<< "\t F(u_nex) = " << setw(PP_SETW) << objF_nex << "\t\t\t\t---> Movement is possible." << endl;
+		cout << "\n u_nex = "; Print_Vector(u_nex); cout << endl;
+		#endif // PP_DEBUG /**/
+	}
+
+	if (objF_nex_max == -PP_INFINITY) {
+		/*DEBUG PC_bsf_MapF**
+		#ifdef PP_DEBUG
+		cout << "Worker " << BSF_sv_mpiRank << ": ===>>> Movement is impossible.\n";
+		#endif // PP_DEBUG /**/
+		*success = false;
 		return;
 	}
 
-	/*DEBUG PC_bsf_MapF**
-	if (!PointBelongsToPolytope(u_nex, PP_EPS_ON_HYPERPLANE)) {
-		cout << "Worker " << BSF_sv_mpiRank << ": PC_bsf_MapF warning: u_nex does not belong to polytope with precision of PP_EPS_ON_HYPERPLANE = "
-			<< PP_EPS_ON_HYPERPLANE << endl;
-		#ifdef PP_DEBUG
-		double eps_on_polytope = PP_EPS_ON_HYPERPLANE;
-		Tuning_Eps_PointBelongsToPolytope(u_nex, &eps_on_polytope);
-		cout << "Minimum PP_EPS_ON_HYPERPLANE should be " << eps_on_polytope << endl;
-	}
-	#endif // PP_DEBUG /**/
-
-	reduceElem->objF_nex = ObjF(u_nex);
-
-#ifdef PP_GRADIENT
-	PT_vector_T u_grd;
-	PT_vector_T d;
-	Vector_Subtraction(u_nex, u_cur, d);
-	Shift(u_cur, d, 1 / Vector_Norm(d), u_grd);
-	reduceElem->objF_grd = ObjF(u_grd);
-#endif // PP_GRADIENT
+	reduceElem->objF_nex = objF_nex_max;
+	Vector_Copy(u_nex_max, reduceElem->u_nex);
+	#ifdef PP_GRADIENT
+	reduceElem->objF_grd = objF_grd_max;
+	#endif
 
 	/*DEBUG PC_bsf_MapF**
 	#ifdef PP_DEBUG
 	cout << "Worker " << BSF_sv_mpiRank << ": ";
 	#ifdef PP_GRADIENT
-	cout << "\tF(u_grd) = " << reduceElem->objF_grd;
+	cout << "\tF(u_grd_max) = " << reduceElem->objF_grd;
 	#endif // PP_GRADIENT
-	cout << "\tF(u_nex) = " << setw(PP_SETW) << reduceElem->objF_nex << "\t\t\t\t---> Movement is possible." << endl;
-	cout << "\n u_nex = "; Print_Vector(u_nex); cout << endl;
+	cout << "\tF(u_nex_max) = " << setw(PP_SETW) << reduceElem->objF_nex << "\t\t\t\t---> Movement is possible." << endl;;
+	cout << "\n u_nex_max = "; Print_Vector(reduceElem->u_nex); cout << endl;
 	#endif // PP_DEBUG /**/
 
 } // end PC_bsf_MapF
@@ -345,26 +391,26 @@ void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
 #endif // PP_MAXPROJECTION
 
 	cout << "PP_EPS_ZERO\t\t\t" << PP_EPS_ZERO << endl;
-	cout << "PP_EPS_ON_HYPERPLANE\t\t" << PP_EPS_ON_HYPERPLANE << endl;
 	cout << "PP_EPS_PROJECTION\t\t" << PP_EPS_PROJECTION << endl;
+	cout << "PP_EPS_ON_HYPERPLANE\t\t" << PP_EPS_ON_HYPERPLANE << endl;
 	cout << "PP_OBJECTIVE_VECTOR_LENGTH\t" << PP_OBJECTIVE_VECTOR_LENGTH << endl;
-		cout << "PP_EPS_RELATIVE_ERROR\t\t" << PP_EPS_RELATIVE_ERROR << endl;
+	cout << "PP_EPS_RELATIVE_ERROR\t\t" << PP_EPS_RELATIVE_ERROR << endl;
 cout << "--------------- Data ---------------\n";
-	cout << "F(v) = " << setw(PP_SETW) << ObjF(PD_u_cur) << endl;
 
 #ifdef PP_MATRIX_OUTPUT
 	cout << "------- Matrix PD_A & Column PD_b -------" << endl;
 	Print_Constraints();
 	cout << "Obj Function:\t"; 	Print_Vector(PD_c); cout << endl;
-	cout << "u0 =\t\t"; Print_Vector(PD_u_cur); cout << endl;
+	cout << "v0 =\t\t"; Print_Vector(PD_u_cur); cout << endl;
 #endif // PP_MATRIX_OUTPUT
+	cout << "F(v0) = " << setw(PP_SETW) << ObjF(PD_u_cur) << endl;
 
 #ifdef PP_DEBUG
 	if (!PointBelongsToPolytope(PD_u_cur, PP_EPS_ON_HYPERPLANE))
-		cout << "u0 is outside feasible polytope!!!\n";
+		cout << "v0 is outside feasible polytope!!!\n";
 	else
-		cout << "u0 belongs to feasible polytope.\n";
-	// cout << "Including hyperplanes:\t"; Print_HyperplanesIncludingPoint(PD_u_cur, PP_EPS_ON_HYPERPLANE); cout << endl;
+		cout << "v0 belongs to feasible polytope.\n";
+	cout << "Including hyperplanes:\t"; Print_HyperplanesIncludingPoint(PD_u_cur, PP_EPS_ON_HYPERPLANE); cout << endl;
 	cout << "// Number of inequality hyperplanes including u0: " << Number_IncludingNeHyperplanes(PD_u_cur, PP_EPS_ON_HYPERPLANE) << endl;
 	cout << "Number of edges:\t"; Print_Number_of_edges(PD_u_cur, PP_EPS_ON_HYPERPLANE);
 #endif // PP_DEBUG
@@ -379,17 +425,16 @@ void PC_bsf_ProblemOutput(PT_bsf_reduceElem_T* reduceResult, int reduceCounter, 
 	cout << "// Computed objective value: " << setprecision(24) << ObjF(PD_u_cur) << endl;
 	cout << "// Maximal objective value:  " << PP_MAX_OBJ_VALUE << endl;
 	cout << "// Relative error = " << setprecision(3) << RelativeError(PP_MAX_OBJ_VALUE, ObjF(PD_u_cur)) << setprecision(PP_SETW / 2) << endl;
+	cout << "// Distance to polytope: " << Distance_PointToPolytope(PD_u_cur) << endl;
 	cout << "================================================" << endl;
+	#ifdef PP_DEBUG
+	cout << "Solution point:\t"; Print_Vector(PD_u_cur); cout << endl;
+	#endif // PP_DEBUG
 
 #ifdef PP_SAVE_RESULT
 	if (MTX_SavePoint(PD_u_cur, PP_MTX_POSTFIX_SO))
 		cout << "Calculated solution point is saved into file *.so" << endl;
 #endif // PP_SAVE_RESULT
-
-#ifdef PP_DEBUG
-	cout << "Solution point:\t"; Print_Vector(PD_u_cur);	cout << endl;
-	cout << "Distance to polytope: " << Distance_PointToPolytope(PD_u_cur) << endl;
-#endif // PP_DEBUG
 
 } // end PC_bsf_ProblemOutput
 
@@ -406,17 +451,6 @@ void PC_bsf_ProblemOutput_3(PT_bsf_reduceElem_T_3* reduceResult, int reduceCount
 }
 
 void PC_bsf_ProcessResults(PT_bsf_reduceElem_T* reduceResult, int reduceCounter, PT_bsf_parameter_T* parameter, int* nextJob, bool* exit) {
-
-	if (reduceCounter == 0) {
-
-		/*DEBUG PC_bsf_ProcessResults*/
-		#ifdef PP_DEBUG
-		cout << "reduceCounter = 0 => exit" << endl;
-		#endif // PP_DEBUG /**/
-
-		* exit = true;
-		return;
-	}
 
 	if (reduceResult->objF_nex == -PP_INFINITY) {
 
@@ -467,7 +501,7 @@ void PC_bsf_ProcessResults(PT_bsf_reduceElem_T* reduceResult, int reduceCounter,
 	cout << "_________________________________________________ " << PD_iterNo << " _____________________________________________________" << endl;
 	//cout << "u_nex:\t"; Print_Vector(reduceResult->u_nex);  cout << "\t";
 	cout << "F(u_nex) = " << ObjF(PD_u_cur) << endl;
-	cout << "Number of hyperplanes including u_nex: " << Number_IncludingNeHyperplanes(PD_u_cur, PP_EPS_ON_HYPERPLANE) << endl;
+	//cout << "Number of hyperplanes including u_nex: " << Number_IncludingNeHyperplanes(PD_u_cur, PP_EPS_ON_HYPERPLANE) << endl;
 	cout << "Number of edges:\t"; Print_Number_of_edges(PD_u_cur, PP_EPS_ON_HYPERPLANE);
 	//cout << "u_nex hyperplanes:\t"; Print_HyperplanesIncludingPoint(reduceResult->u_nex, PP_EPS_ON_HYPERPLANE); cout << endl;
 #endif // PP_DEBUG
@@ -490,7 +524,7 @@ void PC_bsf_ProcessResults(PT_bsf_reduceElem_T* reduceResult, int reduceCounter,
 		cout << "Minimum PP_EPS_ON_HYPERPLANE should be " << eps_on_polytope << endl;
 #endif // PP_DEBUG /**/
 
-		* exit = true;
+		*exit = true;
 		return;
 	}
 
@@ -555,11 +589,11 @@ void PC_bsf_SetInitParameter(PT_bsf_parameter_T* parameter) {
 }
 
 void PC_bsf_SetListSize(int* listSize) {
-	*listSize = PP_KK;
+	*listSize = BSF_sv_numOfWorkers;
 }
 
 void PC_bsf_SetMapListElem(PT_bsf_mapElem_T* elem, int i) {
-	elem->edgeCode = &(PD_edgeCodes[i]);
+	elem->workerNo = i;
 }
 
 //----------------------- Assigning Values to BSF-skeleton Variables (Do not modify!) -----------------------
@@ -635,8 +669,8 @@ namespace SF {
 		return Vector_NormSquare(z);
 	}
 
-	static inline bool EpsilonsAreOK(double eps_zero, double eps_projection, double eps_on_hyperplane) {
-		return (eps_zero > DBL_EPSILON && eps_projection > eps_zero && eps_on_hyperplane > eps_projection);
+	static inline bool CheckEpsilons(double eps_zero, double eps_projection, double eps_on_hyperplane) {
+		return (eps_zero >= DBL_EPSILON && eps_projection >= eps_zero && eps_on_hyperplane >= eps_projection);
 	}
 
 	static inline void Flat_BipProjection(int* flatHyperplanes, int m_flat, PT_vector_T v, double eps_projection, int maxProjectingIter, PT_vector_T w, int* success) {
@@ -672,6 +706,7 @@ namespace SF {
 			}
 #endif // PP_DEBUG
 
+			iterCount++;
 			if (iterCount > maxProjectingIter) {
 				*success = -2;
 				break;
@@ -682,12 +717,12 @@ namespace SF {
 			/*DEBUG Flat_BipProjection**
 			#ifdef PP_DEBUG
 			if (iterCount % PP_PROJECTION_COUNT == 0)
-				cout << "Worker " << BSF_sv_mpiRank << ": \t sublist_index = " << BSF_sv_numberInSublist << ": \t Length of r = " << length_r << endl;
+				cout << "Worker " << BSF_sv_mpiRank << ": \t sublist_index = " << PD_sublist_index << ": \t Length of r = " << length_r << endl;
 			#endif // PP_DEBUG /**/
 
 		} while (length_r >= eps_projection);
 
-		/*DEBUG PC_bsf_MapF**
+		/*DEBUG Flat_BipProjection**
 		#ifdef PP_DEBUG
 		cout << "Flat_BipProjection: iterCount = " << iterCount << endl;
 		#endif // PP_DEBUG /**/
@@ -725,7 +760,7 @@ namespace SF {
 			/*DEBUG Flat_MaxProjection**
 			#ifdef PP_DEBUG
 			if (iterCount % PP_PROJECTION_COUNT == 0)
-				cout << "Worker " << BSF_sv_mpiRank << ": \tsublist_index = " << BSF_sv_numberInSublist << ": \t max_length = " << max_length << endl;
+				cout << "Worker " << BSF_sv_mpiRank << ": \tsublist_index = " << PD_sublist_index << ": \t max_length = " << max_length << endl;
 			#endif // PP_DEBUG /**/
 
 		} while (max_length >= eps_projection);
@@ -2768,16 +2803,10 @@ namespace PF {
 	using namespace SF;
 
 	static inline void CalculateNumberOfEdges(int neq, int mneh_u, int* med_u) {
-		if (mneh_u == neq) {
+		if (mneh_u == neq) 
 			*med_u = mneh_u;
-#ifdef PP_DEBUG
-			if (*med_u > PP_KK) {
-				cout << "\nCalculateNumberOfEdges error: Parameter PP_KK = " << PP_KK << " must be greater than or equal to " << *med_u << "\neq";
-				exit(1);
-			}
-#endif // PP_DEBUG
-		}
 		else {
+
 #ifdef PP_DEBUG
 			if (mneh_u > 62) {
 				cout << "\nCalculateNumberOfEdges error: It is impossible to calculate binomial coefficient for number of including hyperplanes mneh_u = "
@@ -2787,63 +2816,25 @@ namespace PF {
 #endif // PP_DEBUG
 
 			unsigned long long long_med_u = BinomialCoefficient(mneh_u, PD_neq - 1);
-
-#ifdef PP_DEBUG
-			if (long_med_u > PP_KK) {
-				if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-					cout << "Parameter PP_KK = " << PP_KK << " must be greater than or equal to " << long_med_u << "\n";
-				exit(1);
-			}
-#endif // PP_DEBUG
-			* med_u = (int)long_med_u;
+			*med_u = (int)long_med_u;
 		}
 	}
 
-	static inline void MakeEdgeList(int* edgeCodeList, int med_u) {
-		int index;
-		int numOfWorkers = BSF_sv_numOfWorkers;
-		int bd_sublistSize[PP_BSF_MAX_MPI_SIZE];
-		int bd_offset[PP_BSF_MAX_MPI_SIZE];
-		int listSize = PP_KK;
-		int elemsPerWorker = listSize / numOfWorkers;
-		int tailLength = listSize - elemsPerWorker * numOfWorkers;
-		int offset = 0;
+	static inline void EdgesToProcess(int workerRank, int* firstEdge_i, int* edgesCount, int med_u) {
+		int elemsPerWorker = med_u / BSF_sv_numOfWorkers;
+		int tailLength = med_u - elemsPerWorker * BSF_sv_numOfWorkers;
 
-		for (int rank = 0; rank < numOfWorkers; rank++) {
-			bd_sublistSize[rank] = elemsPerWorker + (rank < tailLength ? 1 : 0);
-			bd_offset[rank] = offset;
-			offset += bd_sublistSize[rank];
+		if (workerRank < tailLength) {
+			*edgesCount = elemsPerWorker + 1;
+			*firstEdge_i = workerRank * *edgesCount;
 		}
-
-		assert(PP_KK <= PP_INT_MAX);
-
-		for (int k = 0; k < PP_KK; k++) edgeCodeList[k] = -1;
-
-		offset = 0;
-		int count = 0;
-		for (int k = 0; k < med_u; k++) {
-			for (int rank = 0; rank < numOfWorkers; rank++) {
-				edgeCodeList[bd_offset[rank] + offset] = 0;
-				count++;
-				if (count == med_u)
-					break;
-			}
-			if (count == med_u)
-				break;
-			offset++;
-		}
-
-		index = 0;
-		for (int k = 0; k < PP_KK; k++) {
-			if (edgeCodeList[k] == 0) {
-				edgeCodeList[k] = index;
-				index++;
-			}
+		else {
+			*edgesCount = elemsPerWorker;
+			*firstEdge_i = tailLength * (elemsPerWorker + 1) + (workerRank - tailLength) * elemsPerWorker;
 		}
 	}
 
 	static inline void PreparationForIteration(PT_vector_T u) {
-		int med_u;
 
 		#ifdef PP_DEBUG
 		PD_map_counter = 0; // Used for debugging in PC_bsf_MapF(*)
@@ -2855,8 +2846,7 @@ namespace PF {
 		if (PD_mneh_u < PD_neq) // Starting point u is not vertex!
 			return;
 
-		CalculateNumberOfEdges(PD_neq, PD_mneh_u, &med_u);
-		MakeEdgeList(PD_edgeCodes, med_u);
+		CalculateNumberOfEdges(PD_neq, PD_mneh_u, &PD_med_u);
 		PD_TWIDDLE_done = false;
 		PD_TWIDDLE_nextEdgeI = 0;
 		TWIDDLE_Make_p(PD_TWIDDLE_p, PD_mneh_u, PD_neq - 1);

@@ -36,7 +36,6 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_D 5			// Space dimension
 #define PP_M PP_D		// Number of equations (number of rows in *.mtx)
 #define PP_N (2*PP_D)	// Number of variables (number of cols in *.mtx)
-#define PP_KK PP_D		// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
 #define PP_MAX_OBJ_VALUE 3125
 //------------------------------------------------------------------------------
 #ifdef PP_GRADIENT
@@ -52,7 +51,6 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_D 6			// Space dimension
 #define PP_M PP_D		// Number of equations (number of rows in *.mtx)
 #define PP_N (2*PP_D)	// Number of variables (number of cols in *.mtx)
-#define PP_KK PP_D		// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
 #define PP_MAX_OBJ_VALUE 15625
 //------------------------------------------------------------------------------
 #ifdef PP_GRADIENT
@@ -68,7 +66,6 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_D 7			// Space dimension
 #define PP_M PP_D		// Number of equations (number of rows in *.mtx)
 #define PP_N (2*PP_D)	// Number of variables (number of cols in *.mtx)
-#define PP_KK PP_D		// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
 #define PP_MAX_OBJ_VALUE 78125
 //------------------------------------------------------------------------------
 #ifdef PP_GRADIENT
@@ -84,7 +81,6 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_D 8			// Space dimension
 #define PP_M PP_D		// Number of equations (number of rows in *.mtx)
 #define PP_N (2*PP_D)	// Number of variables (number of cols in *.mtx)
-#define PP_KK PP_D		// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
 #define PP_MAX_OBJ_VALUE 390625
 //------------------------------------------------------------------------------
 #ifdef PP_GRADIENT
@@ -100,7 +96,6 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_D 9			// Space dimension
 #define PP_M PP_D		// Number of equations (number of rows in *.mtx)
 #define PP_N (2*PP_D)	// Number of variables (number of cols in *.mtx)
-#define PP_KK 511		// Maximal number of faces that include surface point 2^m-1
 #define PP_MAX_OBJ_VALUE 1953125
 //------------------------------------------------------------------------------
 #ifdef PP_GRADIENT

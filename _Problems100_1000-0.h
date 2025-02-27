@@ -12,8 +12,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #pragma once
 
 //-------------------------- Compilation Modes ---------------------------------
-#define PP_GRADIENT
-//#define PP_BIPROJECTION
+//#define PP_GRADIENT
 //------------------------------------------------------------------------------
 #define PP_EPS_RELATIVE_ERROR			1E-6			// Used if defined PP_CHECK_MAX_OBJ_VALUE 
 
@@ -21,10 +20,10 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 // PP_OBJECTIVE_VECTOR_LENGTH - direct dependence on dimension PD_n.
 // P_EPS_ZERO - inverse dependence on PP_OBJECTIVE_VECTOR_LENGTH.
 //------------------------------------------------------------------------------
-#define PP_EPS_ZERO					1E-13			// Accuracy for comparison with zero
-#define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*100)// Accuracy of belonging to hyperplane
-#define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)// Accuracy of belonging to hyperplane
-#define PP_OBJECTIVE_VECTOR_LENGTH	1E+7			// Length of Objective Vector
+#define PP_EPS_ZERO					1E-13					// Accuracy for comparison with zero
+#define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)		// Accuracy of belonging to hyperplane
+#define PP_EPS_ON_HYPERPLANE		(PP_EPS_PROJECTION*10)	// Accuracy of belonging to hyperplane
+#define PP_OBJECTIVE_VECTOR_LENGTH	1E+7					// Length of Objective Vector
 //==============================================================================
 
 /*============================== rnd100-0 LP problem ===========================*/
@@ -33,6 +32,11 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_M	101		// Number of equations (number of rows in *.mtx)
 #define PP_N	201		// Number of variables (number of cols in *.mtx)
 #define PP_MAX_OBJ_VALUE 1009900 // =200*(n-1)*(2+n)/2+100
+//-------------------------- Compilation Modes ---------------------------------
+#define PP_MAXPROJECTION
+//------------------------------ ifdef PP_DEBUG --------------------------------
+#define PP_ITER_COUNT			10				// Each PP_ITER_COUNT-th iteration to be outputted inside PC_bsf_MapF(*)
+#define PP_PROJECTION_COUNT		1000000			// Each PP_PROJECTION_COUNT iteration to be outputted inside Flat_MaxProjection(*)
 //------------------------------------------------------------------------------
 // Elapsed time: 13.555384
 // Number of iterations: 5

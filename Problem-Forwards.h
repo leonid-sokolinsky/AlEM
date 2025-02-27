@@ -10,7 +10,7 @@ This source code has been produced with using BSF-skeleton
 //====================== Private Functions ===========================
 namespace PF {
 	void	CalculateNumberOfEdges(int neq, int mneh_u, int* med_u);
-	void	MakeEdgeList(int* edgeCodeList, int med_u);
+	void	EdgesToProcess(int workerRank, int* firstEdge_i, int* edgesCount, int med_u);
 	void	PreparationForIteration(PT_vector_T u);
 }
 //====================== Shared Functions ===========================
@@ -22,7 +22,7 @@ namespace SF {
 	double	Distance_PointToPoint(PT_vector_T x, PT_vector_T y);
 	double	Distance_PointToPolytope(PT_vector_T x);
 	double	DistanceSQR_PointToPoint(PT_vector_T x, PT_vector_T y);
-	bool	EpsilonsAreOK(double eps_zero, double eps_projection, double eps_on_hyperplane);
+	bool	CheckEpsilons(double eps_zero, double eps_projection, double eps_on_hyperplane);
 	void	Flat_BipProjection(int* flatHyperplanes, int m_flat, PT_vector_T v, double eps_projection, int maxProjectingIter, PT_vector_T w, int* success);
 	void	Flat_MaxProjection(int* flatHyperplanes, int m_flat, PT_vector_T v, double eps_projection, int maxProjectingIter, PT_vector_T w, int* success);
 	void	JumpingOnPolytope(PT_vector_T startPoint, PT_vector_T direcionVector, PT_vector_T finishPoint, double eps_on_hyperplane, double eps_zero, bool* parallelHPlanes, int* success);

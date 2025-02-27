@@ -24,6 +24,7 @@ static int PD_TWIDDLE_y;			// Auxiliary TWIDDLE variable
 static int PD_TWIDDLE_z;			// Auxiliary TWIDDLE variable
 #ifdef PP_DEBUG
 static int PD_map_counter;			// Used for debugging in PC_bsf_MapF(*)
+static int PD_sublist_index;		// Used for debugging in PC_bsf_MapF(*), Flat_BipProjection(*) and Flat_MaxProjection(*)
 #endif // PP_DEBUG /**/
 //========================== Problem structures ====================================
 static PT_matrix_T PD_A;			// Matrix of constraint coefficients
@@ -35,11 +36,11 @@ static PT_vector_T PD_hi;			// Higher bound
 static PT_vector_T PD_lo;			// Lower bound
 static PT_column_T PD_norm_a;		// Column of norms of matrix rows
 static PT_vector_T PD_objVector;	// Used for pseudoprojecting
+static int PD_med_u;				// Number of edges passing through the vertex u
 static int PD_neHyperplanes_u[PP_MM];		// Index of inequality-hyperplanes that include point u
 static int PD_edgeNeHyperplanes[PP_N - 1];	// Index of inequality-hyperplanes used for pseudoprojection
 static int PD_edgeAlHyperplanes[PP_N - 1];	// Index of all hyperplanes used for pseudoprojection
 static PT_bitscale_T PD_edgeBitscale;		// Bit scale that tags all hyperplanes forming the edge
-static int PD_edgeCodes[PP_KK];				// Edge codes
 static int PD_TWIDDLE_p[PP_MM + 2];			// Auxiliary array for TWIDDLE algorithm
 //========================== Input/Output ====================================
 static string PD_problemName;
