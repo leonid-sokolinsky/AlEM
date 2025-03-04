@@ -23,7 +23,6 @@ static int PD_TWIDDLE_x;			// Auxiliary TWIDDLE variable
 static int PD_TWIDDLE_y;			// Auxiliary TWIDDLE variable
 static int PD_TWIDDLE_z;			// Auxiliary TWIDDLE variable
 #ifdef PP_DEBUG
-static int PD_map_counter;			// Used for debugging in PC_bsf_MapF(*)
 static int PD_sublist_index;		// Used for debugging in PC_bsf_MapF(*), Flat_BipProjection(*) and Flat_MaxProjection(*)
 #endif // PP_DEBUG /**/
 //========================== Problem structures ====================================

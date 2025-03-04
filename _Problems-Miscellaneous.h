@@ -17,7 +17,6 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 //						calculating pseudoprojection.
 #define PP_EPS_RELATIVE_ERROR		1E-4				// Used if defined PP_CHECK_MAX_OBJ_VALUE 
 //------------------------------ ifdef PP_DEBUG --------------------------------
-#define PP_ITER_COUNT				10					// Each PP_ITER_COUNT-th iteration to be outputted inside PC_bsf_MapF(*)
 #define PP_PROJECTION_COUNT			100000				// Each PP_PROJECTION_COUNT iteration to be outputted inside Flat_MaxProjection(*)
 //==============================================================================
 

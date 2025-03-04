@@ -112,3 +112,4 @@ namespace SF {
 #define PF_MIN(x,y) (x<y?x:y)
 #define PF_MAX(x,y) (x>y?x:y)
 #define PF_MAP_LIST_INDEX (BSF_sv_addressOffset + BSF_sv_numberInSublist)
+#define PF_DBL_EPSILON 2.222E-16 // Machine epsilon

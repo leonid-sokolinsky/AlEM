@@ -30,8 +30,8 @@ void PC_bsf_Init(bool* success) {
 	if (!CheckEpsilons(PP_EPS_ZERO, PP_EPS_PROJECTION, PP_EPS_ON_HYPERPLANE)) {
 		if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
 			cout << "PC_bsf_Init error: The following condition must be satisfied:\n"
-			<< "PP_EPS_ON_HYPERPLANE >=  PP_EPS_PROJECTION >= PP_EPS_ZERO >= DBL_EPSILON = "
-			<< DBL_EPSILON << endl;
+			<< "PP_EPS_ON_HYPERPLANE >=  PP_EPS_PROJECTION >= PP_EPS_ZERO >= PF_DBL_EPSILON = "
+			<< PF_DBL_EPSILON << endl;
 		*success = false;
 		return;
 	}
@@ -78,7 +78,7 @@ void PC_bsf_Init(bool* success) {
 		if (PD_norm_a[i] < PP_EPS_ZERO) { //Degenerate equation!
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
 				cout << "Equation/inequality " << i << " is degenerate with pecision of PP_EPS_ZERO = "
-				<< PP_EPS_ZERO << "!!!\n";
+				<< PP_EPS_ZERO << "!!!" << endl;
 			*success = false;
 			return;
 		}
@@ -141,13 +141,17 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 	double* u_cur = BSF_sv_parameter.u_cur;	// Current vertex
 	PT_vector_T u_nex_max;
 	double objF_nex_max = -PP_INFINITY;
+	double t0 = -(double)time(NULL);
 	#ifdef PP_GRADIENT
 	double objF_grd_max = -PP_INFINITY;
 	#endif // PP_GRADIENT
+	#ifdef PP_MAP_PROGRESS_GAUGE
+	int gauge;	// Percentage progress
+	#endif // PP_MAP_PROGRESS_GAUGE
 
 	/*DEBUG PC_bsf_MapF**
 	#ifdef PP_DEBUG
-	cout << "------------------------------------ Map(" << PF_MAP_LIST_INDEX << ") ------------------------------------" << endl;
+	cout << "------------------------------------ Worker " << BSF_sv_mpiRank << ": Map(" << PF_MAP_LIST_INDEX << ") ------------------------------------" << endl;
 	#endif // PP_DEBUG /**/
 	// Condition for breakpoint: PD_iterNo == 2 && (BSF_sv_addressOffset + BSF_sv_numberInSublist == 2)
 
@@ -158,8 +162,6 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 	cout << "Worker " << BSF_sv_mpiRank << ": First i = " << firstEdge_i << "\t Last i = " << firstEdge_i + edgesCount - 1 << endl;
 	#endif // PP_DEBUG /**/
 
-
-
 	for (int edge_i = firstEdge_i; edge_i < firstEdge_i + edgesCount; edge_i++) {
 		PT_vector_T  u_nex;		// Next vertex
 		double objF_nex;
@@ -168,6 +170,22 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 		#endif // PP_GRADIENT
 		PT_vector_T v;	// v = u + PD_objVector (||PD_objVector|| = PP_OBJECTIVE_VECTOR_LENGTH)
 		PT_vector_T w;	// pseudiprojection of v
+
+		#ifdef PP_MAP_PROGRESS_GAUGE
+		if (BSF_sv_mpiRank == 0) {
+			if (edge_i == 0) {
+				gauge = 0;
+				cout << "Map progress: " << gauge << "%\t Elapsed time: 0" << endl;
+			}
+			else {
+				int completionRate = (int)(100 * (double)(edge_i) / (double)edgesCount);
+				if (completionRate > gauge) {
+					gauge = completionRate;
+					cout << "Map progress: " << gauge << "%\t Elapsed time: " << t0 + (double)time(NULL) << endl;
+				}
+			}
+		}
+		#endif // PP_MAP_PROGRESS_GAUGE
 
 		#ifdef PP_DEBUG
 		PD_sublist_index = edge_i - firstEdge_i + 1;
@@ -178,7 +196,7 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 		if (BSF_sv_numberInSublist > 0) {
 			*success = false;
 			if (BSF_sv_numberInSublist == 1)
-				cout << "Worker " << BSF_sv_mpiRank << ":" << "\t\t numberInSublist == 1 ===>>> worker is terminated!\n";
+				cout << "Worker " << BSF_sv_mpiRank << ":" << "\t\t numberInSublist == 1 ===>>> worker is terminated!" << endl;
 			return;
 		}
 		#endif // PP_DEBUG /**/
@@ -194,7 +212,7 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 		cout << "Edge hyperplanes: {";
 		for (int i = 0; i < PD_n - 2; i++)
 				cout << PD_edgeAlHyperplanes[i] << ", ";
-		cout << PD_edgeAlHyperplanes[PD_n - 2] << "}.\n";
+		cout << PD_edgeAlHyperplanes[PD_n - 2] << "}." << endl;
 		#endif // PP_DEBUG /**/
 
 		Bitscale_Create(PD_edgeBitscale, PD_m, PD_edgeAlHyperplanes, PD_n - 1);
@@ -209,12 +227,12 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 
 		if (*success == -1) {
 			cout << "Worker " << BSF_sv_mpiRank
-				<< ": PC_bsf_MapF error: Significand bit depth is exceeded! You should increase PP_EPS_PROJECTION or decrease PP_OBJECTIVE_VECTOR_LENGTH.\n";
+				<< ": PC_bsf_MapF error: Significand bit depth is exceeded! You should increase PP_EPS_PROJECTION or decrease PP_OBJECTIVE_VECTOR_LENGTH." << endl;
 		}
 
 		if (*success == -3) {
 			cout << "Worker " << BSF_sv_mpiRank
-				<< ": PC_bsf_MapF error: Floating-point underflow! You should increase PP_EPS_PROJECTION or decrease PP_OBJECTIVE_VECTOR_LENGTH.\n";
+				<< ": PC_bsf_MapF error: Floating-point underflow! You should increase PP_EPS_PROJECTION or decrease PP_OBJECTIVE_VECTOR_LENGTH." << endl;
 		}
 
 		if (*success == -2) {
@@ -244,7 +262,7 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 		if (!*success) {
 			/*DEBUG PC_bsf_MapF**
 			#ifdef PP_DEBUG
-			cout << "Worker " << BSF_sv_mpiRank << ": ===>>> Movement is impossible.\n";
+			cout << "Worker " << BSF_sv_mpiRank << ": ===>>> Movement is impossible." << endl;
 			#endif // PP_DEBUG /**/
 			continue;
 		}
@@ -253,7 +271,7 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 
 			/*DEBUG PC_bsf_MapF**
 			#ifdef PP_DEBUG
-			cout << "Worker " << BSF_sv_mpiRank << ":\t||u_nex - u_cur|| < PP_EPS_ZERO ===>>> movement is impossible.\n";
+			cout << "Worker " << BSF_sv_mpiRank << ":\t||u_nex - u_cur|| < PP_EPS_ZERO ===>>> movement is impossible." << endl;
 			#endif // PP_DEBUG /**/
 
 			continue;
@@ -297,18 +315,23 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 			<< " F(u_grd) = " << objF_grd
 		#endif // PP_GRADIENT
 			<< "\t F(u_nex) = " << setw(PP_SETW) << objF_nex << "\t\t\t\t---> Movement is possible." << endl;
-		cout << "\n u_nex = "; Print_Vector(u_nex); cout << endl;
+		//cout << "\n u_nex = "; Print_Vector(u_nex); cout << endl;
 		#endif // PP_DEBUG /**/
 	}
 
 	if (objF_nex_max == -PP_INFINITY) {
 		/*DEBUG PC_bsf_MapF**
 		#ifdef PP_DEBUG
-		cout << "Worker " << BSF_sv_mpiRank << ": ===>>> Movement is impossible.\n";
+		cout << "Worker " << BSF_sv_mpiRank << ": ===>>> Movement is impossible." << endl;
 		#endif // PP_DEBUG /**/
 		*success = false;
 		return;
 	}
+
+	#ifdef PP_MAP_PROGRESS_GAUGE
+	if (BSF_sv_mpiRank == 0)
+		cout << "Map progress: 100%" << "\t Elapsed time: " << t0 + (double)time(NULL) << endl;
+	#endif // PP_MAP_PROGRESS_GAUGE
 
 	reduceElem->objF_nex = objF_nex_max;
 	Vector_Copy(u_nex_max, reduceElem->u_nex);
@@ -323,7 +346,7 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 	cout << "\tF(u_grd_max) = " << reduceElem->objF_grd;
 	#endif // PP_GRADIENT
 	cout << "\tF(u_nex_max) = " << setw(PP_SETW) << reduceElem->objF_nex << "\t\t\t\t---> Movement is possible." << endl;;
-	cout << "\n u_nex_max = "; Print_Vector(reduceElem->u_nex); cout << endl;
+	//cout << "\n u_nex_max = "; Print_Vector(reduceElem->u_nex); cout << endl;
 	#endif // PP_DEBUG /**/
 
 } // end PC_bsf_MapF
@@ -395,25 +418,25 @@ void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
 	cout << "PP_EPS_ON_HYPERPLANE\t\t" << PP_EPS_ON_HYPERPLANE << endl;
 	cout << "PP_OBJECTIVE_VECTOR_LENGTH\t" << PP_OBJECTIVE_VECTOR_LENGTH << endl;
 	cout << "PP_EPS_RELATIVE_ERROR\t\t" << PP_EPS_RELATIVE_ERROR << endl;
-cout << "--------------- Data ---------------\n";
+	cout << "--------------- Data ---------------" << endl;
 
-#ifdef PP_MATRIX_OUTPUT
+	#ifdef PP_MATRIX_OUTPUT
 	cout << "------- Matrix PD_A & Column PD_b -------" << endl;
 	Print_Constraints();
 	cout << "Obj Function:\t"; 	Print_Vector(PD_c); cout << endl;
 	cout << "v0 =\t\t"; Print_Vector(PD_u_cur); cout << endl;
-#endif // PP_MATRIX_OUTPUT
-	cout << "F(v0) = " << setw(PP_SETW) << ObjF(PD_u_cur) << endl;
-
-#ifdef PP_DEBUG
-	if (!PointBelongsToPolytope(PD_u_cur, PP_EPS_ON_HYPERPLANE))
-		cout << "v0 is outside feasible polytope!!!\n";
-	else
-		cout << "v0 belongs to feasible polytope.\n";
-	cout << "Including hyperplanes:\t"; Print_HyperplanesIncludingPoint(PD_u_cur, PP_EPS_ON_HYPERPLANE); cout << endl;
+	#endif // PP_MATRIX_OUTPUT
 	cout << "// Number of inequality hyperplanes including u0: " << Number_IncludingNeHyperplanes(PD_u_cur, PP_EPS_ON_HYPERPLANE) << endl;
-	cout << "Number of edges:\t"; Print_Number_of_edges(PD_u_cur, PP_EPS_ON_HYPERPLANE);
-#endif // PP_DEBUG
+	cout << "// F(v0)    = " << setprecision(24) << setw(PP_SETW) << ObjF(PD_u_cur) << "\t\tNumber of edges:\t"; Print_Number_of_edges(PD_u_cur, PP_EPS_ON_HYPERPLANE);
+
+	/*DEBUG PC_bsf_ParametersOutput**
+	#ifdef PP_DEBUG
+	if (!PointBelongsToPolytope(PD_u_cur, PP_EPS_ON_HYPERPLANE))
+		cout << "v0 is outside feasible polytope!!!" << endl;
+	else
+		cout << "v0 belongs to feasible polytope." << endl;
+	//cout << "Including hyperplanes:\t"; Print_HyperplanesIncludingPoint(PD_u_cur, PP_EPS_ON_HYPERPLANE); cout << endl;
+	#endif // PP_DEBUG /**/
 }
 
 void PC_bsf_ProblemOutput(PT_bsf_reduceElem_T* reduceResult, int reduceCounter, PT_bsf_parameter_T parameter, double t) {
@@ -428,7 +451,7 @@ void PC_bsf_ProblemOutput(PT_bsf_reduceElem_T* reduceResult, int reduceCounter, 
 	cout << "// Distance to polytope: " << Distance_PointToPolytope(PD_u_cur) << endl;
 	cout << "================================================" << endl;
 	#ifdef PP_DEBUG
-	cout << "Solution point:\t"; Print_Vector(PD_u_cur); cout << endl;
+	//cout << "Solution point:\t"; Print_Vector(PD_u_cur); cout << endl;
 	#endif // PP_DEBUG
 
 #ifdef PP_SAVE_RESULT
@@ -499,18 +522,16 @@ void PC_bsf_ProcessResults(PT_bsf_reduceElem_T* reduceResult, int reduceCounter,
 
 #ifdef PP_DEBUG
 	cout << "_________________________________________________ " << PD_iterNo << " _____________________________________________________" << endl;
-	//cout << "u_nex:\t"; Print_Vector(reduceResult->u_nex);  cout << "\t";
-	cout << "F(u_nex) = " << ObjF(PD_u_cur) << endl;
+	//cout << "u_nex:\t"; Print_Vector(reduceResult->u_nex);  cout << endl;
+	cout << "// F(u_nex) = " << setprecision(24) << ObjF(PD_u_cur) << "\t\tNumber of edges:\t"; Print_Number_of_edges(PD_u_cur, PP_EPS_ON_HYPERPLANE);
 	//cout << "Number of hyperplanes including u_nex: " << Number_IncludingNeHyperplanes(PD_u_cur, PP_EPS_ON_HYPERPLANE) << endl;
-	cout << "Number of edges:\t"; Print_Number_of_edges(PD_u_cur, PP_EPS_ON_HYPERPLANE);
 	//cout << "u_nex hyperplanes:\t"; Print_HyperplanesIncludingPoint(reduceResult->u_nex, PP_EPS_ON_HYPERPLANE); cout << endl;
 #endif // PP_DEBUG
 
 #ifdef PP_SAVE_ITER_RESULT
-	if (MTX_SavePoint(PD_u_cur, PP_MTX_POSTFIX_V))
-		cout << "\tCurrent approximation is saved into file *_v.mtx\n";
-	*exit = true;
-	return;
+	if (MTX_SavePoint(reduceResult->u_nex, PP_MTX_POSTFIX_V))
+		cout << "Current approximation is saved into file *_v.mtx" << endl;
+	*exit = true; return;
 #endif // PP_SAVE_ITER_RESULT
 
 	if (!PointBelongsToPolytope(PD_u_cur, PP_EPS_ON_HYPERPLANE)) {
@@ -534,6 +555,15 @@ void PC_bsf_ProcessResults(PT_bsf_reduceElem_T* reduceResult, int reduceCounter,
 		*exit = true;
 		return;
 	}
+
+#ifdef PP_MAX_ITER_NUM
+	if (PD_iterNo == PP_MAX_ITER_NUM) {
+		cout << "Number of iterations is limited by PP_MAX_ITER_NUM = " << PP_MAX_ITER_NUM << endl;
+		*exit = true;
+		return;
+	}
+#endif // PP_MAX_ITER_NUM
+
 }
 
 void PC_bsf_ProcessResults_1(PT_bsf_reduceElem_T_1* reduceResult, int reduceCounter, PT_bsf_parameter_T* parameter, int* nextJob, bool* exit) {
@@ -670,7 +700,7 @@ namespace SF {
 	}
 
 	static inline bool CheckEpsilons(double eps_zero, double eps_projection, double eps_on_hyperplane) {
-		return (eps_zero >= DBL_EPSILON && eps_projection >= eps_zero && eps_on_hyperplane >= eps_projection);
+		return (eps_zero >= PF_DBL_EPSILON && eps_projection >= eps_zero && eps_on_hyperplane >= eps_projection);
 	}
 
 	static inline void Flat_BipProjection(int* flatHyperplanes, int m_flat, PT_vector_T v, double eps_projection, int maxProjectingIter, PT_vector_T w, int* success) {
@@ -700,7 +730,7 @@ namespace SF {
 
 #ifdef PP_DEBUG
 			double dist = Distance_PointToPoint(w, w_prev);
-			if (dist < DBL_EPSILON * 10) { // Significand bit depth is exceeded!
+			if (dist < PF_DBL_EPSILON * 10) { // Significand bit depth is exceeded!
 				*success = -1;
 				return;
 			}
@@ -795,7 +825,7 @@ namespace SF {
 		if (norm_d < eps_zero) {
 			/*DEBUG JumpingOnPolytope**
 			#ifdef PP_DEBUG
-			cout << "Worker " << BSF_sv_mpiRank << ": JumpingOnPolytope: norm_d < eps_zero => return \n";
+			cout << "Worker " << BSF_sv_mpiRank << ": JumpingOnPolytope: norm_d < eps_zero => return " << endl;
 			#endif // PP_DEBUG /**/
 			Vector_Copy(startPoint, finishPoint);
 			*success = false;
@@ -819,7 +849,7 @@ namespace SF {
 					/*DEBUG JumpingOnPolytope**
 					#ifdef PP_DEBUG
 					cout << "Worker " << BSF_sv_mpiRank << ": JumpingOnPolytope: " << i 
-						<< ") \tStart and finish points belong to hyperplane. => continue\n";
+						<< ") \tStart and finish points belong to hyperplane. => continue" << endl;
 					#endif // PP_DEBUG /**/
 					continue;
 				}
@@ -828,7 +858,7 @@ namespace SF {
 					/*DEBUG JumpingOnPolytope**
 					#ifdef PP_DEBUG
 					cout << "Worker " << BSF_sv_mpiRank << ": JumpingOnPolytope: " << i
-						<< ") \tStart point belong to hyperplane, finish point is outside half-space. => return\n";
+						<< ") \tStart point belong to hyperplane, finish point is outside half-space. => return" << endl;
 					#endif // PP_DEBUG /**/
 					Vector_Copy(startPoint, finishPoint);
 					*success = false;
@@ -840,7 +870,7 @@ namespace SF {
 				if (fabs(norm_a_DoT_norm_d) < eps_zero) { // Vector d is parallel to hyperplane
 						/*DEBUG JumpingOnPolytope**
 					#ifdef PP_DEBUG
-					cout << "Worker " << BSF_sv_mpiRank << ": JumpingOnPolytope: " << i << ") \tVector d is parallel to hyperplane. => continue\n";
+					cout << "Worker " << BSF_sv_mpiRank << ": JumpingOnPolytope: " << i << ") \tVector d is parallel to hyperplane. => continue" << endl;
 					#endif // PP_DEBUG /**/
 					continue;
 				}
@@ -848,7 +878,7 @@ namespace SF {
 				if (norm_a_DoT_norm_d < 0) { // Vector looks inside of half-space
 					/*DEBUG JumpingOnPolytope**
 					#ifdef PP_DEBUG
-					cout << "Worker " << BSF_sv_mpiRank << ": JumpingOnPolytope: " << i << ") \tVector looks inside of half-space. => continue\n";
+					cout << "Worker " << BSF_sv_mpiRank << ": JumpingOnPolytope: " << i << ") \tVector looks inside of half-space. => continue" << endl;
 					#endif // PP_DEBUG /**/
 					continue;
 				}
@@ -870,7 +900,7 @@ namespace SF {
 				#endif // PP_DEBUG /**/
 				break;
 			case PP_OUTSIDE_HALFSPACE:
-				cout << "JumpingOnPolytope error: Point is outside halfspace!\n";
+				cout << "JumpingOnPolytope error: Point is outside halfspace!" << endl;
 				assert(false);
 			default:
 				assert(false);
@@ -923,35 +953,35 @@ namespace SF {
 		PT_MPS_row_T* rows = (PT_MPS_row_T*)calloc(PP_MAX_NUMBER_OF_ROWS, sizeof(PT_MPS_row_T));
 		if (rows == NULL) {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-				cout << "MPS___Load_Problem error: Can't allocate memory for array 'rows'.\n";
+				cout << "MPS___Load_Problem error: Can't allocate memory for array 'rows'." << endl;
 			return false;
 		}
 
 		PT_MPS_column_T* columns = (PT_MPS_column_T*)calloc(PP_MAX_NUMBER_OF_COLS, sizeof(PT_MPS_column_T));
 		if (rows == NULL) {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-				cout << "MPS___Load_Problem error: Can't allocate memory for array 'columns'.\n";
+				cout << "MPS___Load_Problem error: Can't allocate memory for array 'columns'." << endl;
 			return false;
 		}
 
 		double* loBounds = (double*)calloc(PP_N, sizeof(double));
 		if (rows == NULL) {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-				cout << "MPS___Load_Problem error: Can't allocate memory for array 'loBounds'.\n";
+				cout << "MPS___Load_Problem error: Can't allocate memory for array 'loBounds'." << endl;
 			return false;
 		}
 
 		PT_MPS_upBound_T* upBounds = (PT_MPS_upBound_T*)calloc(PP_N, sizeof(PT_MPS_upBound_T));
 		if (rows == NULL) {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-				cout << "MPS___Load_Problem error: Can't allocate memory for array 'upBounds'.\n";
+				cout << "MPS___Load_Problem error: Can't allocate memory for array 'upBounds'." << endl;
 			return false;
 		}
 
 		PT_MPS_fxVariable_T* fxVariables = (PT_MPS_fxVariable_T*)calloc(PP_N, sizeof(PT_MPS_fxVariable_T));
 		if (rows == NULL) {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-				cout << "MPS___Load_Problem error: Can't allocate memory for array 'fxVariables'.\n";
+				cout << "MPS___Load_Problem error: Can't allocate memory for array 'fxVariables'." << endl;
 			return false;
 		}
 
@@ -964,7 +994,7 @@ namespace SF {
 
 		if (stream == NULL) {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-				cout << "Failure of opening file '" << mpsFile << "'.\n";
+				cout << "Failure of opening file '" << mpsFile << "'." << endl;
 			return false;
 		}
 
@@ -972,7 +1002,7 @@ namespace SF {
 
 		if (!MPS__ReadKeyWord(stream, &word, "NAME")) {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-				cout << "MPS___Load_Problem: Syntax error '" << word << "', expected 'NAME'.\n";
+				cout << "MPS___Load_Problem: Syntax error '" << word << "', expected 'NAME'." << endl;
 			return false;
 		}
 
@@ -980,7 +1010,7 @@ namespace SF {
 
 		if (!MPS__ReadKeyWord(stream, &word, "ROWS")) {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-				cout << "MPS___Load_Problem: Syntax error '" << word << "', expected 'ROWS'.\n";
+				cout << "MPS___Load_Problem: Syntax error '" << word << "', expected 'ROWS'." << endl;
 			return false;
 		}
 
@@ -991,7 +1021,7 @@ namespace SF {
 
 		if (!MPS__ReadKeyWord(stream, &word, "COLUMNS")) {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-				cout << "MPS___Load_Problem: Syntax error '" << word << "', expected 'COLUMNS'.\n";
+				cout << "MPS___Load_Problem: Syntax error '" << word << "', expected 'COLUMNS'." << endl;
 			return false;
 		}
 
@@ -1004,7 +1034,7 @@ namespace SF {
 
 		if (!MPS__ReadKeyWord(stream, &word, "RHS")) {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-				cout << "MPS___Load_Problem: Syntax error '" << word << "', expected 'RHS'.\n";
+				cout << "MPS___Load_Problem: Syntax error '" << word << "', expected 'RHS'." << endl;
 			return false;
 		}
 
@@ -1021,7 +1051,7 @@ namespace SF {
 
 		if (!MPS__ReadKeyWord(stream, &word, "ENDATA")) {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-				cout << "MPS___Load_Problem error: '" << word << "', expected 'ENDATA'.\n";
+				cout << "MPS___Load_Problem error: '" << word << "', expected 'ENDATA'." << endl;
 			return false;
 		}
 
@@ -1077,13 +1107,13 @@ namespace SF {
 
 		if (PD_m != PP_M) {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-				cout << "MPS__MakeProblem error: Number of constraints in mps-file = " << PD_m << " not equal to PP_M = " << PP_M << ".\n";
+				cout << "MPS__MakeProblem error: Number of constraints in mps-file = " << PD_m << " not equal to PP_M = " << PP_M << "." << endl;
 			return false;
 		}
 
 		if (PD_n != PP_N) {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-				cout << "MPS__MakeProblem error: Number of variables in mps-file = " << PD_n << " not equal to PP_M = " << PP_N << ".\n";
+				cout << "MPS__MakeProblem error: Number of variables in mps-file = " << PD_n << " not equal to PP_M = " << PP_N << "." << endl;
 			return false;
 		}
 
@@ -1131,7 +1161,7 @@ namespace SF {
 		ch = getc(stream);
 		if (ch != ' ') {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-				cout << "MPS__ReadBounds error: Expected 'space'!\n";
+				cout << "MPS__ReadBounds error: Expected 'space'!" << endl;
 			return false;
 		}
 
@@ -1152,7 +1182,7 @@ namespace SF {
 				}
 			if (j_var == -1) {
 				if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-					cout << "MPS__ReadBounds Error: Variable " << varName << " was not found.\n";
+					cout << "MPS__ReadBounds Error: Variable " << varName << " was not found." << endl;
 				return false;
 			}
 
@@ -1200,7 +1230,7 @@ namespace SF {
 		fsetpos(stream, &pos);
 		if (ch != ' ') {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-				cout << "MPS__ReadColumns error: Expected 'space'!\n";
+				cout << "MPS__ReadColumns error: Expected 'space'!" << endl;
 			return false;
 		}
 
@@ -1227,7 +1257,7 @@ namespace SF {
 		if (fscanf(stream, "%s", str) < 1) {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
 				cout
-				<< "MPS__ReadKeyWord error: Failure to read string!\n";
+				<< "MPS__ReadKeyWord error: Failure to read string!" << endl;
 			return false;
 		}
 
@@ -1311,7 +1341,7 @@ namespace SF {
 				ch = getc(stream);
 				if (ch < ' ') {
 					if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-						cout << "MPS__ReadRows: Syntax error - not ASCII symbol.\n";
+						cout << "MPS__ReadRows: Syntax error - not ASCII symbol." << endl;
 					return false;
 				}
 				j++;
@@ -1366,7 +1396,7 @@ namespace SF {
 				if (!PD_A[PD_m][column[i_col].j] == 0) {
 					if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
 						cout << "MPS_AddEquation error: Coefficient redefinition of the variable " << column[i_col].varName
-						<< " in row " << column[i_col].rowName << ".\n";
+						<< " in row " << column[i_col].rowName << "." << endl;
 					return false;
 				}
 				PD_A[PD_m][column[i_col].j] = column[i_col].value;
@@ -1375,7 +1405,7 @@ namespace SF {
 		if (empty) {
 			if (RHS_value != 0) {
 				if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-					cout << "MPS_AddEquation error: Zero row " << rowName << " has non-zero RHS value.\n";
+					cout << "MPS_AddEquation error: Zero row " << rowName << " has non-zero RHS value." << endl;
 				return false;
 			}
 			return true;
@@ -1395,7 +1425,7 @@ namespace SF {
 				if (!PD_A[PD_m][column[i_col].j] == 0) {
 					if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
 						cout << "MPS_AddInequality_G error: Coefficient redefinition of the variable " << column[i_col].varName
-						<< " in row " << column[i_col].rowName << ".\n";
+						<< " in row " << column[i_col].rowName << "." << endl;
 					return false;
 				}
 				PD_A[PD_m][column[i_col].j] = -column[i_col].value;
@@ -1404,7 +1434,7 @@ namespace SF {
 		if (empty) {
 			if (RHS_value != 0) {
 				if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-					cout << "MPS_AddInequality_G error: Zero row " << rowName << " has non-zero RHS value.\n";
+					cout << "MPS_AddInequality_G error: Zero row " << rowName << " has non-zero RHS value." << endl;
 				return false;
 			}
 			return true;
@@ -1423,7 +1453,7 @@ namespace SF {
 				if (!PD_A[PD_m][column[i_col].j] == 0) {
 					if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
 						cout << "MPS_AddInequality_L error: Coefficient redefinition of the variable " << column[i_col].varName
-						<< " in row " << column[i_col].rowName << ".\n";
+						<< " in row " << column[i_col].rowName << "." << endl;
 					return false;
 				}
 				PD_A[PD_m][column[i_col].j] = column[i_col].value;
@@ -1432,7 +1462,7 @@ namespace SF {
 		if (empty) {
 			if (RHS_value != 0) {
 				if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-					cout << "MPS_AddInequality_L error: Zero row " << rowName << " has non-zero RHS value.\n";
+					cout << "MPS_AddInequality_L error: Zero row " << rowName << " has non-zero RHS value." << endl;
 				return false;
 			}
 			return true;
@@ -1448,7 +1478,7 @@ namespace SF {
 			if (MPS_SameNames(column[i_col].rowName, rowName)) {
 				if (!PD_c[column[i_col].j] == 0) {
 					if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-						cout << "MPS_AddObjectiveFunction error: Coefficient redefinition of the objective function for " << column[i_col].varName << ".\n";
+						cout << "MPS_AddObjectiveFunction error: Coefficient redefinition of the objective function for " << column[i_col].varName << "." << endl;
 					return false;
 				}
 #ifdef MPS_MIN_OF_OBJECTIVE_FUNCTION
@@ -1507,7 +1537,7 @@ namespace SF {
 			if (MPS_SameNames(column[j_col].varName, column[*n_col].varName) && MPS_SameNames(column[j_col].rowName, column[*n_col].rowName)) {
 				if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
 					cout << "MPS_ReadColumnLine error: Redefinition of item varName = " << column[j_col].varName
-					<< ", rowName = " << column[j_col].rowName << ".\n";
+					<< ", rowName = " << column[j_col].rowName << "." << endl;
 				return false;
 			}
 
@@ -1545,7 +1575,7 @@ namespace SF {
 			if (column[j_col].varName == column[*n_col].varName && column[j_col].rowName == column[*n_col].rowName) {
 				if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
 					cout << "MPS_ReadColumnLine error: Redefinition of item varName = " << column[j_col].varName
-					<< ", rowName = " << column[j_col].rowName << ".\n";
+					<< ", rowName = " << column[j_col].rowName << "." << endl;
 				return false;
 			}
 
@@ -1614,7 +1644,7 @@ namespace SF {
 			ch = getc(stream);
 			if (ch != ' ') {
 				if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-					cout << "MPS_ReadRHS_line: Syntax error, expected ' '\n";
+					cout << "MPS_ReadRHS_line: Syntax error, expected ' '" << endl;
 				return false;
 			}
 		}
@@ -1637,7 +1667,7 @@ namespace SF {
 		if (RHS_name[0] != '\0') {
 			if (!MPS_SameNames(RHS_name, next_RHS_name)) {
 				if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-					cout << "MPS_ReadRHS_line: Syntax error, Multiple RHS names.\n";
+					cout << "MPS_ReadRHS_line: Syntax error, Multiple RHS names." << endl;
 				return false;
 			}
 		}
@@ -1653,13 +1683,13 @@ namespace SF {
 
 		if (rowIndex < 0) {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-				cout << "MPS_ReadRHS_line: Syntax error, non-existent row name '" << rowName << "'.\n";
+				cout << "MPS_ReadRHS_line: Syntax error, non-existent row name '" << rowName << "'." << endl;
 			return false;
 		}
 
 		if (row[rowIndex].type == 'N') {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-				cout << "MPS_ReadRHS_line: Invalid row type 'N'.\n";
+				cout << "MPS_ReadRHS_line: Invalid row type 'N'." << endl;
 			return false;
 		}
 
@@ -1667,7 +1697,7 @@ namespace SF {
 
 		if (fscanf(stream, "%lf", &RHS_value) < 1) {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-				cout << "MPS_ReadRHS_line: Unexpected end of line!\n";
+				cout << "MPS_ReadRHS_line: Unexpected end of line!" << endl;
 			return false;
 		}
 		row[rowIndex].RHS_value = RHS_value;
@@ -1692,13 +1722,13 @@ namespace SF {
 
 		if (rowIndex < 0) {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-				cout << "MPS_ReadRHS_line: Syntax error, non-existent row name '" << rowName << "'.\n";
+				cout << "MPS_ReadRHS_line: Syntax error, non-existent row name '" << rowName << "'." << endl;
 			return false;
 		}
 
 		if (row[rowIndex].type == 'N') {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-				cout << "MPS_ReadRHS_line: Invalid row type 'N'.\n";
+				cout << "MPS_ReadRHS_line: Invalid row type 'N'." << endl;
 			return false;
 		}
 
@@ -1706,7 +1736,7 @@ namespace SF {
 
 		if (fscanf(stream, "%lf", &RHS_value) < 1) {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-				cout << "MPS_ReadRHS_line: Unexpected end of line!\n";
+				cout << "MPS_ReadRHS_line: Unexpected end of line!" << endl;
 			return false;
 		}
 		row[rowIndex].RHS_value = RHS_value;
@@ -1716,7 +1746,7 @@ namespace SF {
 		fgetpos(stream, &pos);
 		if (char ch = getc(stream) > ' ') {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-				cout << "MPS_ReadRHS_line: Illegal ASCII character '" << ch << "' at end of line.\n";
+				cout << "MPS_ReadRHS_line: Illegal ASCII character '" << ch << "' at end of line." << endl;
 			return false;
 		}
 		fsetpos(stream, &pos);
@@ -1729,7 +1759,7 @@ namespace SF {
 	static inline bool MPS_ReadValue(FILE* stream, double* value) {
 		if (fscanf(stream, "%lf", value) < 1) {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-				cout << "MPS_ReadValue: Error: Non-ASCII character.\n";
+				cout << "MPS_ReadValue: Error: Non-ASCII character." << endl;
 			return false;
 		}
 		return true;
@@ -1832,9 +1862,9 @@ namespace SF {
 		}
 
 		/**
-		cout << "-----------------------------------------------------\n";
+		cout << "-----------------------------------------------------" << endl;
 		Print_Constraints();
-		cout << "-----------------------------------------------------\n";
+		cout << "-----------------------------------------------------" << endl;
 		cout << "PD_c: "; Print_Vector(PD_c); cout << endl;/**/
 	}
 
@@ -1864,9 +1894,9 @@ namespace SF {
 		MTX_Conversion();
 
 		/**
-		cout << "-----------------------------------------------------\n";
+		cout << "-----------------------------------------------------" << endl;
 		Print_Constraints();
-		cout << "-----------------------------------------------------\n";
+		cout << "-----------------------------------------------------" << endl;
 		cout << "PD_c: "; Print_Vector(PD_c); cout << endl;/**/
 
 		return true;
@@ -1891,7 +1921,7 @@ namespace SF {
 
 		if (stream == NULL) {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-				cout << "Failure of opening file '" << mtxFile << "'.\n";
+				cout << "Failure of opening file '" << mtxFile << "'." << endl;
 			return false;
 		}
 
@@ -1904,19 +1934,19 @@ namespace SF {
 
 		if (nor >= noc) {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-				cout << "Number of rows m = " << nor << " must be < " << "Number of columns n = " << noc << "\n";
+				cout << "Number of rows m = " << nor << " must be < " << "Number of columns n = " << noc << "" << endl;
 			return false;
 		}
 
 		if (noc != PP_N) {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-				cout << "MTX_Load_A error: PP_N must be = " << noc << "\n";
+				cout << "MTX_Load_A error: PP_N must be = " << noc << "" << endl;
 			return false;
 		}
 
 		if (nor != PP_M) {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-				cout << "MTX_Load_A error:  PP_M must be = " << nor << "\n";
+				cout << "MTX_Load_A error:  PP_M must be = " << nor << "" << endl;
 			return false;
 		}
 
@@ -1926,7 +1956,7 @@ namespace SF {
 		if (nor + noc > PP_MM) {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
 				cout << "Invalid input data: number of constraints m = " << nor + noc
-				<< " must be < PP_MM + 1 =" << PP_MM + 1 << "\n";
+				<< " must be < PP_MM + 1 =" << PP_MM + 1 << "" << endl;
 			return false;
 		}
 
@@ -1980,7 +2010,7 @@ namespace SF {
 
 		if (stream == NULL) {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-				cout << "Failure of opening file '" << mtxFile << "'.\n";
+				cout << "Failure of opening file '" << mtxFile << "'." << endl;
 			return false;
 		}
 
@@ -1992,12 +2022,12 @@ namespace SF {
 		}
 		if (PD_m != nor) {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-				cout << "Incorrect number of rows in'" << mtxFile << "'.\n";
+				cout << "Incorrect number of rows in'" << mtxFile << "'." << endl;
 			return false;
 		}
 		if (noc != 1) {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-				cout << "Incorrect number of columnws in'" << mtxFile << "'.\n";
+				cout << "Incorrect number of columnws in'" << mtxFile << "'." << endl;
 			return false;
 		}
 
@@ -2033,7 +2063,7 @@ namespace SF {
 
 		if (stream == NULL) {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-				cout << "Failure of opening file '" << mtxFile << "'.\n";
+				cout << "Failure of opening file '" << mtxFile << "'." << endl;
 			return false;
 		}
 
@@ -2045,12 +2075,12 @@ namespace SF {
 		}
 		if (nor != PD_n) {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-				cout << "Incorrect number of rows in'" << mtxFile << "'.\n";
+				cout << "Incorrect number of rows in'" << mtxFile << "'." << endl;
 			return false;
 		}
 		if (noc != 1) {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-				cout << "Incorrect number of columnws in'" << mtxFile << "'.\n";
+				cout << "Incorrect number of columnws in'" << mtxFile << "'." << endl;
 			return false;
 		}
 
@@ -2086,7 +2116,7 @@ namespace SF {
 
 		if (stream == NULL) {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-				cout << "Failure of opening file '" << mtxFile << "'.\n";
+				cout << "Failure of opening file '" << mtxFile << "'." << endl;
 			return false;
 		}
 
@@ -2098,12 +2128,12 @@ namespace SF {
 		}
 		if (nor != PD_n) {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-				cout << "Incorrect number of rows in'" << mtxFile << "'.\n";
+				cout << "Incorrect number of rows in'" << mtxFile << "'." << endl;
 			return false;
 		}
 		if (noc != 1) {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-				cout << "Incorrect number of columnws in'" << mtxFile << "'.\n";
+				cout << "Incorrect number of columnws in'" << mtxFile << "'." << endl;
 			return false;
 		}
 
@@ -2137,7 +2167,7 @@ namespace SF {
 
 		if (stream == NULL) {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-				cout << "Failure of opening file '" << mtxFile << "'.\n";
+				cout << "Failure of opening file '" << mtxFile << "'." << endl;
 			return false;
 		}
 
@@ -2149,12 +2179,12 @@ namespace SF {
 		}
 		if (nor != PD_n) {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-				cout << "Incorrect number of rows in'" << mtxFile << "'.\n";
+				cout << "Incorrect number of rows in'" << mtxFile << "'." << endl;
 			return false;
 		}
 		if (noc != 1) {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-				cout << "Incorrect number of columnws in'" << mtxFile << "'.\n";
+				cout << "Incorrect number of columnws in'" << mtxFile << "'." << endl;
 			return false;
 		}
 
@@ -2191,7 +2221,7 @@ namespace SF {
 
 		if (stream == NULL) {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-				cout << "Failure of opening file '" << mtxFile << "'.\n";
+				cout << "Failure of opening file '" << mtxFile << "'." << endl;
 			return false;
 		}
 
@@ -2203,12 +2233,12 @@ namespace SF {
 		}
 		if (nor != PD_n) {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-				cout << "Incorrect number of rows in'" << mtxFile << "'. Must be " << PD_n << "\n";
+				cout << "Incorrect number of rows in'" << mtxFile << "'. Must be " << PD_n << "" << endl;
 			return false;
 		}
 		if (noc != 1) {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-				cout << "Incorrect number of columnws in'" << mtxFile << "'.\n";
+				cout << "Incorrect number of columnws in'" << mtxFile << "'." << endl;
 			return false;
 		}
 
@@ -2291,9 +2321,9 @@ namespace SF {
 					PD_n--; assert(PD_n >= 0);
 
 					/**
-					cout << "-----------------------------------------------------\n";
+					cout << "-----------------------------------------------------" << endl;
 					Print_Constraints();
-					cout << "-----------------------------------------------------\n";/**/
+					cout << "-----------------------------------------------------" << endl;/**/
 				}
 			}
 		}
@@ -2312,7 +2342,7 @@ namespace SF {
 		stream = fopen(mtxFile, "w");
 		if (stream == NULL) {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-				cout << "Failure of opening file '" << mtxFile << "'.\n";
+				cout << "Failure of opening file '" << mtxFile << "'." << endl;
 			return false;
 		}
 
@@ -2402,7 +2432,7 @@ namespace SF {
 		/*DEBUG PointBelongsToHyperplane_i**
 		#ifdef PP_DEBUG
 		if (dist > eps_on_hyperplane && dist < eps_on_hyperplane * 10) {
-			cout << "Distance from testing point is less than " << PD_eps_on_hyperplane*10 << ", but greater than " << PD_eps_on_hyperplane << "!\n";
+			cout << "Distance from testing point is less than " << PD_eps_on_hyperplane*10 << ", but greater than " << PD_eps_on_hyperplane << "!" << endl;
 			//system("pause");
 		}
 		#endif // PP_DEBUG /**/
@@ -2835,10 +2865,6 @@ namespace PF {
 	}
 
 	static inline void PreparationForIteration(PT_vector_T u) {
-
-		#ifdef PP_DEBUG
-		PD_map_counter = 0; // Used for debugging in PC_bsf_MapF(*)
-		#endif // PP_DEBUG /**/
 
 		MakeNeHyperplaneList(u, PD_neHyperplanes_u, &PD_mneh_u, PP_EPS_ON_HYPERPLANE);
 		assert(PD_mneh_u <= PP_MM);
