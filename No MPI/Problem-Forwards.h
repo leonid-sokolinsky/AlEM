@@ -9,8 +9,7 @@ This source code has been produced with using BSF-skeleton
 #include "Problem-Types.h"
 //====================== Private Functions ===========================
 namespace PF {
-	void	CalculateNumberOfEdges(int neq, int mneh_u, int* med_u);
-	void	EdgesToProcess(int workerRank, int* firstEdge_i, int* edgesCount, int med_u);
+	void	CalculateNumberOfEdges(int neq, int mneh_u, int* med_u, int* success);
 	void	PreparationForIteration(PT_vector_T u);
 }
 //====================== Shared Functions ===========================

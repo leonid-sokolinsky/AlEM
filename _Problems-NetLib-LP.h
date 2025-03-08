@@ -35,18 +35,58 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 //------------------------------ ifdef PP_DEBUG --------------------------------
 #define PP_PROJECTION_COUNT			100000				// Each PP_PROJECTION_COUNT iteration to be outputted inside Flat_MaxProjection(*)
 //------------------------------------------------------------------------------
-// F(v0)    = 5.42133935088576546235117 Number of edges:        300
-// F(u_nex) = 5.51664004337707858383055 Number of edges:        2600
-// F(u_nex) = 5.74558361413826901298307 Number of edges:        475020
-// F(u_nex) = 65.9075338346486745422226 Number of edges:        98280
-// F(u_nex) = 194.545562288452885013612 Number of edges:        475020
 // Elapsed time: 906.17045
 // Number of iterations: 5
 // Computed objective value: 464.753142857056957382156
 // Maximal objective value:  464.753142857142847788054
 // Relative error = 1.85e-13
-// Distance to polytope: 3.530165e-11
 //------------------------------------------------------------------------------
+
+/*============================== sc50a LP problem ==========================*/
+// Number of equations: 20
+// Subspace dimension: 28
+#define PP_PROBLEM_NAME		"sc50a"
+#define PP_M 49	// Number of constraints
+#define PP_N 48	// Number of variables
+#define PP_MAX_OBJ_VALUE 64.575077058564509026860413914575	// Exact maximum value of objective function
+//-------------------------------------------------------------------------
+#define PP_EPS_ZERO					1E-11					// Accuracy for comparison with zero
+#define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)		// Accuracy of calculating pseudoprojection
+#define PP_EPS_ON_HYPERPLANE		(PP_EPS_PROJECTION*10)	// Accuracy of belonging to hyperplane
+#define PP_OBJECTIVE_VECTOR_LENGTH	1E+6					// Length of Objective Vector
+//-------------------------- Compilation Modes ---------------------------------
+//#define PP_GRADIENT
+#define PP_MAXPROJECTION
+//----------------------------------------------------------------------------
+// Elapsed time: 603.93944
+// Number of iterations: 1
+// Computed objective value: 64.5750770586501801062695
+// Maximal objective value:  64.5750770585645028631916
+// Relative error = 1.33e-12
+//----------------------------------------------------------------------------
+
+/*============================== sc50b LP problem ============================*
+// Number of equations: 20
+// Subspace dimension: 28
+#define PP_PROBLEM_NAME		"sc50b"
+#define PP_M 48	// Number of constraints
+#define PP_N 48	// Number of variables
+#define PP_MAX_OBJ_VALUE 70	// Exact maximum value of objective function
+//--------------------------------------------------------------------------
+#define PP_EPS_ZERO					1E-12					// Accuracy for comparison with zero
+#define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)		// Accuracy of calculating pseudoprojection
+#define PP_EPS_ON_HYPERPLANE		(PP_EPS_PROJECTION*10)	// Accuracy of belonging to hyperplane
+#define PP_OBJECTIVE_VECTOR_LENGTH	1E+6					// Length of Objective Vector
+//-------------------------- Compilation Modes ---------------------------------
+//#define PP_GRADIENT
+#define PP_MAXPROJECTION
+//--------------------------------------------------------------------------
+// Elapsed time: 3.747997
+// Number of iterations: 1
+// Computed objective value: 70.0000000000000142108547
+// Maximal objective value:  70
+// Relative error = 2.03e-16
+//--------------------------------------------------------------------------
 
 /*============================== blend LP problem ==============================*
 // Number of equations: 43
@@ -70,7 +110,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 // F(u_nex) = 23.2679314484932646678317 Number of edges:        1086008
 //------------------------------------------------------------------------------
 
-/*============================== kb2 LP problem ================================*/
+/*============================== kb2 LP problem ================================*
 // Number of equations: 16
 // Subspace dimension: 25
 #define PP_PROBLEM_NAME		"kb2"
@@ -92,31 +132,6 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 // Map progress : 100 % Elapsed time : 4044
 // F(u_nex) = 0.59837678849741360309622         Number of edges:        2925
 //------------------------------------------------------------------------------
-
-/*============================== sc50a LP problem ==========================*
-// Number of equations: 20
-// Subspace dimension: 28
-#define PP_PROBLEM_NAME		"sc50a"
-#define PP_M 49	// Number of constraints
-#define PP_N 48	// Number of variables
-#define PP_MAX_OBJ_VALUE 64.575077058564509026860413914575	// Exact maximum value of objective function
-//-------------------------------------------------------------------------
-#define PP_EPS_ZERO					1E-11					// Accuracy for comparison with zero
-#define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)		// Accuracy of calculating pseudoprojection
-#define PP_EPS_ON_HYPERPLANE		(PP_EPS_PROJECTION*10)	// Accuracy of belonging to hyperplane
-#define PP_OBJECTIVE_VECTOR_LENGTH	1E+6					// Length of Objective Vector
-//-------------------------- Compilation Modes ---------------------------------
-//#define PP_GRADIENT
-//#define PP_MAXPROJECTION
-#define PP_MAX_ITER_NUM 3 
-//----------------------------------------------------------------------------
-// Elapsed time: 300.29126
-// Number of iterations: 4
-// Computed objective value: 63.6597884497166006667612
-// Maximal objective value:  64.5750770585645028631916
-// Relative error = 0.0142
-// Distance to polytope: 2.7913026e-11
-//----------------------------------------------------------------------------
 
 /*============================== adlittle LP problem ===========================*
 // Number of equations : 15
@@ -158,27 +173,6 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*100)	// Accuracy of belonging to hyperplane
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+7			// Length of Objective Vector
 
-//--------------------------------------------------------------------------
-
-/*============================== sc50b LP problem ============================*
-// Number of equations: 20
-// Subspace dimension: 28
-#define PP_PROBLEM_NAME		"sc50b"
-#define PP_M 48	// Number of constraints
-#define PP_N 48	// Number of variables
-#define PP_MAX_OBJ_VALUE 70	// Exact maximum value of objective function
-//--------------------------------------------------------------------------
-#define PP_EPS_ZERO					1E-7			// Precision for comparison with zero
-#define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*100)	// Accuracy of belonging to hyperplane
-#define PP_OBJECTIVE_VECTOR_LENGTH	1E+7			// Length of Objective Vector
-
-
-//--------------------------------------------------------------------------
-// Elapsed time: 2468.7376
-// Number of iterations: 16
-// Computed objective value: 68.62744550653315
-// Maximal objective value:  70
-// Relative error = 0.0196
 //--------------------------------------------------------------------------
 
 /*============================== sc105 LP problem ==========================*

@@ -70,6 +70,34 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 // Distance to polytope: 0
 //------------------------------------------------------------------------------
 
+/*============================== featheredCube LP problem =========================*/
+#define PP_MPS_FORMAT
+#define PP_PROBLEM_NAME	"featheredCube"
+#ifdef PP_MPS_FORMAT
+#define PP_M 15		// Number of constrains
+#define PP_N 3		// Number of variables
+#else
+#define PP_M 3	// Number of rows in *.mtx
+#define PP_N 6	// Number of cols in *.mtx
+#endif
+#define PP_MAX_OBJ_VALUE 		60000
+//------------------------------------------------------------------------------
+#define PP_EPS_ZERO					1E-11					// Precision for comparison with zero
+#define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)		// Accuracy of belonging to hyperplane
+#define PP_EPS_ON_HYPERPLANE		(PP_EPS_PROJECTION*10)	// Accuracy of belonging to hyperplane
+#define PP_OBJECTIVE_VECTOR_LENGTH	1E+6					// Length of Objective Vector
+//-------------------------- Compilation Modes ---------------------------------
+//#define PP_GRADIENT
+#define PP_MAXPROJECTION 
+//------------------------------------------------------------------------------
+// Elapsed time: 0
+// Number of iterations: 3
+// Computed objective value: 60000
+// Maximal objective value:  60000
+// Relative error = 0
+// Distance to polytope: 0
+//------------------------------------------------------------------------------
+
 /*============================== cubeInHyperplane LP problem ===================*
 #define PP_MPS_FORMAT
 #define PP_PROBLEM_NAME	"cubeInHyperplane"
@@ -484,7 +512,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 // Distance to polytope: 2.8421709e-14
 //------------------------------------------------------------------------------
 
-/*============================== rnd5-100 LP problem ===========================*/
+/*============================== rnd5-100 LP problem ===========================*
 #define PP_PROBLEM_NAME	"rnd5-100"
 #define PP_M 105		// Number of equations (number of rows in *.mtx)
 #define PP_N 110		// Number of variables (number of cols in *.mtx)
@@ -497,6 +525,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 //-------------------------- Compilation Modes ---------------------------------
 #define PP_GRADIENT
 #define PP_MAXPROJECTION 
+//#define PP_MAX_ITER_NUM 1 
 //------------------------------------------------------------------------------
 // Elapsed time: 0
 // Number of iterations: 10
