@@ -50,7 +50,6 @@ This source code has been produced with using BSF-skeleton
 #define PP_MAX_ITER_COUNT				10000000000		// Maximal count of iterations
 #define PP_MAX_PSEUDOPROJECTING_ITER	10000000		// Maximum acceptable number of iterations in Pseudoprojection on flat
 #define PP_INT_MAX						2147483647		// This is necessary for compatibility with different compilers
-//#define PP_EPS_RELATIVE_ERROR			1E-4			// Used if defined PP_CHECK_MAX_OBJ_VALUE 
 //------------------------------ ifdef PP_DEBUG --------------------------------
 //#define PP_PROJECTION_COUNT			100000			// Each PP_PROJECTION_COUNT-th iteration to be outputted inside Flat_MaxProjection(*)
 //-------------------------- Input/Outpoot Parameters --------------------------

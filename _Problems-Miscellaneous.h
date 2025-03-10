@@ -15,7 +15,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 // PP_EPS_PROJECTION -	inverse dependence on PP_OBJECTIVE_VECTOR_LENGTH. 
 //						This parameter affects terminate condition when 
 //						calculating pseudoprojection.
-#define PP_EPS_RELATIVE_ERROR		1E-4				// Used if defined PP_CHECK_MAX_OBJ_VALUE 
+#define PP_EPS_RELATIVE_ERROR		1E-5				// Used if defined PP_CHECK_MAX_OBJ_VALUE 
 //------------------------------ ifdef PP_DEBUG --------------------------------
 #define PP_PROJECTION_COUNT			100000				// Each PP_PROJECTION_COUNT iteration to be outputted inside Flat_MaxProjection(*)
 //==============================================================================
@@ -70,7 +70,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 // Distance to polytope: 0
 //------------------------------------------------------------------------------
 
-/*============================== featheredCube LP problem =========================*/
+/*============================== featheredCube LP problem =========================*
 #define PP_MPS_FORMAT
 #define PP_PROBLEM_NAME	"featheredCube"
 #ifdef PP_MPS_FORMAT
@@ -512,7 +512,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 // Distance to polytope: 2.8421709e-14
 //------------------------------------------------------------------------------
 
-/*============================== rnd5-100 LP problem ===========================*
+/*============================== rnd5-100 LP problem ===========================*/
 #define PP_PROBLEM_NAME	"rnd5-100"
 #define PP_M 105		// Number of equations (number of rows in *.mtx)
 #define PP_N 110		// Number of variables (number of cols in *.mtx)
@@ -525,7 +525,6 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 //-------------------------- Compilation Modes ---------------------------------
 #define PP_GRADIENT
 #define PP_MAXPROJECTION 
-//#define PP_MAX_ITER_NUM 1 
 //------------------------------------------------------------------------------
 // Elapsed time: 0
 // Number of iterations: 10

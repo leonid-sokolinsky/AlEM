@@ -155,13 +155,14 @@ void PC_bsf_MainArguments(int argc, char* argv[]) {
 	// Not used
 }
 
-void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int* success) {
+void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int* mapSuccess) {
 	double* u_cur = BSF_sv_parameter.u_cur;	// Current vertex
 	PT_vector_T u_nex_max;
 	double objF_nex_max = -PP_INFINITY;
 	int edge_i;
 	int iterCounter;
 	double edgesPerWorker;
+	int localSuccess;
 	#ifdef PP_GRADIENT
 	double objF_grd_max = -PP_INFINITY;
 	#endif // PP_GRADIENT
@@ -222,22 +223,22 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 		Vector_Addition(u_cur, PD_objVector, v);
 
 		#ifndef PP_MAXPROJECTION
-		Flat_BipProjection(PD_edgeAlHyperplanes, PD_n - 1, v, PP_EPS_PROJECTION, PP_MAX_PSEUDOPROJECTING_ITER, w, success);
+		Flat_BipProjection(PD_edgeAlHyperplanes, PD_n - 1, v, PP_EPS_PROJECTION, PP_MAX_PSEUDOPROJECTING_ITER, w, &localSuccess);
 		#else
-		Flat_MaxProjection(PD_edgeAlHyperplanes, PD_n - 1, v, PP_EPS_PROJECTION, PP_MAX_PSEUDOPROJECTING_ITER, w, success);
+		Flat_MaxProjection(PD_edgeAlHyperplanes, PD_n - 1, v, PP_EPS_PROJECTION, PP_MAX_PSEUDOPROJECTING_ITER, w, &localSuccess);
 		#endif // PP_MAXPROJECTION
 
-		if (*success == -1) {
+		if (localSuccess == -1) {
 			cout << "Worker " << BSF_sv_mpiRank
 				<< ": PC_bsf_MapF error: Significand bit depth is exceeded! You should increase PP_EPS_PROJECTION or decrease PP_OBJECTIVE_VECTOR_LENGTH." << endl;
 		}
 
-		if (*success == -3) {
+		if (localSuccess == -3) {
 			cout << "Worker " << BSF_sv_mpiRank
 				<< ": PC_bsf_MapF error: Floating-point underflow! You should increase PP_EPS_PROJECTION or decrease PP_OBJECTIVE_VECTOR_LENGTH." << endl;
 		}
 
-		if (*success == -2) {
+		if (localSuccess == -2) {
 			cout << "Worker " << BSF_sv_mpiRank
 				<< ": PC_bsf_MapF warning: Exceeded the maximum number of iterations PP_MAX_PSEUDOPROJECTING_ITER = "
 				<< PP_MAX_PSEUDOPROJECTING_ITER << " when calculating pseudoprojection!" << endl;
@@ -256,8 +257,8 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 
 		PT_vector_T directionVector;
 		Vector_Subtraction(w, u_cur, directionVector);
-		JumpingOnPolytope(u_cur, directionVector, u_nex, PP_EPS_ON_HYPERPLANE, PP_EPS_ZERO, PD_edgeBitscale, success);
-		if (!*success) {
+		JumpingOnPolytope(u_cur, directionVector, u_nex, PP_EPS_ON_HYPERPLANE, PP_EPS_ZERO, PD_edgeBitscale, &localSuccess);
+		if (!localSuccess) {
 			/*DEBUG PC_bsf_MapF**
 			#ifdef PP_DEBUG
 			cout << "Worker " << BSF_sv_mpiRank << ": ===>>> Movement is impossible." << endl;
@@ -296,28 +297,34 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 			objF_grd_max = objF_grd;
 			objF_nex_max = objF_nex;
 			Vector_Copy(u_nex, u_nex_max);
+			/*DEBUG PC_bsf_MapF*/
+			#ifdef PP_DEBUG
+			bool binomial_success;
+			cout << "Worker " << BSF_sv_mpiRank << ":\tF(u_grd) = " << setprecision(PP_SETW / 2) << objF_grd
+				<< "\tObjF = " << setprecision(PP_SETW / 2) << objF_nex 
+				<< "\tNumber of edges: " << Number_of_Edges(u_nex, PP_EPS_ON_HYPERPLANE, &binomial_success) 
+				<< "\t\t\t---> Movement is possible" << endl;
+			#endif // PP_DEBUG /**/
 		}
-		#else
+		#else // !PP_GRADIENT
 		if (objF_nex > objF_nex_max) {
 			objF_nex_max = objF_nex;
 			Vector_Copy(u_nex, u_nex_max);
+			/*DEBUG PC_bsf_MapF**/
+			#ifdef PP_DEBUG
+			bool binomial_success;
+			cout << "Worker " << BSF_sv_mpiRank << ": "
+				<< "\t ObjF = " << setprecision(PP_SETW / 2) << objF_nex
+				<< "\tNumber of edges: " << Number_of_Edges(u_nex, PP_EPS_ON_HYPERPLANE, &binomial_success)
+				<< "\t\t\t---> Movement is possible" << endl;
+			#endif // PP_DEBUG /**/
 		}
 		#endif // PP_GRADIENT
-
-		/*DEBUG PC_bsf_MapF**
-		#ifdef PP_DEBUG
-		cout << "Worker " << BSF_sv_mpiRank << ": "
-		#ifdef PP_GRADIENT
-			<< " F(u_grd) = " << setprecision(PP_SETW / 2) << objF_grd
-		#endif // PP_GRADIENT
-			<< "\t F(u_nex) = " << setprecision(PP_SETW / 2) << objF_nex << "\t\t\t\t---> Movement is possible." << endl;
-		//cout << "\n u_nex = "; Print_Vector(u_nex); cout << endl;
-		#endif // PP_DEBUG /**/
 	}
 
 	#ifdef PP_GAUGE
 	if (BSF_sv_mpiRank == 0) 
-		cout << "Map progress: 100%" << "\t Elapsed time: " << t0 + (double)time(NULL) << endl;
+		cout << "Map progress: 100%" << "\tElapsed time: " << t0 + (double)time(NULL) << endl;
 	#endif // PP_GAUGE
 
 	if (objF_nex_max == -PP_INFINITY) {
@@ -325,7 +332,7 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 		#ifdef PP_DEBUG
 		cout << "Worker " << BSF_sv_mpiRank << ": ===>>> Movement is impossible." << endl;
 		#endif // PP_DEBUG /**/
-		*success = false;
+		*mapSuccess = false;
 		return;
 	}
 
@@ -360,17 +367,19 @@ void PC_bsf_MapF_3(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T_3* reduceElem,
 }
 
 void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
-	cout << "=================================================== " << PP_METHOD_NAME << " ====================================================" << endl;
+	bool binomial_success;
+
+	cout << "=================================================== " << PP_METHOD_NAME << " ==================================================" << endl;
 	cout << "Problem name: " << PD_problemName << endl;
 
-#ifdef PP_MPS_FORMAT
+	#ifdef PP_MPS_FORMAT
 	cout << "Input format: MPS" << endl;
 	cout << "m = " << PD_m << " n = " << PD_n << " (after conversion into standard form)" << endl;
-#else
+	#else
 	cout << "Input format: MTX (with elimination of free variables)" << endl;
 	cout << "Before elimination: m =\t" << PP_M << "\tn = " << PP_N << endl;
 	cout << "After elimination:  m =\t" << PD_m << "\tn = " << PD_n << endl;
-#endif // PP_MPS_FORMAT
+	#endif // PP_MPS_FORMAT
 
 	cout << "Number of equations: " << PD_meq << endl;
 	if (PD_meq > 0)
@@ -381,48 +390,51 @@ void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
 	else
 		cout << "Number of Workers: " << BSF_sv_numOfWorkers << endl;
 
-#ifdef PP_BSF_OMP
-#ifdef PP_BSF_NUM_THREADS
+	#ifdef PP_BSF_OMP
+	#ifdef PP_BSF_NUM_THREADS
 	cout << "Number of Threads: " << PP_BSF_NUM_THREADS << endl;
-#else
+	#else
 	cout << "Number of Threads: " << omp_get_num_procs() << endl;
-#endif // PP_BSF_NUM_THREADS
-#else
+	#endif // PP_BSF_NUM_THREADS
+	#else
 	cout << "OpenMP is turned off!" << endl;
-#endif // PP_BSF_OMP
+	#endif // PP_BSF_OMP
 
-#ifdef PP_BSF_FRAGMENTED_MAP_LIST
+	#ifdef PP_BSF_FRAGMENTED_MAP_LIST
 	cout << "Map List is Fragmented" << endl;
-#else
+	#else
 	cout << "Map List is not Fragmented" << endl;
-#endif
+	#endif
 
-#ifdef PP_GRADIENT
+	#ifdef PP_GRADIENT
 	cout << "Optimization: the best gradient" << endl;
-#else
+	#else
 	cout << "Optimization: the best vertex" << endl;
-#endif // PP_GRADIENT
+	#endif // PP_GRADIENT
 
-#ifndef PP_MAXPROJECTION
+	#ifndef PP_MAXPROJECTION
 	cout << "Pseudoprojection method: BIP" << endl;
-#else
+	#else
 	cout << "Pseudoprojection method: Max" << endl;
-#endif // PP_MAXPROJECTION
+	#endif // PP_MAXPROJECTION
 
 	cout << "PP_EPS_ZERO\t\t\t" << PP_EPS_ZERO << endl;
 	cout << "PP_EPS_PROJECTION\t\t" << PP_EPS_PROJECTION << endl;
 	cout << "PP_EPS_ON_HYPERPLANE\t\t" << PP_EPS_ON_HYPERPLANE << endl;
 	cout << "PP_OBJECTIVE_VECTOR_LENGTH\t" << PP_OBJECTIVE_VECTOR_LENGTH << endl;
 
-#ifdef PP_MATRIX_OUTPUT
+	#ifdef PP_MATRIX_OUTPUT
 	cout << "------- Matrix PD_A & Column PD_b -------" << endl;
 	Print_Constraints();
 	cout << "Obj Function:\t"; 	Print_Vector(PD_c); cout << endl;
 	cout << "v0 =\t\t"; Print_Vector(PD_u_cur); cout << endl;
-#endif // PP_MATRIX_OUTPUT
+	#endif // PP_MATRIX_OUTPUT
 
 	cout << "_________________________________________________________________________________________________________" << endl;
-	cout << "ObjF = " << ObjF(PD_u_cur) << "\tNumber of edges: "; Print_Number_of_edges(PD_u_cur, PP_EPS_ON_HYPERPLANE);
+	cout << "ObjF = " << ObjF(PD_u_cur) << "\tNumber of edges: " << Number_of_Edges(PD_u_cur, PP_EPS_ON_HYPERPLANE, &binomial_success) << endl;
+	if (!binomial_success)
+		cout << "PC_bsf_ParametersOutput Warning: It is not possible to calculate the binomial coefficient correctly for the number of included hyperplanes = "
+		<< Number_IncludingNeHyperplanes(PD_u_cur, PP_EPS_ON_HYPERPLANE) << " > 62" << endl;
 	//cout << "Number of inequality hyperplanes including u0:\t" << Number_IncludingNeHyperplanes(PD_u_cur, PP_EPS_ON_HYPERPLANE) << endl;
 	cout << "_________________________________________________ " << 1 << " _____________________________________________________" << endl;
 
@@ -526,9 +538,11 @@ void PC_bsf_ProcessResults(PT_bsf_reduceElem_T* reduceResult, int reduceCounter,
 	PD_iterNo++;
 
 	#ifdef PP_SAVE_ITER_RESULT
-	if (MTX_SavePoint(PD_u_cur, PP_MTX_POSTFIX_V))
-		cout << "Current approximation is saved into file *_v.mtx" << endl;
-	*exit = true; return;
+	char buf[6];
+	sprintf(buf, "%d", PD_iterNo);
+	string postfix = "_v(" + string(buf) + ").mtx";
+	if (MTX_SavePoint(PD_u_cur, postfix))
+		cout << "Current approximation is saved into file *_v(*).mtx" << endl;
 	#endif // PP_SAVE_ITER_RESULT
 
 	#ifdef PP_DEBUG
@@ -2377,6 +2391,29 @@ namespace SF {
 		return number;
 	}
 
+	static inline int Number_of_Edges(PT_vector_T x, double eps_on_hyperplane, bool* success) {
+		int mne;
+		unsigned long long ull_mne;
+
+		*success = true;
+		mne = 0;
+		for (int i = 0; i < PD_m; i++) {
+			if (PD_isEquation[i])
+				continue;
+			if (PointBelongsToHyperplane_i(x, i, eps_on_hyperplane))
+				mne++;
+		}
+
+		if (mne == PD_neq)
+			ull_mne = (unsigned long long) mne;
+		else {
+			if (mne > 62) 
+				*success = false;
+			ull_mne = BinomialCoefficient(mne, PD_neq - 1);
+		}
+		return ull_mne;
+	}
+
 	static inline double ObjF(PT_vector_T x) {
 		double s = 0;
 		for (int j = 0; j < PD_n; j++)
@@ -2570,31 +2607,6 @@ namespace SF {
 		}
 
 		cout << "}";
-	}
-
-	static inline void Print_Number_of_edges(PT_vector_T x, double eps_on_hyperplane) {
-		int mne;
-		unsigned long long ull_mne;
-
-		mne = 0;
-		for (int i = 0; i < PD_m; i++) {
-			if (PD_isEquation[i])
-				continue;
-			if (PointBelongsToHyperplane_i(x, i, eps_on_hyperplane))
-				mne++;
-		}
-
-		if (mne == PD_neq)
-			ull_mne = (unsigned long long) mne;
-		else {
-			if (mne > 62) {
-				cout << "Warning: Can't calculate binomial coefficient for number of including hyperplanes = "
-					<< mne << " > 62" << endl;
-				return;
-			}
-			ull_mne = BinomialCoefficient(mne, PD_neq - 1);
-		}
-		cout << ull_mne << endl;
 	}
 
 	static inline void Print_Vector(PT_vector_T x) {
