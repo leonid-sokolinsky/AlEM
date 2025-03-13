@@ -293,7 +293,7 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 		Shift(u_cur, d, 1 / Vector_Norm(d), u_grd);
 		objF_grd = ObjF(u_grd);
 
-		if (objF_grd > objF_grd_max) {
+		if (objF_grd > objF_grd_max + PP_EPS_ZERO) {
 			objF_grd_max = objF_grd;
 			objF_nex_max = objF_nex;
 			Vector_Copy(u_nex, u_nex_max);
@@ -307,16 +307,17 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 			#endif // PP_DEBUG /**/
 		}
 		#else // !PP_GRADIENT
-		if (objF_nex > objF_nex_max) {
+		if (objF_nex > objF_nex_max + PP_EPS_ZERO) {
 			objF_nex_max = objF_nex;
 			Vector_Copy(u_nex, u_nex_max);
-			/*DEBUG PC_bsf_MapF**/
+			/*DEBUG PC_bsf_MapF*/
 			#ifdef PP_DEBUG
 			bool binomial_success;
 			cout << "Worker " << BSF_sv_mpiRank << ": "
 				<< "\t ObjF = " << setprecision(PP_SETW / 2) << objF_nex
 				<< "\tNumber of edges: " << Number_of_Edges(u_nex, PP_EPS_ON_HYPERPLANE, &binomial_success)
 				<< "\t\t\t---> Movement is possible" << endl;
+			// if (MTX_SavePoint(u_nex, PP_MTX_POSTFIX_V)) cout << "Current approximation is saved into file *.v" << endl;
 			#endif // PP_DEBUG /**/
 		}
 		#endif // PP_GRADIENT
@@ -2411,7 +2412,7 @@ namespace SF {
 				*success = false;
 			ull_mne = BinomialCoefficient(mne, PD_neq - 1);
 		}
-		return ull_mne;
+		return (int)ull_mne;
 	}
 
 	static inline double ObjF(PT_vector_T x) {
