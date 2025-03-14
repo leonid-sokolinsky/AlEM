@@ -36,11 +36,11 @@ void PC_bsf_Init(bool* success) {
 		return;
 	}
 
-#ifdef PP_MPS_FORMAT
-	*success = MPS___Load_Problem();
-#else
-	*success = MTX__Load_Problem();
-#endif // PP_MPS_FORMAT
+	#ifdef PP_MPS_FORMAT
+	* success = MPS___Load_Problem();
+	#else
+	* success = MTX__Load_Problem();
+	#endif // PP_MPS_FORMAT
 
 	if (*success == false)
 		return;
@@ -60,7 +60,7 @@ void PC_bsf_Init(bool* success) {
 	if (*success == false)
 		return;
 
-#ifdef PP_MAX_OBJ_VALUE
+	#ifdef PP_MAX_OBJ_VALUE
 	double ObjF_u_cur = ObjF(PD_u_cur);
 	if (RelativeError(PP_MAX_OBJ_VALUE, ObjF_u_cur) < PP_EPS_ZERO) {
 		if (BSF_sv_mpiRank == BSF_sv_mpiMaster) {
@@ -78,7 +78,7 @@ void PC_bsf_Init(bool* success) {
 		*success = false;
 		return;
 	}
-#endif // PP_MAX_OBJ_VALUE
+	#endif // PP_MAX_OBJ_VALUE
 
 	MakeColumnOfNorms(PD_A, PD_norm_a);
 
@@ -170,7 +170,7 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 	int t0 = -(int)time(NULL);
 	int t60 = t0;
 	double gauge = 0;	// Percentage progress
-#endif // PP_GAUGE
+	#endif // PP_GAUGE
 
 	/*DEBUG PC_bsf_MapF**
 	#ifdef PP_DEBUG
@@ -301,8 +301,8 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 			#ifdef PP_DEBUG
 			bool binomial_success;
 			cout << "Worker " << BSF_sv_mpiRank << ":\tF(u_grd) = " << setprecision(PP_SETW / 2) << objF_grd
-				<< "\tObjF = " << setprecision(PP_SETW / 2) << objF_nex 
-				<< "\tNumber of edges: " << Number_of_Edges(u_nex, PP_EPS_ON_HYPERPLANE, &binomial_success) 
+				<< "\tObjF = " << setprecision(PP_SETW / 2) << objF_nex
+				<< "\tNumber of edges: " << Number_of_Edges(u_nex, PP_EPS_ON_HYPERPLANE, &binomial_success)
 				<< "\t\t\t---> Movement is possible" << endl;
 			#endif // PP_DEBUG /**/
 		}
@@ -322,11 +322,11 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 		}
 		#endif // PP_GRADIENT
 	}
-	
+
 	#ifdef PP_GAUGE
-	if (BSF_sv_mpiRank == 0) 
+	if (BSF_sv_mpiRank == 0)
 		cout << "Map progress: 100%" << "\tElapsed time: " << t0 + (double)time(NULL) << endl;
-#endif // PP_GAUGE
+	#endif // PP_GAUGE
 
 	if (objF_nex_max == -PP_INFINITY) {
 		/*DEBUG PC_bsf_MapF**
@@ -373,14 +373,14 @@ void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
 	cout << "=================================================== " << PP_METHOD_NAME << " ==================================================" << endl;
 	cout << "Problem name: " << PD_problemName << endl;
 
-#ifdef PP_MPS_FORMAT
+	#ifdef PP_MPS_FORMAT
 	cout << "Input format: MPS" << endl;
 	cout << "m = " << PD_m << " n = " << PD_n << " (after conversion into standard form)" << endl;
-#else
+	#else
 	cout << "Input format: MTX (with elimination of free variables)" << endl;
 	cout << "Before elimination: m =\t" << PP_M << "\tn = " << PP_N << endl;
 	cout << "After elimination:  m =\t" << PD_m << "\tn = " << PD_n << endl;
-#endif // PP_MPS_FORMAT
+	#endif // PP_MPS_FORMAT
 
 	cout << "Number of equations: " << PD_meq << endl;
 	if (PD_meq > 0)
@@ -391,33 +391,33 @@ void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
 	else
 		cout << "Number of Workers: " << BSF_sv_numOfWorkers << endl;
 
-#ifdef PP_BSF_OMP
-#ifdef PP_BSF_NUM_THREADS
+	#ifdef PP_BSF_OMP
+	#ifdef PP_BSF_NUM_THREADS
 	cout << "Number of Threads: " << PP_BSF_NUM_THREADS << endl;
-#else
+	#else
 	cout << "Number of Threads: " << omp_get_num_procs() << endl;
-#endif // PP_BSF_NUM_THREADS
-#else
+	#endif // PP_BSF_NUM_THREADS
+	#else
 	cout << "OpenMP is turned off!" << endl;
-#endif // PP_BSF_OMP
+	#endif // PP_BSF_OMP
 
-#ifdef PP_BSF_FRAGMENTED_MAP_LIST
+	#ifdef PP_BSF_FRAGMENTED_MAP_LIST
 	cout << "Map List is Fragmented" << endl;
-#else
+	#else
 	cout << "Map List is not Fragmented" << endl;
-#endif
+	#endif
 
-#ifdef PP_GRADIENT
+	#ifdef PP_GRADIENT
 	cout << "Optimization: the best gradient" << endl;
-#else
+	#else
 	cout << "Optimization: the best vertex" << endl;
-#endif // PP_GRADIENT
+	#endif // PP_GRADIENT
 
-#ifndef PP_MAXPROJECTION
+	#ifndef PP_MAXPROJECTION
 	cout << "Pseudoprojection method: BIP" << endl;
-#else
+	#else
 	cout << "Pseudoprojection method: Max" << endl;
-#endif // PP_MAXPROJECTION
+	#endif // PP_MAXPROJECTION
 
 	cout << "PP_EPS_ZERO\t\t\t" << PP_EPS_ZERO << endl;
 	cout << "PP_EPS_PROJECTION\t\t" << PP_EPS_PROJECTION << endl;
@@ -463,10 +463,10 @@ void PC_bsf_ProblemOutput(PT_bsf_reduceElem_T* reduceResult, int reduceCounter, 
 	//cout << "Solution point:\t"; Print_Vector(PD_u_cur); cout << endl;
 	#endif // PP_DEBUG
 
-#ifdef PP_SAVE_RESULT
+	#ifdef PP_SAVE_RESULT
 	if (MTX_SavePoint(PD_u_cur, PP_MTX_POSTFIX_SO))
 		cout << "Calculated solution point is saved into file *.so" << endl;
-#endif // PP_SAVE_RESULT
+	#endif // PP_SAVE_RESULT
 
 } // end PC_bsf_ProblemOutput
 
@@ -500,7 +500,7 @@ void PC_bsf_ProcessResults(PT_bsf_reduceElem_T* reduceResult, int reduceCounter,
 		return;
 	}
 
-#ifdef PP_CHECK_MAX_OBJ_VALUE
+	#ifdef PP_CHECK_MAX_OBJ_VALUE
 	if (RelativeError(PP_MAX_OBJ_VALUE, reduceResult->objF_nex) < PP_EPS_RELATIVE_ERROR) {
 
 		#ifdef PP_DEBUG
@@ -515,18 +515,18 @@ void PC_bsf_ProcessResults(PT_bsf_reduceElem_T* reduceResult, int reduceCounter,
 		* exit = true;
 		return;
 	}
-#else
+	#else
 	if (RelativeError(PD_objF_cur, reduceResult->objF_nex) < PP_EPS_ZERO) {
 
-#ifdef PP_DEBUG
+		#ifdef PP_DEBUG
 		cout << "ObjF = " << setprecision(PP_SETW / 2) << ObjF(PD_u_cur) << "\tNumber of edges: " << PD_med_u << endl;
-#endif // PP_DEBUG
+		#endif // PP_DEBUG
 
 		/*DEBUG PC_bsf_ProcessResults*/
-#ifdef PP_DEBUG
-//cout << "u_nex = "; Print_Vector(reduceResult->u_nex); cout << "\t";
+		#ifdef PP_DEBUG
+		//cout << "u_nex = "; Print_Vector(reduceResult->u_nex); cout << "\t";
 		cout << "|F(u_cur)-ObjF|/|F(F(u_cur))| = " << RelativeError(PD_objF_cur, reduceResult->objF_nex) << " < PP_EPS_ZERO = " << PP_EPS_ZERO << endl;
-#endif // PP_DEBUG /**/
+		#endif // PP_DEBUG /**/
 
 		* exit = true;
 		return;
@@ -553,20 +553,20 @@ void PC_bsf_ProcessResults(PT_bsf_reduceElem_T* reduceResult, int reduceCounter,
 	//cout << "u_nex:\t"; Print_Vector(reduceResult->u_nex);  cout << endl;
 	//cout << "u_nex hyperplanes:\t"; Print_HyperplanesIncludingPoint(reduceResult->u_nex, PP_EPS_ON_HYPERPLANE); cout << endl;
 	cout << "_________________________________________________ " << PD_iterNo + 1 << " _____________________________________________________" << endl;
-#endif // PP_DEBUG
+	#endif // PP_DEBUG
 
 	if (!PointBelongsToPolytope(PD_u_cur, PP_EPS_ON_HYPERPLANE)) {
 		cout << "PC_bsf_ProcessResults error: u_nex does not belong to polytope with precision of PP_EPS_ON_HYPERPLANE = "
 			<< PP_EPS_ON_HYPERPLANE << endl;
 
 		/*DEBUG PC_bsf_ProcessResults*/
-	#ifdef PP_DEBUG
+		#ifdef PP_DEBUG
 		double eps_on_polytope = PP_EPS_ON_HYPERPLANE;
 		Tuning_Eps_PointBelongsToPolytope(PD_u_cur, &eps_on_polytope);
 		cout << "Minimum PP_EPS_ON_HYPERPLANE should be " << eps_on_polytope << endl;
-	#endif // PP_DEBUG /**/
+		#endif // PP_DEBUG /**/
 
-		*exit = true;
+		* exit = true;
 		return;
 	}
 
@@ -577,13 +577,13 @@ void PC_bsf_ProcessResults(PT_bsf_reduceElem_T* reduceResult, int reduceCounter,
 		return;
 	}
 
-#ifdef PP_MAX_ITER_NUM
+	#ifdef PP_MAX_ITER_NUM
 	if (PD_iterNo == PP_MAX_ITER_NUM) {
 		cout << "Number of iterations is limited by PP_MAX_ITER_NUM = " << PP_MAX_ITER_NUM << endl;
 		*exit = true;
 		return;
 	}
-#endif // PP_MAX_ITER_NUM
+	#endif // PP_MAX_ITER_NUM
 
 	if (!success) {
 		cout << "\nCalculateNumberOfEdges error: It is impossible to calculate binomial coefficient for number of including hyperplanes PD_mneh_u = " << PD_mneh_u << " > 62" << endl;
@@ -605,7 +605,7 @@ void PC_bsf_ProcessResults_3(PT_bsf_reduceElem_T_3* reduceResult, int reduceCoun
 }
 
 void PC_bsf_ReduceF(PT_bsf_reduceElem_T* x, PT_bsf_reduceElem_T* y, PT_bsf_reduceElem_T* z) { // z = x o y
-#ifdef PP_GRADIENT
+	#ifdef PP_GRADIENT
 	if (x->objF_grd > y->objF_grd) {
 		z->objF_grd = x->objF_grd;
 		z->objF_nex = x->objF_nex;
@@ -616,7 +616,7 @@ void PC_bsf_ReduceF(PT_bsf_reduceElem_T* x, PT_bsf_reduceElem_T* y, PT_bsf_reduc
 		z->objF_nex = y->objF_nex;
 		Vector_Copy((*y).u_nex, (*z).u_nex);
 	}
-#else
+	#else
 	if (x->objF_nex > y->objF_nex) {
 		z->objF_nex = x->objF_nex;
 		Vector_Copy((*x).u_nex, (*z).u_nex);
@@ -625,7 +625,7 @@ void PC_bsf_ReduceF(PT_bsf_reduceElem_T* x, PT_bsf_reduceElem_T* y, PT_bsf_reduc
 		z->objF_nex = y->objF_nex;
 		Vector_Copy((*y).u_nex, (*z).u_nex);
 	}
-#endif // PP_GRADIENT
+	#endif // PP_GRADIENT
 }
 
 void PC_bsf_ReduceF_1(PT_bsf_reduceElem_T_1* x, PT_bsf_reduceElem_T_1* y, PT_bsf_reduceElem_T_1* z) {
@@ -745,22 +745,22 @@ namespace SF {
 				Vector_PlusEquals(r, p);
 			}
 
-		Vector_DivideEquals(r, m_flat);
+			Vector_DivideEquals(r, m_flat);
 
-#ifdef PP_DEBUG
+			#ifdef PP_DEBUG
 			PT_vector_T w_prev;
 			Vector_Copy(w, w_prev);
-#endif // PP_DEBUG
+			#endif // PP_DEBUG
 
 			Vector_PlusEquals(w, r);
 
-#ifdef PP_DEBUG
+			#ifdef PP_DEBUG
 			double dist = Distance_PointToPoint(w, w_prev);
 			if (dist < PF_DBL_EPSILON * 10) { // Significand bit depth is exceeded!
 				*success = -1;
 				return;
 			}
-#endif // PP_DEBUG
+			#endif // PP_DEBUG
 
 			iterCount++;
 			if (iterCount > maxProjectingIter) {
@@ -860,7 +860,7 @@ namespace SF {
 				if (fabs(norm_a_DoT_norm_d) < eps_zero) { // Vector d is parallel to hyperplane
 					/*DEBUG JumpingOnPolytope**
 					#ifdef PP_DEBUG
-					cout << "Worker " << BSF_sv_mpiRank << ": JumpingOnPolytope: " << i 
+					cout << "Worker " << BSF_sv_mpiRank << ": JumpingOnPolytope: " << i
 						<< ") \tStart and finish points belong to hyperplane. => continue" << endl;
 					#endif // PP_DEBUG /**/
 					continue;
@@ -880,10 +880,10 @@ namespace SF {
 			case PP_INSIDE_HALFSPACE:
 
 				if (fabs(norm_a_DoT_norm_d) < eps_zero) { // Vector d is parallel to hyperplane
-						/*DEBUG JumpingOnPolytope**
-					#ifdef PP_DEBUG
-					cout << "Worker " << BSF_sv_mpiRank << ": JumpingOnPolytope: " << i << ") \tVector d is parallel to hyperplane. => continue" << endl;
-					#endif // PP_DEBUG /**/
+					/*DEBUG JumpingOnPolytope**
+				#ifdef PP_DEBUG
+				cout << "Worker " << BSF_sv_mpiRank << ": JumpingOnPolytope: " << i << ") \tVector d is parallel to hyperplane. => continue" << endl;
+				#endif // PP_DEBUG /**/
 					continue;
 				}
 
@@ -1493,11 +1493,11 @@ namespace SF {
 						cout << "MPS_AddObjectiveFunction error: Coefficient redefinition of the objective function for " << column[i_col].varName << "." << endl;
 					return false;
 				}
-#ifdef MPS_MIN_OF_OBJECTIVE_FUNCTION
+				#ifdef MPS_MIN_OF_OBJECTIVE_FUNCTION
 				PD_c[column[i_col].j] = column[i_col].value;
-#else
+				#else
 				PD_c[column[i_col].j] = -column[i_col].value;
-#endif
+				#endif
 			}
 		return true;
 	}
@@ -1987,13 +1987,13 @@ namespace SF {
 			if (i < 0) {
 				if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
 					cout
-					<< "Negative row index in'" << mtxFile << "'.\n" << endl;
+					<< "Negative row index in'" << mtxFile << "'." << endl;
 				return false;
 			}
 			if (j < 0) {
 				if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
 					cout
-					<< "Negative column index in'" << mtxFile << "'.\n" << endl;
+					<< "Negative column index in'" << mtxFile << "'." << endl;
 				return false;
 			}
 			PD_A[i][j] = strtod(str, &chr);
@@ -2408,7 +2408,7 @@ namespace SF {
 		if (mne == PD_neq)
 			ull_mne = (unsigned long long) mne;
 		else {
-			if (mne > 62) 
+			if (mne > 62)
 				*success = false;
 			ull_mne = BinomialCoefficient(mne, PD_neq - 1);
 		}
@@ -2535,16 +2535,6 @@ namespace SF {
 			return PP_INSIDE_HALFSPACE;
 
 		return PP_OUTSIDE_HALFSPACE;							// <a,x> > b
-	}
-
-	static inline void PolytopeHomothety(PT_vector_T center, double ratio) { // https://en.wikipedia.org/wiki/Homothety
-		if (ratio == 1)
-			return;
-		assert(ratio > 0);
-
-		for (int i = 0; i < PD_m; i++) {
-			PD_b[i] = ratio * PD_b[i] - (ratio - 1) * Vector_DotProduct(PD_A[i], center);
-		}
 	}
 
 	static inline void Print_Constraints() {
@@ -2747,6 +2737,13 @@ namespace SF {
 		for (int j = 0; j < PD_n; j++)
 			sum += x[j] * y[j];
 		return sum;
+	}
+
+	static inline bool Vector_Equal(PT_vector_T x, PT_vector_T y) { // x = y
+		for (int j = 0; j < PD_n; j++)
+			if (x[j] != y[j])
+				return false;
+		return true;
 	}
 
 	static inline void Vector_MakeLike(PT_vector_T x, double lengthOfLikeVector, PT_vector_T likeVector) {

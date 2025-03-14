@@ -37,9 +37,9 @@ void PC_bsf_Init(bool* success) {
 	}
 
 	#ifdef PP_MPS_FORMAT
-	*success = MPS___Load_Problem();
+	* success = MPS___Load_Problem();
 	#else
-	*success = MTX__Load_Problem();
+	* success = MTX__Load_Problem();
 	#endif // PP_MPS_FORMAT
 
 	if (*success == false)
@@ -301,8 +301,8 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 			#ifdef PP_DEBUG
 			bool binomial_success;
 			cout << "Worker " << BSF_sv_mpiRank << ":\tF(u_grd) = " << setprecision(PP_SETW / 2) << objF_grd
-				<< "\tObjF = " << setprecision(PP_SETW / 2) << objF_nex 
-				<< "\tNumber of edges: " << Number_of_Edges(u_nex, PP_EPS_ON_HYPERPLANE, &binomial_success) 
+				<< "\tObjF = " << setprecision(PP_SETW / 2) << objF_nex
+				<< "\tNumber of edges: " << Number_of_Edges(u_nex, PP_EPS_ON_HYPERPLANE, &binomial_success)
 				<< "\t\t\t---> Movement is possible" << endl;
 			#endif // PP_DEBUG /**/
 		}
@@ -324,7 +324,7 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 	}
 
 	#ifdef PP_GAUGE
-	if (BSF_sv_mpiRank == 0) 
+	if (BSF_sv_mpiRank == 0)
 		cout << "Map progress: 100%" << "\tElapsed time: " << t0 + (double)time(NULL) << endl;
 	#endif // PP_GAUGE
 
@@ -550,7 +550,7 @@ void PC_bsf_ProcessResults(PT_bsf_reduceElem_T* reduceResult, int reduceCounter,
 	cout << "ObjF = " << ObjF(PD_u_cur) << "\tNumber of edges: " << PD_med_u << endl;
 	//cout << "Distance to polytope: " << Distance_PointToPolytope(PD_u_cur) << endl;
 	//cout << "Number of hyperplanes including u_nex: " << Number_IncludingNeHyperplanes(PD_u_cur, PP_EPS_ON_HYPERPLANE) << endl;
-    //cout << "u_nex:\t"; Print_Vector(reduceResult->u_nex);  cout << endl;
+	//cout << "u_nex:\t"; Print_Vector(reduceResult->u_nex);  cout << endl;
 	//cout << "u_nex hyperplanes:\t"; Print_HyperplanesIncludingPoint(reduceResult->u_nex, PP_EPS_ON_HYPERPLANE); cout << endl;
 	cout << "_________________________________________________ " << PD_iterNo + 1 << " _____________________________________________________" << endl;
 	#endif // PP_DEBUG
@@ -566,7 +566,7 @@ void PC_bsf_ProcessResults(PT_bsf_reduceElem_T* reduceResult, int reduceCounter,
 		cout << "Minimum PP_EPS_ON_HYPERPLANE should be " << eps_on_polytope << endl;
 		#endif // PP_DEBUG /**/
 
-		*exit = true;
+		* exit = true;
 		return;
 	}
 
@@ -605,7 +605,7 @@ void PC_bsf_ProcessResults_3(PT_bsf_reduceElem_T_3* reduceResult, int reduceCoun
 }
 
 void PC_bsf_ReduceF(PT_bsf_reduceElem_T* x, PT_bsf_reduceElem_T* y, PT_bsf_reduceElem_T* z) { // z = x o y
-#ifdef PP_GRADIENT
+	#ifdef PP_GRADIENT
 	if (x->objF_grd > y->objF_grd) {
 		z->objF_grd = x->objF_grd;
 		z->objF_nex = x->objF_nex;
@@ -616,7 +616,7 @@ void PC_bsf_ReduceF(PT_bsf_reduceElem_T* x, PT_bsf_reduceElem_T* y, PT_bsf_reduc
 		z->objF_nex = y->objF_nex;
 		Vector_Copy((*y).u_nex, (*z).u_nex);
 	}
-#else
+	#else
 	if (x->objF_nex > y->objF_nex) {
 		z->objF_nex = x->objF_nex;
 		Vector_Copy((*x).u_nex, (*z).u_nex);
@@ -625,7 +625,7 @@ void PC_bsf_ReduceF(PT_bsf_reduceElem_T* x, PT_bsf_reduceElem_T* y, PT_bsf_reduc
 		z->objF_nex = y->objF_nex;
 		Vector_Copy((*y).u_nex, (*z).u_nex);
 	}
-#endif // PP_GRADIENT
+	#endif // PP_GRADIENT
 }
 
 void PC_bsf_ReduceF_1(PT_bsf_reduceElem_T_1* x, PT_bsf_reduceElem_T_1* y, PT_bsf_reduceElem_T_1* z) {
@@ -747,20 +747,20 @@ namespace SF {
 
 			Vector_DivideEquals(r, m_flat);
 
-#ifdef PP_DEBUG
+			#ifdef PP_DEBUG
 			PT_vector_T w_prev;
 			Vector_Copy(w, w_prev);
-#endif // PP_DEBUG
+			#endif // PP_DEBUG
 
 			Vector_PlusEquals(w, r);
 
-#ifdef PP_DEBUG
+			#ifdef PP_DEBUG
 			double dist = Distance_PointToPoint(w, w_prev);
 			if (dist < PF_DBL_EPSILON * 10) { // Significand bit depth is exceeded!
 				*success = -1;
 				return;
 			}
-#endif // PP_DEBUG
+			#endif // PP_DEBUG
 
 			iterCount++;
 			if (iterCount > maxProjectingIter) {
@@ -1493,11 +1493,11 @@ namespace SF {
 						cout << "MPS_AddObjectiveFunction error: Coefficient redefinition of the objective function for " << column[i_col].varName << "." << endl;
 					return false;
 				}
-#ifdef MPS_MIN_OF_OBJECTIVE_FUNCTION
+				#ifdef MPS_MIN_OF_OBJECTIVE_FUNCTION
 				PD_c[column[i_col].j] = column[i_col].value;
-#else
+				#else
 				PD_c[column[i_col].j] = -column[i_col].value;
-#endif
+				#endif
 			}
 		return true;
 	}
@@ -1987,13 +1987,13 @@ namespace SF {
 			if (i < 0) {
 				if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
 					cout
-					<< "Negative row index in'" << mtxFile << "'.\n" << endl;
+					<< "Negative row index in'" << mtxFile << "'." << endl;
 				return false;
 			}
 			if (j < 0) {
 				if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
 					cout
-					<< "Negative column index in'" << mtxFile << "'.\n" << endl;
+					<< "Negative column index in'" << mtxFile << "'." << endl;
 				return false;
 			}
 			PD_A[i][j] = strtod(str, &chr);
@@ -2408,7 +2408,7 @@ namespace SF {
 		if (mne == PD_neq)
 			ull_mne = (unsigned long long) mne;
 		else {
-			if (mne > 62) 
+			if (mne > 62)
 				*success = false;
 			ull_mne = BinomialCoefficient(mne, PD_neq - 1);
 		}
@@ -2535,16 +2535,6 @@ namespace SF {
 			return PP_INSIDE_HALFSPACE;
 
 		return PP_OUTSIDE_HALFSPACE;							// <a,x> > b
-	}
-
-	static inline void PolytopeHomothety(PT_vector_T center, double ratio) { // https://en.wikipedia.org/wiki/Homothety
-		if (ratio == 1)
-			return;
-		assert(ratio > 0);
-
-		for (int i = 0; i < PD_m; i++) {
-			PD_b[i] = ratio * PD_b[i] - (ratio - 1) * Vector_DotProduct(PD_A[i], center);
-		}
 	}
 
 	static inline void Print_Constraints() {
@@ -2747,6 +2737,13 @@ namespace SF {
 		for (int j = 0; j < PD_n; j++)
 			sum += x[j] * y[j];
 		return sum;
+	}
+
+	static inline bool Vector_Equal(PT_vector_T x, PT_vector_T y) { // x = y
+		for (int j = 0; j < PD_n; j++)
+			if (x[j] != y[j])
+				return false;
+		return true;
 	}
 
 	static inline void Vector_MakeLike(PT_vector_T x, double lengthOfLikeVector, PT_vector_T likeVector) {

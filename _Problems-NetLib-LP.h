@@ -109,7 +109,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 // Relative error = 2.03e-16
 //--------------------------------------------------------------------------
 
-/*============================== sc105 LP problem ==============================*/
+/*============================== sc105 LP problem ==============================*
 #define PP_PROBLEM_NAME		"sc105"
 #define PP_M 104	// Number of constraints in *.mps
 #define PP_N 103	// Number of variables in *.mps
@@ -193,7 +193,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+7			// Length of Objective Vector
 //------------------------------------------------------------------------------
 
-/*============================== share2b LP problem ============================*
+/*============================== share2b LP problem ============================*/
 #define PP_PROBLEM_NAME		"share2b"	
 #define PP_M 96		// Number of constraints in *.mps
 #define PP_N 79	// Number of variables in *.mps
