@@ -17,11 +17,6 @@ static int PD_mneh_u;				// Number of inequality-hyperplanes that include point 
 static int PD_mne_p;				// Number of inequality-hyperplanes used for pseudoprojection
 static int PD_iterNo;				// Number of iterations
 static double PD_objF_cur;			// Objective function value in curerent point
-static bool PD_TWIDDLE_done;		// Done indicator for TWIDDLE_Run algorithm
-static int PD_TWIDDLE_nextEdgeI;	// Next index of edge in TWIDDLE_Run algorithm
-static int PD_TWIDDLE_x;			// Auxiliary TWIDDLE_Run variable
-static int PD_TWIDDLE_y;			// Auxiliary TWIDDLE_Run variable
-static int PD_TWIDDLE_z;			// Auxiliary TWIDDLE_Run variable
 //========================== Problem structures ====================================
 static PT_matrix_T PD_A;			// Matrix of constraint coefficients
 static bool PD_isEquation[PP_MM];	// Constraint is equation

@@ -218,8 +218,7 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 		}
 		#endif // PP_GAUGE
 
-		TWIDDLE__CodeToSubset(edge_i, PD_neHyperplanes_u, PD_edgeNeHyperplanes, PD_mneh_u, PD_neq - 1,
-			&PD_TWIDDLE_x, &PD_TWIDDLE_y, &PD_TWIDDLE_z, PD_TWIDDLE_p, &PD_TWIDDLE_done, &PD_TWIDDLE_nextEdgeI);
+		TWIDDLE__CodeToSubset(edge_i, PD_neHyperplanes_u, PD_edgeNeHyperplanes, PD_mneh_u, PD_neq - 1, PD_TWIDDLE_p);
 
 		for (int i = PD_meq; i < PD_n - 1; i++)
 			PD_edgeAlHyperplanes[i] = PD_edgeNeHyperplanes[i - PD_meq];
@@ -2663,26 +2662,21 @@ namespace SF {
 			(*eps) *= 2;
 	}
 
-	static inline void TWIDDLE__CodeToSubset(int code, int* a, int* c, int n, int m, int* x, int* y, int* z, int* p, bool* done, int* nextI) {
-		PD_TWIDDLE_done = false;
-		PD_TWIDDLE_nextEdgeI = 0;
-		TWIDDLE_Make_p(PD_TWIDDLE_p, PD_mneh_u, PD_neq - 1);
+	static inline void TWIDDLE__CodeToSubset(int code, int* a, int* c, int n, int m, int* p) {
+		static int x, y, z;
+		static bool done;
 
-		if (*nextI == 0) {
-			for (int k = 0; k < m; k++)
-				c[k] = a[n - m + k];
-			if (code == 0) {
-				(*nextI)++;
-				return;
-			}
+		TWIDDLE_Make_p(p, n, m);
+		for (int k = 0; k < m; k++)
+			c[k] = a[n - m + k];
+
+		if (code == 0) return;
+
+		for (int i = 0; i < code; i++) {
+			TWIDDLE_Run(&x, &y, &z, p, &done);
+			assert(!done);
+			c[z - 1] = a[x - 1];
 		}
-
-		do {
-			TWIDDLE_Run(x, y, z, p, done);
-			assert(!*done);
-			c[*z - 1] = a[*x - 1];
-			(*nextI)++;
-		} while (*nextI < code);
 	}
 
 	static inline void TWIDDLE_Make_p(int* p, int n, int m) {
