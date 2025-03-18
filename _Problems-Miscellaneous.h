@@ -20,17 +20,17 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_PROJECTION_COUNT			100000				// Each PP_PROJECTION_COUNT iteration to be outputted inside Flat_MaxProjection(*)
 //==============================================================================
 
-/*============================== nguyen5 LP problem ============================*
+/*============================== nguyen5 LP problem ============================*/
 #define PP_PROBLEM_NAME	"nguyen5"
 #define PP_MPS_FORMAT
 #define PP_M 4		// Number of constrains
 #define PP_N 5		// Number of variables
-#define PP_MAX_OBJ_VALUE 21.4549732313099141833845
+#define PP_MAX_OBJ_VALUE 21.4549732313098289182562
 //------------------------------------------------------------------------------
 #define PP_EPS_ZERO					1E-11					// Precision for comparison with zero
 #define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)		// Accuracy of belonging to hyperplane
 #define PP_EPS_ON_HYPERPLANE		(PP_EPS_PROJECTION*10)	// Accuracy of belonging to hyperplane
-#define PP_OBJECTIVE_VECTOR_LENGTH	1E+7					// Length of Objective Vector
+#define PP_OBJECTIVE_VECTOR_LENGTH	1E+6					// Length of Objective Vector
 //-------------------------- Compilation Modes ---------------------------------
 #define PP_GRADIENT
 //#define PP_MAXPROJECTION 
@@ -110,15 +110,14 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_EPS_ON_HYPERPLANE		(PP_EPS_PROJECTION*10)	// Accuracy of belonging to hyperplane
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+6					// Length of Objective Vector
 //-------------------------- Compilation Modes ---------------------------------
-//#define PP_GRADIENT
-#define PP_MAXPROJECTION 
+#define PP_GRADIENT
+//#define PP_MAXPROJECTION 
 //------------------------------------------------------------------------------
 // Elapsed time: 0
 // Number of iterations: 1
-// Computed objective value: 90000.0000000000145519152
+// Computed objective value: 90000.0000000000727595761
 // Maximal objective value:  90000
-// Relative error = 1.62e-16
-// Distance to polytope: 1.1776836e-13
+// Relative error = 8.08e-16
 //------------------------------------------------------------------------------
 
 /*============================== simple1FxVar LP problem =======================*
@@ -241,12 +240,11 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 //#define PP_GRADIENT
 //#define PP_MAXPROJECTION 
 //------------------------------------------------------------------------------
-/// Elapsed time: 0
+// Elapsed time: 0
 // Number of iterations: 1
-// Computed objective value: 55000.0000000002110027708
+// Computed objective value: 55000.0000000001164153218
 // Maximal objective value:  55000
-// Relative error = 3.84e-15
-// Distance to polytope: 1.9092324e-12
+// Relative error = 2.12e-15
 //------------------------------------------------------------------------------
 
 /*============================== simple1min LP problem =========================*
@@ -255,20 +253,19 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_N 8		// Number of variables (number of cols in *.mtx)
 #define PP_MAX_OBJ_VALUE 		-5000
 //------------------------------------------------------------------------------
-#define PP_EPS_ZERO					1E-11				// Precision for comparison with zero
-#define PP_EPS_PROJECTION			PP_EPS_ZERO			// Accuracy of belonging to hyperplane
-#define PP_EPS_ON_HYPERPLANE		PP_EPS_PROJECTION	// Accuracy of belonging to hyperplane
-#define PP_OBJECTIVE_VECTOR_LENGTH	1E+7				// Length of Objective Vector
+#define PP_EPS_ZERO					1E-11					// Precision for comparison with zero
+#define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)		// Accuracy of belonging to hyperplane
+#define PP_EPS_ON_HYPERPLANE		(PP_EPS_PROJECTION*10)	// Accuracy of belonging to hyperplane
+#define PP_OBJECTIVE_VECTOR_LENGTH	1E+6					// Length of Objective Vector
 //-------------------------- Compilation Modes ---------------------------------
 //#define PP_GRADIENT
-#define PP_MAXPROJECTION 
+//#define PP_MAXPROJECTION 
 //------------------------------------------------------------------------------
 // Elapsed time: 0
 // Number of iterations: 2
-// Computed objective value: -5000
+// Computed objective value: -4999.99999999999636202119
 // Maximal objective value:  -5000
-// Relative error = 0
-// Distance to polytope: 0
+// Relative error = 7.28e-16
 //------------------------------------------------------------------------------
 
 /*============================== simple_zcv LP problem =========================*
@@ -278,19 +275,18 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_MAX_OBJ_VALUE 		50000
 //------------------------------------------------------------------------------
 #define PP_EPS_ZERO					1E-11					// Precision for comparison with zero
-#define PP_EPS_PROJECTION			PP_EPS_ZERO				// Accuracy of belonging to hyperplane
+#define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)		// Accuracy of belonging to hyperplane
 #define PP_EPS_ON_HYPERPLANE		(PP_EPS_PROJECTION*10)	// Accuracy of belonging to hyperplane
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+6					// Length of Objective Vector
 //-------------------------- Compilation Modes ---------------------------------
 #define PP_GRADIENT
 //#define PP_MAXPROJECTION 
 //------------------------------------------------------------------------------
-// Elapsed time: 0
+/// Elapsed time: 0
 // Number of iterations: 3
-// Computed objective value: 50000
+// Computed objective value: 49999.9999999999854480848
 // Maximal objective value:  50000
-// Relative error = 0
-// Distance to polytope: 3.7895613e-14
+// Relative error = 2.91e-16
 //------------------------------------------------------------------------------
 
 /*============================== simple_lcv LP problem =========================*
@@ -312,7 +308,6 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 // Computed objective value: 50000.199999999997089617
 // Maximal objective value:  50000.199999999997089617
 // Relative error = 0
-// Distance to polytope: 5.6843419e-14
 //------------------------------------------------------------------------------
 
 /*============================== simple_lcv_neg LP problem =====================*
@@ -349,14 +344,13 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+7					// Length of Objective Vector
 //-------------------------- Compilation Modes ---------------------------------
 //#define PP_GRADIENT
-#define PP_MAXPROJECTION 
+//#define PP_MAXPROJECTION 
 //------------------------------------------------------------------------------
 // Elapsed time: 0
 // Number of iterations: 1
 // Computed objective value: 3000
 // Maximal objective value:  3000
 // Relative error = 0
-// Distance to polytope: 0
 //------------------------------------------------------------------------------
 
 /*============================== angle04 LP problem ============================*
@@ -378,7 +372,6 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 // Computed objective value: 3300
 // Maximal objective value:  3300
 // Relative error = 0
-// Distance to polytope: 0
 //------------------------------------------------------------------------------
 
 /*============================== cone3-0 LP problem ============================*
@@ -400,7 +393,6 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 // Computed objective value: 132.5
 // Maximal objective value:  132.5
 // Relative error = 0
-// Distance to polytope: 0
 //------------------------------------------------------------------------------
 
 /*============================== rnd3_3_Olkhovsky56 LP problem =================*
@@ -412,17 +404,15 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_EPS_ZERO					1E-11					// Precision for comparison with zero
 #define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)		// Accuracy of belonging to hyperplane
 #define PP_EPS_ON_HYPERPLANE		(PP_EPS_PROJECTION*10)	// Accuracy of belonging to hyperplane
-#define PP_OBJECTIVE_VECTOR_LENGTH	1E+7					// Length of Objective Vector
+#define PP_OBJECTIVE_VECTOR_LENGTH	1E+6					// Length of Objective Vector
 //-------------------------- Compilation Modes ---------------------------------
 #define PP_GRADIENT
-#define PP_BIPROJECTION
 //------------------------------------------------------------------------------
 // Elapsed time: 0
 // Number of iterations: 2
 // Computed objective value: 990.797118755359292663343
 // Maximal objective value:  990.797118755359292663343
 // Relative error = 0
-// Distance to polytope: 3.9017824e-14
 //------------------------------------------------------------------------------
 
 /*============================== rnd3_3_Olkhovsky289 LP problem ================*
@@ -434,7 +424,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_EPS_ZERO					1E-11					// Precision for comparison with zero
 #define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)		// Accuracy of belonging to hyperplane
 #define PP_EPS_ON_HYPERPLANE		(PP_EPS_PROJECTION*10)	// Accuracy of belonging to hyperplane
-#define PP_OBJECTIVE_VECTOR_LENGTH	1E+7					// Length of Objective Vector
+#define PP_OBJECTIVE_VECTOR_LENGTH	1E+6					// Length of Objective Vector
 //-------------------------- Compilation Modes ---------------------------------
 //#define PP_MAXPROJECTION 
 //------------------------------------------------------------------------------
@@ -443,51 +433,48 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 // Computed objective value: 671.952494859795933734858
 // Maximal objective value:  671.952494859795933734858
 // Relative error = 0
-// Distance to polytope: 1.1085433e-13
 //------------------------------------------------------------------------------
 
 /*============================== rnd3_3_Olkhovsky331 LP problem ================*
 #define PP_PROBLEM_NAME	"rnd3_3_Olkhovsky331"
 #define PP_M 6		// Number of equations (number of rows in *.mtx)
 #define PP_N 9		// Number of variables (number of cols in *.mtx)
-#define PP_MAX_OBJ_VALUE 714.53547796531813673937
+#define PP_MAX_OBJ_VALUE 714.535477965318250426208
 //------------------------------------------------------------------------------
 #define PP_EPS_ZERO					1E-11					// Precision for comparison with zero
 #define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)		// Accuracy of belonging to hyperplane
 #define PP_EPS_ON_HYPERPLANE		(PP_EPS_PROJECTION*10)	// Accuracy of belonging to hyperplane
-#define PP_OBJECTIVE_VECTOR_LENGTH	1E+7					// Length of Objective Vector
+#define PP_OBJECTIVE_VECTOR_LENGTH	1E+6					// Length of Objective Vector
 //-------------------------- Compilation Modes ---------------------------------
 #define PP_GRADIENT
-#define PP_MAXPROJECTION 
+//#define PP_MAXPROJECTION 
 //------------------------------------------------------------------------------
 // Elapsed time: 0
 // Number of iterations: 3
-// Computed objective value: 714.53547796531813673937
-// Maximal objective value:  714.53547796531813673937
+// Computed objective value: 714.535477965318250426208
+// Maximal objective value:  714.535477965318250426208
 // Relative error = 0
-// Distance to polytope: 0
 //------------------------------------------------------------------------------
 
 /*============================== rnd3_3_Olkhovsky336 LP problem ================*
 #define PP_PROBLEM_NAME	"rnd3_3_Olkhovsky336"
 #define PP_M 6		// Number of equations (number of rows in *.mtx)
 #define PP_N 9		// Number of variables (number of cols in *.mtx)
-#define PP_MAX_OBJ_VALUE 998.193448648739490636217
+#define PP_MAX_OBJ_VALUE 998.193448648739376949379
 //------------------------------------------------------------------------------
 #define PP_EPS_ZERO					1E-11					// Precision for comparison with zero
 #define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)		// Accuracy of belonging to hyperplane
 #define PP_EPS_ON_HYPERPLANE		(PP_EPS_PROJECTION*10)	// Accuracy of belonging to hyperplane
-#define PP_OBJECTIVE_VECTOR_LENGTH	1E+7					// Length of Objective Vector
+#define PP_OBJECTIVE_VECTOR_LENGTH	1E+6					// Length of Objective Vector
 //-------------------------- Compilation Modes ---------------------------------
-#define PP_GRADIENT
-#define PP_MAXPROJECTION 
+//#define PP_GRADIENT
+//#define PP_MAXPROJECTION 
 //------------------------------------------------------------------------------
 // Elapsed time: 0
 // Number of iterations: 2
-// Computed objective value: 998.193448648739490636217
-// Maximal objective value:  998.193448648739490636217
+// Computed objective value: 998.193448648739376949379
+// Maximal objective value:  998.193448648739376949379
 // Relative error = 0
-// Distance to polytope: 0
 //------------------------------------------------------------------------------
 
 /*============================== rnd3-10 LP problem ============================*
@@ -509,14 +496,13 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 // Computed objective value: 852.028917900972601273679
 // Maximal objective value:  852.028917900972601273679
 // Relative error = 0
-// Distance to polytope: 2.8421709e-14
 //------------------------------------------------------------------------------
 
-/*============================== rnd5-100 LP problem ===========================*/
+/*============================== rnd5-100 LP problem ===========================*
 #define PP_PROBLEM_NAME	"rnd5-100"
 #define PP_M 105		// Number of equations (number of rows in *.mtx)
 #define PP_N 110		// Number of variables (number of cols in *.mtx)
-#define PP_MAX_OBJ_VALUE 1848.43708056819377816282
+#define PP_MAX_OBJ_VALUE 1848.43708056834998387785
 //------------------------------------------------------------------------------
 #define PP_EPS_ZERO					1E-11					// Precision for comparison with zero
 #define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)		// Accuracy of belonging to hyperplane
@@ -524,14 +510,13 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+6					// Length of Objective Vector
 //-------------------------- Compilation Modes ---------------------------------
 #define PP_GRADIENT
-#define PP_MAXPROJECTION 
+//#define PP_MAXPROJECTION 
 //------------------------------------------------------------------------------
 // Elapsed time: 0
-// Number of iterations: 10
-// Computed objective value: 1848.43708056819377816282
-// Maximal objective value:  1848.43708056819377816282
+// Number of iterations: 12
+// Computed objective value: 1848.43708056834998387785
+// Maximal objective value:  1848.43708056834998387785
 // Relative error = 0
-// Distance to polytope: 2.0337103e-13
 //------------------------------------------------------------------------------
 
 /*==============================================================================*/

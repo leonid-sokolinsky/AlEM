@@ -16,7 +16,10 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 // PP_OBJECTIVE_VECTOR_LENGTH - direct dependence on dimension PD_n.
 // P_EPS_ZERO - inverse dependence on PP_OBJECTIVE_VECTOR_LENGTH.
 //------------------------------------------------------------------------------
-#define PP_EPS_RELATIVE_ERROR			1E-3			// Used if defined PP_CHECK_MAX_OBJ_VALUE 
+#define PP_EPS_RELATIVE_ERROR	1E-5		// Used if defined PP_CHECK_MAX_OBJ_VALUE 
+//------------------------------ ifdef PP_DEBUG --------------------------------
+#define PP_PROJECTION_COUNT		10000000	// Each PP_PROJECTION_COUNT-th iteration to be outputted inside Flat_MaxProjection(*) or Flat_BipProjection(*)
+//------------------------------------------------------------------------------
 
 /*============================== afiro LP problem ==============================*
 // Number of equations : 8
@@ -61,6 +64,23 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 // Computed objective value: 30.8121498459151119675425
 // Maximal objective value:  30.8121498458282196963864
 // Relative error = 2.82e-12
+//------------------------------------------------------------------------------
+
+/*============================== share2b LP problem ============================*/
+// Number of equations: 13
+// Subspace dimension: 66
+#define PP_PROBLEM_NAME		"share2b"	
+#define PP_M 96		// Number of constraints in *.mps
+#define PP_N 79	// Number of variables in *.mps
+#define PP_MAX_OBJ_VALUE 415.732240741419486545199108738 // Exact maximum value of objective function
+//--------------------------------------------------------------------------
+#define PP_EPS_ZERO					1E-11					// Accuracy for comparison with zero
+#define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)		// Accuracy of calculating pseudoprojection
+#define PP_EPS_ON_HYPERPLANE		(PP_EPS_PROJECTION*10)	// Accuracy of belonging to hyperplane
+#define PP_OBJECTIVE_VECTOR_LENGTH	1E+6					// Length of Objective Vector
+//-------------------------- Compilation Modes ---------------------------------
+//#define PP_GRADIENT
+#define PP_MAXPROJECTION
 //------------------------------------------------------------------------------
 
 /*============================== sc50a LP problem ==========================*
@@ -139,17 +159,13 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_N 41	// Number of variables in mps-file (after conversion to standard form)
 #define PP_MAX_OBJ_VALUE 1749.9001299062057129526866493726
 //--------------------------------------------------------------------------
-#define PP_EPS_ZERO					1E-7					// Accuracy for comparison with zero
+#define PP_EPS_ZERO					1E-11					// Accuracy for comparison with zero
 #define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)		// Accuracy of calculating pseudoprojection
 #define PP_EPS_ON_HYPERPLANE		(PP_EPS_PROJECTION*10)	// Accuracy of belonging to hyperplane
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+6					// Length of Objective Vector
 //-------------------------- Compilation Modes ---------------------------------
 #define PP_MAXPROJECTION
 //------------------------------------------------------------------------------
-// Number of inequality hyperplanes including u0: 27
-// F(v0)    = 0.560444040042418656355494        Number of edges:        2925
-// Map progress : 100 % Elapsed time : 4044
-// F(u_nex) = 0.59837678849741360309622         Number of edges:        2925
 //------------------------------------------------------------------------------
 
 /*============================== adlittle LP problem ===========================*
@@ -193,18 +209,4 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+7			// Length of Objective Vector
 //------------------------------------------------------------------------------
 
-/*============================== share2b LP problem ============================*/
-#define PP_PROBLEM_NAME		"share2b"	
-#define PP_M 96		// Number of constraints in *.mps
-#define PP_N 79	// Number of variables in *.mps
-#define PP_MAX_OBJ_VALUE 415.732240741419486545199108738 // Exact maximum value of objective function
-//--------------------------------------------------------------------------
-#define PP_EPS_ZERO					1E-11					// Accuracy for comparison with zero
-#define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)		// Accuracy of calculating pseudoprojection
-#define PP_EPS_ON_HYPERPLANE		(PP_EPS_PROJECTION*10)	// Accuracy of belonging to hyperplane
-#define PP_OBJECTIVE_VECTOR_LENGTH	1E+6					// Length of Objective Vector
-//-------------------------- Compilation Modes ---------------------------------
-//#define PP_GRADIENT
-#define PP_MAXPROJECTION
-//------------------------------------------------------------------------------
 //----------------------------------------------------------------------------/**/

@@ -37,16 +37,17 @@ This source code has been produced with using BSF-skeleton
 
 //-------------------------- Compilation Modes ---------------------------------
 #define PP_DEBUG
+#define PP_RANDOM_OBJ_VECTOR
 //#define PP_MATRIX_OUTPUT
 //#define PP_SAVE_ITER_RESULT
 //#define PP_SAVE_RESULT
-#define PP_CHECK_MAX_OBJ_VALUE // Exit if relative error of computed maximum of objective function is less than PP_EPS_RELATIVE_ERROR (demands #define PP_MAX_OBJ_VALUE)
-#define PP_GAUGE
+//#define PP_CHECK_MAX_OBJ_VALUE // Exit if relative error of computed maximum of objective function is less than PP_EPS_RELATIVE_ERROR (demands #define PP_MAX_OBJ_VALUE)
+//#define PP_GAUGE
 //#define MPS_MIN_OF_OBJECTIVE_FUNCTION
 
 //================================ Problem Paramrters ==========================
 #define PP_MM							(PP_M+2*PP_N)		// Maximal number of constraints
-
+#define PP_EPS_JUMP_VECTOR_LEN			1E-3
 #define PP_MAX_ITER_COUNT				10000000000		// Maximal count of iterations
 #define PP_MAX_PSEUDOPROJECTING_ITER	10000000		// Maximum acceptable number of iterations in Pseudoprojection on flat
 #define PP_INT_MAX						2147483647		// This is necessary for compatibility with different compilers

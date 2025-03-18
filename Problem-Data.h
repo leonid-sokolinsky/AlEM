@@ -17,11 +17,11 @@ static int PD_mneh_u;				// Number of inequality-hyperplanes that include point 
 static int PD_mne_p;				// Number of inequality-hyperplanes used for pseudoprojection
 static int PD_iterNo;				// Number of iterations
 static double PD_objF_cur;			// Objective function value in curerent point
-static bool PD_TWIDDLE_done;		// Done indicator for TWIDDLE algorithm
-static int PD_TWIDDLE_nextEdgeI;	// Next index of edge in TWIDDLE algorithm
-static int PD_TWIDDLE_x;			// Auxiliary TWIDDLE variable
-static int PD_TWIDDLE_y;			// Auxiliary TWIDDLE variable
-static int PD_TWIDDLE_z;			// Auxiliary TWIDDLE variable
+static bool PD_TWIDDLE_done;		// Done indicator for TWIDDLE_Run algorithm
+static int PD_TWIDDLE_nextEdgeI;	// Next index of edge in TWIDDLE_Run algorithm
+static int PD_TWIDDLE_x;			// Auxiliary TWIDDLE_Run variable
+static int PD_TWIDDLE_y;			// Auxiliary TWIDDLE_Run variable
+static int PD_TWIDDLE_z;			// Auxiliary TWIDDLE_Run variable
 //========================== Problem structures ====================================
 static PT_matrix_T PD_A;			// Matrix of constraint coefficients
 static bool PD_isEquation[PP_MM];	// Constraint is equation
@@ -37,6 +37,6 @@ static int PD_neHyperplanes_u[PP_MM];		// Index of inequality-hyperplanes that i
 static int PD_edgeNeHyperplanes[PP_N - 1];	// Index of inequality-hyperplanes used for pseudoprojection
 static int PD_edgeAlHyperplanes[PP_N - 1];	// Index of all hyperplanes used for pseudoprojection
 static PT_bitscale_T PD_edgeBitscale;		// Bit scale that tags all hyperplanes forming the edge
-static int PD_TWIDDLE_p[PP_MM + 2];			// Auxiliary array for TWIDDLE algorithm
+static int PD_TWIDDLE_p[PP_MM + 2];			// Auxiliary array for TWIDDLE_Run algorithm
 //========================== Input/Output ====================================
 static string PD_problemName;
