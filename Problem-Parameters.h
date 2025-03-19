@@ -38,15 +38,12 @@ This source code has been produced with using BSF-skeleton
 #define PP_SAVE_ITER_RESULT
 #define PP_SAVE_RESULT
 #define PP_CHECK_MAX_OBJ_VALUE // Exit if relative error of computed maximum of objective function is less than PP_EPS_RELATIVE_ERROR (demands #define PP_MAX_OBJ_VALUE)
-#define PP_GAUGE
+//#define PP_GAUGE
 //#define MPS_MIN_OF_OBJECTIVE_FUNCTION
 
 //================================ Problem Paramrters ==========================
 #define PP_MM							(PP_M+2*PP_N)	// Maximal number of constraints
 #define PP_EPS_JUMP_VECTOR_LEN			1E-3			// Minimum acceptable length of the jump vector
-#define PP_MAX_ITER_COUNT				10000000000		// Maximal count of iterations
-#define PP_MAX_PSEUDOPROJECTING_ITER	100000000		// Maximum acceptable number of iterations in Pseudoprojection on flat
-//#define PP_EPS_RELATIVE_ERROR			1E-4			// Used if defined PP_CHECK_MAX_OBJ_VALUE 
 //-------------------------- Input/Outpoot Parameters --------------------------
 #define PP_OUTPUT_LIMIT	30	// Number of Elements to output
 #define PP_SETW 16

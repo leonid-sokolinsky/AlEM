@@ -189,9 +189,6 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 	#endif // PP_DEBUG /**/
 	// Condition for breakpoint: PD_iterNo == 2 && (BSF_sv_addressOffset + BSF_sv_numberInSublist == 2)
 
-	//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	//cout << BSF_sv_mpiRank << ") Hyperplanes including v:\t"; Print_HyperplanesIncludingPoint(u_cur, PP_EPS_ON_HYPERPLANE); cout << endl;
-
 	edge_i = BSF_sv_mpiRank - BSF_sv_numOfWorkers;
 	iterCounter = -1;
 	edgesPerWorker = PF_MAX(PD_med_u / (double)BSF_sv_numOfWorkers, 1);
@@ -341,8 +338,7 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 	}
 
 	#ifdef PP_GAUGE
-	if (BSF_sv_mpiRank == 0)
-		cout << "Map progress: 100%" << "\tElapsed time: " << t0 + (double)time(NULL) << endl;
+	cout  << "Worker " << BSF_sv_mpiRank << ". Map progress: 100%" << "\tElapsed time: " << t0 + (double)time(NULL) << endl;
 	#endif // PP_GAUGE
 
 	if (objF_nex_max == -PP_INFINITY) {
@@ -520,9 +516,6 @@ void PC_bsf_ProcessResults(PT_bsf_reduceElem_T* reduceResult, int reduceCounter,
 		* exit = true;
 		return;
 	}
-
-	//cout << "PD_objF_cur = " << PD_objF_cur << "\treduceResult->objF_nex = " << reduceResult->objF_nex << endl;//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	//if (PD_iterNo == 3) { cout << "Breakpoint " << PD_iterNo << " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl; *exit = true; return; }//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 	#ifdef PP_CHECK_MAX_OBJ_VALUE
 	if (RelativeError(PP_MAX_OBJ_VALUE, reduceResult->objF_nex) < PP_EPS_RELATIVE_ERROR) {
