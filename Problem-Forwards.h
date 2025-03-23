@@ -9,7 +9,8 @@ This source code has been produced with using BSF-skeleton
 #include "Problem-Types.h"
 //====================== Private Functions ===========================
 namespace PF {
-	void	CalculateNumberOfEdges(int neq, int mneh_u, int* med_u, bool* success);
+	void	CalculateNumberOfEdges(int neq, int mneh_u, int* med_u);
+	int		Number_of_Edges(PT_vector_T x, double eps_on_hyperplane);
 	void	PreparationForIteration(PT_vector_T u);
 }
 //====================== Shared Functions ===========================
@@ -64,7 +65,6 @@ namespace SF {
 	bool	MTX_SavePoint(PT_vector_T x, string postfix);
 	void	MTX_SkipComments(FILE* stream);
 	int		Number_IncludingNeHyperplanes(PT_vector_T x, double eps_on_hyperplane);
-	int		Number_of_Edges(PT_vector_T x, double eps_on_hyperplane, bool* success);
 	double	ObjF(PT_vector_T x);
 	void	OrthogonalProjectingVectorOntoHalfspace_i(PT_vector_T z, int i, PT_vector_T r, bool* success);
 	void	OrthogonalProjectingVectorOntoHyperplane_i(PT_vector_T x, int i, PT_vector_T p);
@@ -85,7 +85,8 @@ namespace SF {
 	void	Shift(PT_vector_T point, PT_vector_T shiftVector, double factor, PT_vector_T shiftedPoint);
 	void	Tuning_Eps_PointBelongsToFlat(PT_vector_T x, int* hyperplaneList, int hyperplaneCount, double* eps);
 	void	Tuning_Eps_PointBelongsToPolytope(PT_vector_T x, double* eps);
-	void	TWIDDLE__CodeToSubset(int code, int* a, int* c, int n, int m, int* p);
+	int		TWIDDLE__BinomialCoefficient(int n, int k, int* p);
+	void	TWIDDLE__CodeToSubset(int code, int* a, int* c, int n, int m, int* p, bool* done);
 	void	TWIDDLE_Make_p(int* p, int n, int m);
 	void	TWIDDLE_Run(int* x, int* y, int* z, int* p, bool* done);
 	void	Vector_Addition(PT_vector_T x, PT_vector_T y, PT_vector_T z);
@@ -113,3 +114,4 @@ namespace SF {
 #define PF_MAX(x,y) (x>y?x:y)
 #define PF_MAP_LIST_INDEX (BSF_sv_addressOffset + BSF_sv_numberInSublist)
 #define PF_DBL_EPSILON 2.222E-16 // Machine epsilon
+#define PF_INT_MAX 2147483647 // Maximum value for a variable of type int

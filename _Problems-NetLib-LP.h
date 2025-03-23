@@ -65,7 +65,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 // Relative error = 2.82e-12
 //------------------------------------------------------------------------------
 
-/*============================== kb2 LP problem ================================*/
+/*============================== kb2 LP problem ================================*
 // Number of equations: 16
 // Subspace dimension: 25
 #define PP_PROBLEM_NAME		"kb2"
@@ -185,19 +185,19 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 //----------------------------------------------------------------------------
 #define PP_EPS_RELATIVE_ERROR			1E-4				// Used if defined PP_CHECK_MAX_OBJ_VALUE 
 #define PP_MAX_PSEUDOPROJECTING_ITER	100000000			// Maximum acceptable number of iterations in Pseudoprojection on flat
+//------------------------------ ifdef PP_DEBUG --------------------------------
+#define PP_PROJECTION_COUNT			10000000				// Each PP_PROJECTION_COUNT-th iteration to be outputted inside Flat_MaxProjection(*) or Flat_BipProjection(*)
 //-------------------------- Compilation Modes ---------------------------------
 //#define PP_GRADIENT
 #define PP_MAXPROJECTION
+#define PP_MIN_OF_EDGES
 //------------------------------------------------------------------------------
-// ObjF = 50.021278        Number of edges: 521855
-// Map progress: 0.034% (per minute)
-// ...
-// Map progress: 0.78%
-// ObjF = 50.021278       Number of edges: 6471002
+// ObjF = 50.20643 Number of edges: 521855
+// Map progress: 0.018%    Time = 61
 // ...
 //------------------------------------------------------------------------------
 
-/*============================== adlittle LP problem ===========================*
+/*============================== adlittle LP problem ===========================*/
 // Number of equations : 15
 // Subspace dimension : 82
 #define PP_PROBLEM_NAME		"adlittle"
@@ -205,9 +205,20 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_N 97	// Number of variables in mps-file
 #define PP_MAX_OBJ_VALUE 		-225494.96316238038228101176621492
 //------------------------------------------------------------------------------
-#define PP_EPS_ZERO					1E-7			// Precision for comparison with zero
-#define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*10)// Accuracy of belonging to hyperplane
-#define PP_OBJECTIVE_VECTOR_LENGTH	1E+7			// Length of Objective Vector
+#define PP_EPS_ZERO					1E-11					// Accuracy for comparison with zero
+#define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)		// Accuracy of calculating pseudoprojection
+#define PP_EPS_ON_HYPERPLANE		(PP_EPS_PROJECTION*10)	// Accuracy of belonging to hyperplane
+#define PP_OBJECTIVE_VECTOR_LENGTH	1E+6					// Length of Objective Vector
+//------------------------------------------------------------------------------
+#define PP_EPS_RELATIVE_ERROR			1E-8				// Used if defined PP_CHECK_MAX_OBJ_VALUE 
+#define PP_MAX_PSEUDOPROJECTING_ITER	1000000000			// Maximum acceptable number of iterations in Pseudoprojection on flat
+//------------------------------ ifdef PP_DEBUG --------------------------------
+#define PP_PROJECTION_COUNT				100000000			// Each PP_PROJECTION_COUNT-th iteration to be outputted inside Flat_MaxProjection(*) or Flat_BipProjection(*)
+//-------------------------- Compilation Modes ---------------------------------
+//#define PP_GRADIENT
+#define PP_MAXPROJECTION
+#define PP_MIN_OF_EDGES
+//------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 

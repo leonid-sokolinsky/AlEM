@@ -17,10 +17,11 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 //						calculating pseudoprojection.
 #define PP_EPS_RELATIVE_ERROR		1E-5				// Used if defined PP_CHECK_MAX_OBJ_VALUE 
 //------------------------------ ifdef PP_DEBUG --------------------------------
-#define PP_PROJECTION_COUNT			100000				// Each PP_PROJECTION_COUNT iteration to be outputted inside Flat_MaxProjection(*)
+#define PP_PROJECTION_COUNT				100000				// Each PP_PROJECTION_COUNT iteration to be outputted inside Flat_MaxProjection(*)
+#define PP_MAX_PSEUDOPROJECTING_ITER	100000000			// Maximum acceptable number of iterations in Pseudoprojection on flat
 //==============================================================================
 
-/*============================== nguyen5 LP problem ============================*
+/*============================== nguyen5 LP problem ============================*/
 #define PP_PROBLEM_NAME	"nguyen5"
 #define PP_MPS_FORMAT
 #define PP_M 4		// Number of constrains
@@ -34,6 +35,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 //-------------------------- Compilation Modes ---------------------------------
 #define PP_GRADIENT
 //#define PP_MAXPROJECTION 
+//#define PP_MIN_OF_EDGES
 //------------------------------------------------------------------------------
 // Elapsed time: 0
 // Number of iterations: 5
@@ -70,7 +72,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 // Distance to polytope: 0
 //------------------------------------------------------------------------------
 
-/*============================== featheredCube LP problem =========================*/
+/*============================== featheredCube LP problem =========================*
 #define PP_MPS_FORMAT
 #define PP_PROBLEM_NAME	"featheredCube"
 #ifdef PP_MPS_FORMAT
@@ -509,7 +511,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_EPS_ON_HYPERPLANE		(PP_EPS_PROJECTION*10)	// Accuracy of belonging to hyperplane
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+6					// Length of Objective Vector
 //-------------------------- Compilation Modes ---------------------------------
-#define PP_GRADIENT
+//#define PP_GRADIENT
 //#define PP_MAXPROJECTION 
 //------------------------------------------------------------------------------
 // Elapsed time: 0

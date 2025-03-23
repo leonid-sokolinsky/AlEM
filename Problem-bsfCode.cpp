@@ -167,15 +167,11 @@ void PC_bsf_MainArguments(int argc, char* argv[]) {
 void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int* mapSuccess) {
 	double* u_cur = BSF_sv_parameter.u_cur;	// Current vertex
 	double objF_u_cur = ObjF(u_cur);
-	PT_vector_T u_nex_max;
-	double objF_nex_max = -PP_INFINITY;
 	int edge_i;
 	int iterCounter;
 	double edgesPerWorker;
 	int exitCode;
-	#ifdef PP_GRADIENT
-	double objF_grd_max = -PP_INFINITY;
-	#endif // PP_GRADIENT
+	bool TWIDDLE_done;
 	#ifdef PP_GAUGE
 	int t0 = -(int)time(NULL);
 	int t60 = t0;
@@ -192,6 +188,10 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 	edge_i = BSF_sv_mpiRank - BSF_sv_numOfWorkers;
 	iterCounter = -1;
 	edgesPerWorker = PF_MAX(PD_med_u / (double)BSF_sv_numOfWorkers, 1);
+
+	reduceElem->objF_nex = -PP_INFINITY;
+	reduceElem->numOfEdges = PF_INT_MAX;
+	reduceElem->objF_grd = -PP_INFINITY;
 
 	while ((edge_i += BSF_sv_numOfWorkers) < PD_med_u) {
 		PT_vector_T  u_nex;		// Next vertex
@@ -215,7 +215,7 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 		}
 		#endif // PP_GAUGE
 
-		TWIDDLE__CodeToSubset(edge_i, PD_neHyperplanes_u, PD_edgeNeHyperplanes, PD_mneh_u, PD_neq - 1, PD_TWIDDLE_p);
+		TWIDDLE__CodeToSubset(edge_i, PD_neHyperplanes_u, PD_edgeNeHyperplanes, PD_mneh_u, PD_neq - 1, PD_TWIDDLE_p, &TWIDDLE_done);
 
 		for (int i = PD_meq; i < PD_n - 1; i++)
 			PD_edgeAlHyperplanes[i] = PD_edgeNeHyperplanes[i - PD_meq];
@@ -300,6 +300,8 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 
 		objF_nex = ObjF(u_nex);
 
+		int numOfEdges_u_nex = Number_of_Edges(u_nex, PP_EPS_ON_HYPERPLANE);
+
 		#ifdef PP_GRADIENT
 		PT_vector_T u_grd;
 		PT_vector_T d;
@@ -307,41 +309,54 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 		Shift(u_cur, d, 1 / Vector_Norm(d), u_grd);
 		objF_grd = ObjF(u_grd);
 
-		if (objF_grd > objF_grd_max + PP_EPS_ZERO) {
-			objF_grd_max = objF_grd;
-			objF_nex_max = objF_nex;
-			Vector_Copy(u_nex, u_nex_max);
+		#ifdef PP_MIN_OF_EDGES
+		bool goodEdge = numOfEdges_u_nex < reduceElem->numOfEdges || (numOfEdges_u_nex == reduceElem->numOfEdges && objF_grd > reduceElem->objF_grd + PP_EPS_ZERO);
+		#else
+		bool goodEdge = objF_grd > reduceElem->objF_grd + PP_EPS_ZERO;
+		#endif // PP_MIN_OF_EDGES
+
+		if (goodEdge) {
+
 			/*DEBUG PC_bsf_MapF*/
 			#ifdef PP_DEBUG
-			bool binomial_success;
 			cout << "Worker " << BSF_sv_mpiRank << ":\tF(u_grd) = " << setprecision(PP_SETW / 2) << objF_grd
 				<< "\tObjF = " << setprecision(PP_SETW / 2) << objF_nex
-				<< "\tNumber of edges: " << Number_of_Edges(u_nex, PP_EPS_ON_HYPERPLANE, &binomial_success)
-				<< "\t\t\t---> Movement is possible" << endl;
+				<< "\tNumber of edges: " << numOfEdges_u_nex << "\t\t\t---> Movement is possible" << endl;
 			#endif // PP_DEBUG /**/
+
+			reduceElem->numOfEdges = numOfEdges_u_nex;
+			reduceElem->objF_grd = objF_grd;
+			reduceElem->objF_nex = objF_nex;
+			Vector_Copy(u_nex, reduceElem->u_nex);
 		}
 		#else // !PP_GRADIENT
-		if (objF_nex > objF_nex_max + PP_EPS_ZERO) {
-			objF_nex_max = objF_nex;
-			Vector_Copy(u_nex, u_nex_max);
+
+		#ifdef PP_MIN_OF_EDGES
+		bool goodEdge = numOfEdges_u_nex < reduceElem->numOfEdges || (numOfEdges_u_nex == reduceElem->numOfEdges && objF_nex > reduceElem->objF_nex + PP_EPS_ZERO);
+		#else
+		bool goodEdge = objF_nex > reduceElem->objF_nex + PP_EPS_ZERO;
+		#endif // PP_MIN_OF_EDGES
+
+		if (goodEdge) {
 			/*DEBUG PC_bsf_MapF*/
 			#ifdef PP_DEBUG
-			bool binomial_success;
 			cout << "Worker " << BSF_sv_mpiRank << ": "
 				<< "\t ObjF = " << setprecision(PP_SETW / 2) << objF_nex
-				<< "\tNumber of edges: " << Number_of_Edges(u_nex, PP_EPS_ON_HYPERPLANE, &binomial_success)
-				<< "\t\t\t---> Movement is possible" << endl;
+				<< "\tNumber of edges: " << numOfEdges_u_nex << "\t\t\t---> Movement is possible" << endl;
 			// if (MTX_SavePoint(u_nex, PP_MTX_POSTFIX_V)) cout << "Current approximation is saved into file *.v" << endl;
 			#endif // PP_DEBUG /**/
+			reduceElem->numOfEdges = numOfEdges_u_nex;
+			reduceElem->objF_nex = objF_nex;
+			Vector_Copy(u_nex, reduceElem->u_nex);
 		}
 		#endif // PP_GRADIENT
 	}
 
 	#ifdef PP_GAUGE
-	cout  << "Worker " << BSF_sv_mpiRank << ". Map progress: 100%" << "\tElapsed time: " << t0 + (double)time(NULL) << endl;
+	cout << "Worker " << BSF_sv_mpiRank << ". Map progress: 100%" << "\tElapsed time: " << t0 + (double)time(NULL) << endl;
 	#endif // PP_GAUGE
 
-	if (objF_nex_max == -PP_INFINITY) {
+	if (reduceElem->objF_nex == -PP_INFINITY) {
 		reduceElem->objF_nex = objF_u_cur;
 		#ifdef PP_GRADIENT
 		reduceElem->objF_grd = -PP_INFINITY;
@@ -353,12 +368,6 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 		#endif // PP_DEBUG /**/
 		return;
 	}
-
-	reduceElem->objF_nex = objF_nex_max;
-	Vector_Copy(u_nex_max, reduceElem->u_nex);
-	#ifdef PP_GRADIENT
-	reduceElem->objF_grd = objF_grd_max;
-	#endif
 
 	/*DEBUG PC_bsf_MapF**
 	#ifdef PP_DEBUG
@@ -385,8 +394,6 @@ void PC_bsf_MapF_3(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T_3* reduceElem,
 }
 
 void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
-	bool binomial_success;
-
 	cout << "=================================================== " << PP_METHOD_NAME << " ==================================================" << endl;
 	cout << "Problem name: " << PD_problemName << endl;
 
@@ -449,10 +456,7 @@ void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
 	#endif // PP_MATRIX_OUTPUT
 
 	cout << "_________________________________________________________________________________________________________" << endl;
-	cout << "ObjF = " << ObjF(PD_u_cur) << "\tNumber of edges: " << Number_of_Edges(PD_u_cur, PP_EPS_ON_HYPERPLANE, &binomial_success) << endl;
-	if (!binomial_success)
-		cout << "PC_bsf_ParametersOutput Warning: It is not possible to calculate the binomial coefficient correctly for the number of included hyperplanes = "
-		<< Number_IncludingNeHyperplanes(PD_u_cur, PP_EPS_ON_HYPERPLANE) << " > 62" << endl;
+	cout << "ObjF = " << ObjF(PD_u_cur) << "\tNumber of edges: " << Number_of_Edges(PD_u_cur, PP_EPS_ON_HYPERPLANE) << endl;
 	//cout << "Number of inequality hyperplanes including u0:\t" << Number_IncludingNeHyperplanes(PD_u_cur, PP_EPS_ON_HYPERPLANE) << endl;
 	cout << "_________________________________________________ " << 1 << " _____________________________________________________" << endl;
 
@@ -500,11 +504,10 @@ void PC_bsf_ProblemOutput_3(PT_bsf_reduceElem_T_3* reduceResult, int reduceCount
 }
 
 void PC_bsf_ProcessResults(PT_bsf_reduceElem_T* reduceResult, int reduceCounter, PT_bsf_parameter_T* parameter, int* nextJob, bool* exit) {
-	bool bin_success = true;
 
 	Vector_Copy(reduceResult->u_nex, PD_u_cur);
 	MakeNeHyperplaneList(PD_u_cur, PD_neHyperplanes_u, &PD_mneh_u, PP_EPS_ON_HYPERPLANE);
-	CalculateNumberOfEdges(PD_neq, PD_mneh_u, &PD_med_u, &bin_success);
+	CalculateNumberOfEdges(PD_neq, PD_mneh_u, &PD_med_u);
 
 	if (reduceResult->objF_nex == -PP_INFINITY) {
 
@@ -601,12 +604,6 @@ void PC_bsf_ProcessResults(PT_bsf_reduceElem_T* reduceResult, int reduceCounter,
 		return;
 	}
 	#endif // PP_MAX_ITER_NUM
-
-	if (!bin_success) {
-		cout << "\nCalculateNumberOfEdges error: It is impossible to calculate binomial coefficient for number of including hyperplanes PD_mneh_u = " << PD_mneh_u << " > 62" << endl;
-		*exit = true;
-		return;
-	}
 }
 
 void PC_bsf_ProcessResults_1(PT_bsf_reduceElem_T_1* reduceResult, int reduceCounter, PT_bsf_parameter_T* parameter, int* nextJob, bool* exit) {
@@ -622,24 +619,39 @@ void PC_bsf_ProcessResults_3(PT_bsf_reduceElem_T_3* reduceResult, int reduceCoun
 }
 
 void PC_bsf_ReduceF(PT_bsf_reduceElem_T* x, PT_bsf_reduceElem_T* y, PT_bsf_reduceElem_T* z) { // z = x o y
+
 	#ifdef PP_GRADIENT
-	if (x->objF_grd > y->objF_grd) {
+	#ifdef PP_MIN_OF_EDGES
+	bool x_is_better = x->numOfEdges < y->numOfEdges || (x->numOfEdges == y->numOfEdges && x->objF_grd > y->objF_grd);
+	#else
+	bool x_is_better = x->objF_grd > y->objF_grd;
+	#endif // PP_MIN_OF_EDGES
+	if (x_is_better) {
 		z->objF_grd = x->objF_grd;
 		z->objF_nex = x->objF_nex;
+		z->numOfEdges = x->numOfEdges;
 		Vector_Copy((*x).u_nex, (*z).u_nex);
 	}
 	else {
 		z->objF_grd = y->objF_grd;
 		z->objF_nex = y->objF_nex;
+		z->numOfEdges = y->numOfEdges;
 		Vector_Copy((*y).u_nex, (*z).u_nex);
 	}
 	#else
-	if (x->objF_nex > y->objF_nex) {
+	#ifdef PP_MIN_OF_EDGES
+	bool x_is_better = x->numOfEdges < y->numOfEdges || (x->numOfEdges == y->numOfEdges && x->objF_nex > y->objF_nex);
+	#else
+	bool x_is_better = x->objF_nex > y->objF_nex;
+	#endif // PP_MIN_OF_EDGES
+	if (x_is_better) {
 		z->objF_nex = x->objF_nex;
+		z->numOfEdges = x->numOfEdges;
 		Vector_Copy((*x).u_nex, (*z).u_nex);
 	}
 	else {
 		z->objF_nex = y->objF_nex;
+		z->numOfEdges = y->numOfEdges;
 		Vector_Copy((*y).u_nex, (*z).u_nex);
 	}
 	#endif // PP_GRADIENT
@@ -791,7 +803,7 @@ namespace SF {
 			#ifdef PP_DEBUG
 			if (iterCount % PP_PROJECTION_COUNT == 0)
 				//if (BSF_sv_mpiRank == 0)
-					cout << "Worker " << BSF_sv_mpiRank << ": \t Length of r = " << length_r << endl;
+				cout << "Worker " << BSF_sv_mpiRank << ": \t Length of r = " << length_r << endl;
 			#endif // PP_DEBUG /**/
 
 		} while (length_r >= eps_projection);
@@ -835,7 +847,7 @@ namespace SF {
 			#ifdef PP_DEBUG
 			if (iterCount % PP_PROJECTION_COUNT == 0)
 				//if (BSF_sv_mpiRank == 0)
-					cout << "Worker " << BSF_sv_mpiRank << ": \t max_length = " << max_length << endl;
+				cout << "Worker " << BSF_sv_mpiRank << ": \t max_length = " << max_length << endl;
 			#endif // PP_DEBUG /**/
 
 		} while (max_length >= eps_projection);
@@ -2425,29 +2437,6 @@ namespace SF {
 		return number;
 	}
 
-	static inline int Number_of_Edges(PT_vector_T x, double eps_on_hyperplane, bool* success) {
-		int mne;
-		unsigned long long ull_mne;
-
-		*success = true;
-		mne = 0;
-		for (int i = 0; i < PD_m; i++) {
-			if (PD_isEquation[i])
-				continue;
-			if (PointBelongsToHyperplane_i(x, i, eps_on_hyperplane))
-				mne++;
-		}
-
-		if (mne == PD_neq)
-			ull_mne = (unsigned long long) mne;
-		else {
-			if (mne > 62)
-				*success = false;
-			ull_mne = BinomialCoefficient(mne, PD_neq - 1);
-		}
-		return (int)ull_mne;
-	}
-
 	static inline double ObjF(PT_vector_T x) {
 		double s = 0;
 		for (int j = 0; j < PD_n; j++)
@@ -2655,9 +2644,25 @@ namespace SF {
 			(*eps) *= 2;
 	}
 
-	static inline void TWIDDLE__CodeToSubset(int code, int* a, int* c, int n, int m, int* p) {
+	static inline int TWIDDLE__BinomialCoefficient(int n, int k, int* p) { // |p|=n+2
+		int x, y, z;
+		bool done = false;
+		int B;
+
+		assert(n <= PP_MM);
+
+		TWIDDLE_Make_p(p, n, k);
+		B = 0;
+		while (!done) {
+			TWIDDLE_Run(&x, &y, &z, p, &done);
+			assert(B < PF_INT_MAX);
+			B++;
+		}
+		return B;
+	}
+
+	static inline void TWIDDLE__CodeToSubset(int code, int* a, int* c, int n, int m, int* p, bool* done) {
 		static int x, y, z;
-		static bool done;
 
 		TWIDDLE_Make_p(p, n, m);
 		for (int k = 0; k < m; k++)
@@ -2666,8 +2671,9 @@ namespace SF {
 		if (code == 0) return;
 
 		for (int i = 0; i < code; i++) {
-			TWIDDLE_Run(&x, &y, &z, p, &done);
-			assert(!done);
+			TWIDDLE_Run(&x, &y, &z, p, done);
+			if (*done)
+				return;
 			c[z - 1] = a[x - 1];
 		}
 	}
@@ -2878,23 +2884,42 @@ namespace SF {
 namespace PF {
 	using namespace SF;
 
-	static inline void CalculateNumberOfEdges(int neq, int mneh_u, int* med_u, bool* bin_success) {
-		*bin_success = true;
+	static inline void CalculateNumberOfEdges(int neq, int mneh_u, int* med_u) {
 		if (mneh_u == neq)
 			*med_u = mneh_u;
 		else {
-			if (mneh_u > 62) {
-				*bin_success = false; //cout << "\nCalculateNumberOfEdges error: It is impossible to calculate binomial coefficient for number of including hyperplanes mneh_u = " << mneh_u << " > 62" << endl;
-				*med_u = 0;
-				return;
-			}
-			unsigned long long long_med_u = BinomialCoefficient(mneh_u, PD_neq - 1);
-			*med_u = (int)long_med_u;
+			if (mneh_u < 63)
+				*med_u = (int)BinomialCoefficient(mneh_u, PD_neq - 1);
+			else
+				*med_u = TWIDDLE__BinomialCoefficient(mneh_u, PD_neq - 1, PD_TWIDDLE_p);
 		}
 	}
 
+	static inline int Number_of_Edges(PT_vector_T x, double eps_on_hyperplane) {
+		int mne;
+		int res;
+
+		mne = 0;
+		for (int i = 0; i < PD_m; i++) {
+			if (PD_isEquation[i])
+				continue;
+			if (PointBelongsToHyperplane_i(x, i, eps_on_hyperplane))
+				mne++;
+		}
+
+		if (mne == PD_neq)
+			res = mne;
+		else {
+			if (mne < 63)
+				res = (int)BinomialCoefficient(mne, PD_neq - 1);
+			else
+				res = TWIDDLE__BinomialCoefficient(mne, PD_neq - 1, PD_TWIDDLE_p);
+		}
+
+		return res;
+	}
+
 	static inline void PreparationForIteration(PT_vector_T u) {
-		bool success;
 
 		MakeNeHyperplaneList(u, PD_neHyperplanes_u, &PD_mneh_u, PP_EPS_ON_HYPERPLANE);
 		assert(PD_mneh_u <= PP_MM);
@@ -2902,7 +2927,6 @@ namespace PF {
 		if (PD_mneh_u < PD_neq) // Starting point u is not vertex!
 			return;
 
-		CalculateNumberOfEdges(PD_neq, PD_mneh_u, &PD_med_u, &success);
-		assert(success);
+		CalculateNumberOfEdges(PD_neq, PD_mneh_u, &PD_med_u);
 	}
 }
