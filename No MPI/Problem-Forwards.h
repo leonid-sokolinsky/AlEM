@@ -10,7 +10,7 @@ This source code has been produced with using BSF-skeleton
 //====================== Private Functions ===========================
 namespace PF {
 	void	CalculateNumberOfEdges(int neq, int mneh_u, int* med_u);
-	int		Number_of_Edges(PT_vector_T x, double eps_on_hyperplane);
+	int		Vertex_Degree(PT_vector_T x, double eps_on_hyperplane);
 	void	PreparationForIteration(PT_vector_T u);
 }
 //====================== Shared Functions ===========================

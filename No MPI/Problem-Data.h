@@ -13,8 +13,6 @@ static int PD_m;					// Total number of constraints
 static int PD_meq;					// Number of constraints being equations
 static int PD_n;					// Space dimension
 static int PD_neq;					// Dimension of the subspace of intersection of equation-hyperplanes (PD_n = PD_neq + PD_meq)
-static int PD_mneh_u;				// Number of inequality-hyperplanes that include point u
-static int PD_mne_p;				// Number of inequality-hyperplanes used for pseudoprojection
 static int PD_iterNo;				// Number of iterations
 static double PD_objF_cur;			// Objective function value in curerent point
 //========================== Problem structures ====================================
@@ -27,11 +25,21 @@ static PT_vector_T PD_hi;			// Higher bound
 static PT_vector_T PD_lo;			// Lower bound
 static PT_column_T PD_norm_a;		// Column of norms of matrix rows
 static PT_vector_T PD_objVector;	// Used for pseudoprojecting
-static int PD_med_u;				// Number of edges passing through the vertex u
-static int PD_neHyperplanes_u[PP_MM];		// Index of inequality-hyperplanes that include point u
+static int PD_medco_u;				// Number of edge combinations in the vertex u
+
+static int PD_neHyperplanes_u[PP_MM];	// Index of inequality-hyperplanes that include point u
+static int PD_mneh_u;					// Number of inequality-hyperplanes that include point u
+
 static int PD_edgeNeHyperplanes[PP_N - 1];	// Index of inequality-hyperplanes used for pseudoprojection
+static int PD_mne_p;						// Number of inequality-hyperplanes used for pseudoprojection
+
 static int PD_edgeAlHyperplanes[PP_N - 1];	// Index of all hyperplanes used for pseudoprojection
 static PT_bitscale_T PD_edgeBitscale;		// Bit scale that tags all hyperplanes forming the edge
 static int PD_TWIDDLE_p[PP_MM + 2];			// Auxiliary array for TWIDDLE_Run algorithm
+
+#ifdef PP_ELIMINATE_DUPLICATES
+static PT_matrix_T PD_incidentEdges_u;		// Edge is determined by the second point w
+static int PD_mie_u;
+#endif // PP_ELIMINATE_DUPLICATES
 //========================== Input/Output ====================================
 static string PD_problemName;

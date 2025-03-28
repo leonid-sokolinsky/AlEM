@@ -17,6 +17,36 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 // P_EPS_ZERO - inverse dependence on PP_OBJECTIVE_VECTOR_LENGTH.
 //------------------------------------------------------------------------------
 
+/*============================== adlittle LP problem ===========================*
+// Number of equations : 15
+// Subspace dimension : 82
+#define PP_PROBLEM_NAME		"adlittle"
+#define PP_M 56	// Number of constraints in mps-file
+#define PP_N 97	// Number of variables in mps-file
+#define PP_MAX_OBJ_VALUE 		-225494.96316238038228101176621492
+//------------------------------------------------------------------------------
+#define PP_EPS_ZERO					1E-11					// Accuracy for comparison with zero
+#define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)		// Accuracy of calculating pseudoprojection
+#define PP_EPS_ON_HYPERPLANE		(PP_EPS_PROJECTION*10)	// Accuracy of belonging to hyperplane
+#define PP_OBJECTIVE_VECTOR_LENGTH	1E+6					// Length of Objective Vector
+//------------------------------------------------------------------------------
+#define PP_EPS_RELATIVE_ERROR			1E-8				// Used if defined PP_CHECK_MAX_OBJ_VALUE 
+#define PP_MAX_PSEUDOPROJECTING_ITER	1000000000			// Maximum acceptable number of iterations in Pseudoprojection on flat
+//------------------------------ ifdef PP_DEBUG --------------------------------
+#define PP_PROJECTION_COUNT				100000000			// Each PP_PROJECTION_COUNT-th iteration to be outputted inside Flat_MaxProjection(*) or Flat_BipProjection(*)
+//-------------------------- Compilation Modes ---------------------------------
+//#define PP_GRADIENT
+#define PP_MAXPROJECTION
+#define PP_ELIMINATE_DUPLICATES // Eliminate duplicates of edge combinations
+//#define PP_MIN_OF_DEGREE // Prefer vertex with lowest degree
+//------------------------------------------------------------------------------
+// Elapsed time: 4867.2259
+// Number of iterations: 3
+// Computed objective value: -225494.963161462976131588
+// Maximal objective value:  -225494.963162380387075245
+// Relative error = 4.07e-12
+//------------------------------------------------------------------------------
+
 /*============================== afiro LP problem ==============================*
 // Number of equations : 8
 // Subspace dimension : 24
@@ -30,17 +60,24 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_EPS_ON_HYPERPLANE		(PP_EPS_PROJECTION*10)	// Accuracy of belonging to hyperplane
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+6					// Length of Objective Vector
 //------------------------------------------------------------------------------
-#define PP_EPS_RELATIVE_ERROR	1E-5		// Used if defined PP_CHECK_MAX_OBJ_VALUE 
+#define PP_EPS_RELATIVE_ERROR			1E-8				// Used if defined PP_CHECK_MAX_OBJ_VALUE 
+#define PP_MAX_PSEUDOPROJECTING_ITER	1000000000			// Maximum acceptable number of iterations in Pseudoprojection on flat
+//------------------------------ ifdef PP_DEBUG --------------------------------
+#define PP_PROJECTION_COUNT				100000000			// Each PP_PROJECTION_COUNT-th iteration to be outputted inside Flat_MaxProjection(*) or Flat_BipProjection(*)
 //-------------------------- Compilation Modes ---------------------------------
+#define PP_GRADIENT
 #define PP_MAXPROJECTION
-// Elapsed time: 906.17045
-// Number of iterations: 5
-// Computed objective value: 464.753142857056957382156
+#define PP_ELIMINATE_DUPLICATES // Eliminate duplicates of edge combinations
+//#define PP_MIN_OF_DEGREE // Prefer vertex with lowest degree
+//------------------------------------------------------------------------------
+// Elapsed time: 141.94531
+// Number of iterations: 3
+// Computed objective value: 464.753142857212083072227
 // Maximal objective value:  464.753142857142847788054
-// Relative error = 1.85e-13
+// Relative error = 1.49e-13
 //------------------------------------------------------------------------------
 
-/*============================== blend LP problem ==============================*
+/*============================== blend LP problem ==============================*/
 // Number of equations: 43
 // Subspace dimension: 40
 #define PP_PROBLEM_NAME		"blend"
@@ -48,15 +85,19 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_N 83			// Number of variables in mps-file
 #define PP_MAX_OBJ_VALUE 30.812149845828220173774356124984	// Exact maximum value of objective function
 //------------------------------------------------------------------------------
-#define PP_EPS_ZERO					1E-11					// Accuracy for comparison with zero
+#define PP_EPS_ZERO					1E-10					// Accuracy for comparison with zero
 #define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)		// Accuracy of calculating pseudoprojection
 #define PP_EPS_ON_HYPERPLANE		(PP_EPS_PROJECTION*10)	// Accuracy of belonging to hyperplane
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+6					// Length of Objective Vector
 //------------------------------------------------------------------------------
-#define PP_EPS_RELATIVE_ERROR	1E-5		// Used if defined PP_CHECK_MAX_OBJ_VALUE 
+#define PP_EPS_RELATIVE_ERROR			1E-8				// Used if defined PP_CHECK_MAX_OBJ_VALUE 
+#define PP_MAX_PSEUDOPROJECTING_ITER	1000000000			// Maximum acceptable number of iterations in Pseudoprojection on flat
+//------------------------------ ifdef PP_DEBUG --------------------------------
+#define PP_PROJECTION_COUNT				10000000			// Each PP_PROJECTION_COUNT-th iteration to be outputted inside Flat_MaxProjection(*) or Flat_BipProjection(*)
 //-------------------------- Compilation Modes ---------------------------------
-#define PP_GRADIENT
+//#define PP_GRADIENT
 #define PP_MAXPROJECTION
+#define PP_ELIMINATE_DUPLICATES // Eliminate duplicates of edge combinations
 //------------------------------------------------------------------------------
 // Elapsed time: 757.57823
 // Number of iterations: 4
@@ -190,36 +231,11 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 //-------------------------- Compilation Modes ---------------------------------
 //#define PP_GRADIENT
 #define PP_MAXPROJECTION
-#define PP_MIN_OF_EDGES
+#define PP_MIN_OF_DEGREE // Prefer vertex with lowest degree
 //------------------------------------------------------------------------------
-// ObjF = 50.20643 Number of edges: 521855
+// ObjF = 50.20643 Number of edge combinations: 521855
 // Map progress: 0.018%    Time = 61
 // ...
-//------------------------------------------------------------------------------
-
-/*============================== adlittle LP problem ===========================*/
-// Number of equations : 15
-// Subspace dimension : 82
-#define PP_PROBLEM_NAME		"adlittle"
-#define PP_M 56	// Number of constraints in mps-file
-#define PP_N 97	// Number of variables in mps-file
-#define PP_MAX_OBJ_VALUE 		-225494.96316238038228101176621492
-//------------------------------------------------------------------------------
-#define PP_EPS_ZERO					1E-11					// Accuracy for comparison with zero
-#define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)		// Accuracy of calculating pseudoprojection
-#define PP_EPS_ON_HYPERPLANE		(PP_EPS_PROJECTION*10)	// Accuracy of belonging to hyperplane
-#define PP_OBJECTIVE_VECTOR_LENGTH	1E+6					// Length of Objective Vector
-//------------------------------------------------------------------------------
-#define PP_EPS_RELATIVE_ERROR			1E-8				// Used if defined PP_CHECK_MAX_OBJ_VALUE 
-#define PP_MAX_PSEUDOPROJECTING_ITER	1000000000			// Maximum acceptable number of iterations in Pseudoprojection on flat
-//------------------------------ ifdef PP_DEBUG --------------------------------
-#define PP_PROJECTION_COUNT				100000000			// Each PP_PROJECTION_COUNT-th iteration to be outputted inside Flat_MaxProjection(*) or Flat_BipProjection(*)
-//-------------------------- Compilation Modes ---------------------------------
-//#define PP_GRADIENT
-#define PP_MAXPROJECTION
-#define PP_MIN_OF_EDGES
-//------------------------------------------------------------------------------
-//------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 
 /*============================== beaconfd LP problem ===========================*
