@@ -269,7 +269,7 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 				<< PP_MAX_PSEUDOPROJECTING_ITER << " when calculating pseudoprojection!" << endl;
 		}
 
-		/*DEBUG PC_bsf_MapF**
+		/*DEBUG PC_bsf_MapF*/
 		#ifdef PP_DEBUG
 		if (!PointBelongsToFlat(w, PD_edgeAlHyperplanes, PD_n - 1, PP_EPS_ON_HYPERPLANE)) {
 			cout << "Worker " << BSF_sv_mpiRank << ": PC_bsf_MapF warning: w does not belong to flat with precision of PP_EPS_ON_HYPERPLANE = "
@@ -481,6 +481,18 @@ void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
 	#else
 	cout << "Prefer vertex with lowest degree: No" << endl;
 	#endif // PP_MIN_OF_DEGREE
+
+	#ifdef PP_RANDOM_OBJ_VECTOR
+	cout << "Use random vector for pseudoprojection: Yes" << endl;
+	#else
+	cout << "Use random vector for pseudoprojection: No" << endl;
+	#endif // PP_RANDOM_OBJ_VECTOR
+
+	#ifdef PP_ELIMINATE_DUPLICATES
+	cout << "Eliminate duplicates of edge combinations: Yes" << endl;
+	#else
+	cout << "Eliminate duplicates of edge combinations: No" << endl;
+	#endif // PP_ELIMINATE_DUPLICATES
 
 	#ifndef PP_MAXPROJECTION
 	cout << "Pseudoprojection method: BIP" << endl;
@@ -2521,6 +2533,14 @@ namespace SF {
 	static inline bool PointBelongsToHalfspace_i(PT_vector_T x, int i, double eps_on_hyperplane) {
 		double a_DoT_x_MinuS_b = Vector_DotProduct(PD_A[i], x) - PD_b[i];
 		double distanceToHyperplane = fabs(a_DoT_x_MinuS_b) / PD_norm_a[i];
+
+		#ifdef PP_DEBUG
+		if (distanceToHyperplane > eps_on_hyperplane && distanceToHyperplane < eps_on_hyperplane * 10) {
+			cout << "Distance from testing point is less than " << eps_on_hyperplane * 10 << ", but greater than " << eps_on_hyperplane << "!" << endl;
+			//system("pause");
+		}
+		#endif // PP_DEBUG /**/
+
 		if (distanceToHyperplane < eps_on_hyperplane)
 			return true;
 		if (PD_isEquation[i])
@@ -2533,10 +2553,9 @@ namespace SF {
 	static inline bool PointBelongsToHyperplane_i(PT_vector_T x, int i, double eps_on_hyperplane) {
 		double dist = Distance_PointToHyperplane_i(x, i);
 
-		/*DEBUG PointBelongsToHyperplane_i**
 		#ifdef PP_DEBUG
 		if (dist > eps_on_hyperplane && dist < eps_on_hyperplane * 10) {
-			cout << "Distance from testing point is less than " << PD_eps_on_hyperplane*10 << ", but greater than " << PD_eps_on_hyperplane << "!" << endl;
+			cout << "Distance from testing point is less than " << eps_on_hyperplane * 10 << ", but greater than " << eps_on_hyperplane << "!" << endl;
 			//system("pause");
 		}
 		#endif // PP_DEBUG /**/
@@ -2557,6 +2576,14 @@ namespace SF {
 	static inline bool PointInsideHalfspace_i(PT_vector_T x, int i, double eps_on_hyperplane) {
 		double a_DoT_x_MinuS_b = Vector_DotProduct(PD_A[i], x) - PD_b[i];
 		double distanceToHyperplane = fabs(a_DoT_x_MinuS_b) / PD_norm_a[i];
+
+		#ifdef PP_DEBUG
+		if (distanceToHyperplane > eps_on_hyperplane && distanceToHyperplane < eps_on_hyperplane * 10) {
+			cout << "Distance from testing point is less than " << eps_on_hyperplane * 10 << ", but greater than " << eps_on_hyperplane << "!" << endl;
+			//system("pause");
+		}
+		#endif // PP_DEBUG /**/
+
 		if (distanceToHyperplane < eps_on_hyperplane)
 			return false;
 		if (a_DoT_x_MinuS_b < 0)
@@ -2596,6 +2623,13 @@ namespace SF {
 	static inline int PointLocation_i(PT_vector_T x, int i, double eps_on_hyperplane, double* a_DoT_x_MinuS_b) {
 		*a_DoT_x_MinuS_b = Vector_DotProduct(PD_A[i], x) - PD_b[i];
 		double dist = fabs(*a_DoT_x_MinuS_b) / PD_norm_a[i];
+
+		#ifdef PP_DEBUG
+		if (dist > eps_on_hyperplane && dist < eps_on_hyperplane * 10) {
+			cout << "Distance from testing point is less than " << eps_on_hyperplane * 10 << ", but greater than " << eps_on_hyperplane << "!" << endl;
+			//system("pause");
+		}
+		#endif // PP_DEBUG /**/
 
 		if (dist < eps_on_hyperplane)// <a,x> = b
 			return PP_ON_HYPERPLANE;
@@ -2801,6 +2835,7 @@ namespace SF {
 		for (int j = 0; j < PD_n; j++)
 			z[j] = x[j] + y[j];
 	}
+
 
 	static inline void Vector_Copy(PT_vector_T fromPoint, PT_vector_T toPoint) { // toPoint = fromPoint
 		for (int j = 0; j < PD_n; j++)

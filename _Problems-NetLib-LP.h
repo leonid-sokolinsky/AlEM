@@ -17,7 +17,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 // P_EPS_ZERO - inverse dependence on PP_OBJECTIVE_VECTOR_LENGTH.
 //------------------------------------------------------------------------------
 
-/*============================== adlittle LP problem ===========================*/
+/*============================== adlittle LP problem ===========================*
 // Number of equations : 15
 // Subspace dimension : 82
 #define PP_PROBLEM_NAME		"adlittle"
@@ -39,6 +39,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_MAXPROJECTION
 #define PP_ELIMINATE_DUPLICATES // Eliminate duplicates of edge combinations
 #define PP_MIN_OF_DEGREE // Prefer vertex with lowest degree
+#define PP_RANDOM_OBJ_VECTOR
 //------------------------------------------------------------------------------
 // Elapsed time: 1827.593
 // Number of iterations: 1
@@ -77,7 +78,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 // Relative error = 1.49e-13
 //------------------------------------------------------------------------------
 
-/*============================== blend LP problem ==============================*
+/*============================== blend LP problem ==============================*/
 // Number of equations: 43
 // Subspace dimension: 40
 #define PP_PROBLEM_NAME		"blend"
@@ -95,10 +96,9 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 //------------------------------ ifdef PP_DEBUG --------------------------------
 #define PP_PROJECTION_COUNT				10000000			// Each PP_PROJECTION_COUNT-th iteration to be outputted inside Flat_MaxProjection(*) or Flat_BipProjection(*)
 //-------------------------- Compilation Modes ---------------------------------
-//#define PP_GRADIENT
+#define PP_GRADIENT
 #define PP_MAXPROJECTION
-#define PP_ELIMINATE_DUPLICATES // Eliminate duplicates of edge combinations
-#define PP_MIN_OF_DEGREE // Prefer vertex with lowest degree
+#define PP_MIN_OF_DEGREE		// Prefer vertex with lowest degree
 //------------------------------------------------------------------------------
 // Elapsed time: 757.57823
 // Number of iterations: 4

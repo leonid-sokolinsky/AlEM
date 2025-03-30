@@ -33,12 +33,11 @@ This source code has been produced with using BSF-skeleton
 
 //-------------------------- Compilation Modes ---------------------------------
 #define PP_DEBUG
-#define PP_RANDOM_OBJ_VECTOR
 //#define PP_MATRIX_OUTPUT
-#define PP_SAVE_ITER_RESULT
-#define PP_SAVE_RESULT
+//#define PP_SAVE_ITER_RESULT
+//#define PP_SAVE_RESULT
 #define PP_CHECK_MAX_OBJ_VALUE // Exit if relative error of computed maximum of objective function is less than PP_EPS_RELATIVE_ERROR (demands #define PP_MAX_OBJ_VALUE)
-#define PP_GAUGE
+//#define PP_GAUGE
 //#define PP_OPT_MIN // Optimization by minimum
 
 //================================ Problem Paramrters ==========================
