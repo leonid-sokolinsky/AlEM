@@ -24,6 +24,13 @@ void PC_bsf_CopyParameter(PT_bsf_parameter_T parameterIn, PT_bsf_parameter_T* pa
 
 void PC_bsf_Init(bool* success) {
 	PD_problemName = PP_PROBLEM_NAME;
+
+	#ifdef PP_OMP
+	if (PP_OMP_NUM_THREADS != omp_get_num_procs())
+		cout << "PC_bsf_Init warning: PP_OMP_NUM_THREADS=" << PP_OMP_NUM_THREADS << " is not equal to omp_get_num_procs()="
+		<< omp_get_num_procs() << endl;
+	#endif
+
 	PD_m = 0;
 	PD_n = 0;
 
@@ -188,10 +195,6 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 	reduceElem->objF_nex = -PP_INFINITY;
 	reduceElem->numOfEdgeCombinations = PF_INT_MAX;
 	reduceElem->objF_grd = -PP_INFINITY;
-	
-	#ifdef PP_ELIMINATE_DUPLICATES
-	PD_mie_u = 0;
-	#endif // PP_ELIMINATE_DUPLICATES
 
 	while (true) {
 		PT_vector_T  u_nex;		// Next vertex
@@ -213,24 +216,11 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 			if (t60 + t >= 60) { // Once-per-minute display.
 				t60 = -t;
 				gauge = (100 * (double)iterCounter / edgesPerWorker);
-				cout << "Map progress: " << setprecision(2) << gauge << "%" << setprecision(PP_SETW / 2) << "\tTime = " << t0 + t << endl;
+				cout << "Map progress: " << setprecision(2) << gauge << "%" << setprecision(PP_SETW / 2) << "\tTime = "
+					<< t0 + t << "\tedge_i = " << edge_i << endl;
 			}
 		}
 		#endif // PP_GAUGE
-
-		#ifdef PP_ELIMINATE_DUPLICATES
-		if (PD_mie_u > 0) {
-			bool sameEdge = false;
-			for (int i = 0; i < PD_mie_u; i++) {
-				if (PointBelongsToFlat(PD_incidentEdges_u[i], PD_edgeNeHyperplanes, PD_neq - 1, PP_EPS_ON_HYPERPLANE)) {
-					sameEdge = true;
-					break;
-				}
-			}
-			if (sameEdge)
-				continue;
-		}
-		#endif // PP_ELIMINATE_DUPLICATES
 
 		for (int i = PD_meq; i < PD_n - 1; i++)
 			PD_edgeAlHyperplanes[i] = PD_edgeNeHyperplanes[i - PD_meq];
@@ -247,11 +237,22 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 
 		Vector_Addition(u_cur, PD_objVector, v);
 
+		int projectionMode;
+		#ifdef PP_MAXPROJECTION
+		projectionMode = PP_MAXPROJECTION_MODE;
+		#else
+		projectionMode = PP_BIPPROJECTION_MODE;
+		#endif // PP_MAXPROJECTION
+
+		#ifdef PP_OMP
+		OMP__FlatProjection(PD_edgeAlHyperplanes, PD_n - 1, v, projectionMode, PP_EPS_PROJECTION, PP_MAX_PSEUDOPROJECTING_ITER, w, &exitCode);
+		#else
 		#ifndef PP_MAXPROJECTION
 		Flat_BipProjection(PD_edgeAlHyperplanes, PD_n - 1, v, PP_EPS_PROJECTION, PP_MAX_PSEUDOPROJECTING_ITER, w, &exitCode);
 		#else
 		Flat_MaxProjection(PD_edgeAlHyperplanes, PD_n - 1, v, PP_EPS_PROJECTION, PP_MAX_PSEUDOPROJECTING_ITER, w, &exitCode);
 		#endif // PP_MAXPROJECTION
+		#endif // PP_OMP
 
 		if (exitCode == -1) {
 			cout << "Worker " << BSF_sv_mpiRank
@@ -279,12 +280,6 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 			cout << "Minimum PP_EPS_ON_HYPERPLANE should be " << eps_on_flat << endl;
 		}
 		#endif // PP_DEBUG /**/
-
-		#ifdef PP_ELIMINATE_DUPLICATES
-		Vector_Copy(w, PD_incidentEdges_u[PD_mie_u]);
-		PD_mie_u++;
-		assert(PD_mie_u < PP_MM);
-		#endif // PP_ELIMINATE_DUPLICATES
 
 		PT_vector_T jumpVector;
 		if (ObjF(w) > objF_u_cur)
@@ -391,13 +386,6 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 		return;
 	}
 
-	/*DEBUG PC_bsf_MapF*/
-	#ifdef PP_DEBUG
-	#ifdef PP_ELIMINATE_DUPLICATES
-	cout << "Worker " << BSF_sv_mpiRank << ": Number of different edges: " << PD_mie_u << endl;
-	#endif // PP_ELIMINATE_DUPLICATES
-	#endif // PP_DEBUG /**/
-
 	/*DEBUG PC_bsf_MapF**
 	#ifdef PP_DEBUG
 	cout << "Worker " << BSF_sv_mpiRank << ": ";
@@ -444,17 +432,12 @@ void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
 	else
 		cout << "Number of Workers: " << BSF_sv_numOfWorkers << endl;
 
-	/**
-	#ifdef PP_BSF_OMP
-	#ifdef PP_BSF_NUM_THREADS
-	cout << "Number of Threads: " << PP_BSF_NUM_THREADS << endl;
-	#else
-	cout << "Number of Threads: " << omp_get_num_procs() << endl;
-	#endif // PP_BSF_NUM_THREADS
+
+	#ifdef PP_OMP
+	cout << "OpenMP is on. " << "Number of Threads: " << PP_OMP_NUM_THREADS << endl;
 	#else
 	cout << "OpenMP is turned off!" << endl;
-	#endif // PP_BSF_OMP
-	/**/
+	#endif // PP_OMP
 
 	/**
 	#ifdef PP_BSF_FRAGMENTED_MAP_LIST
@@ -487,12 +470,6 @@ void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
 	#else
 	cout << "Use random vector for pseudoprojection: No" << endl;
 	#endif // PP_RANDOM_OBJ_VECTOR
-
-	#ifdef PP_ELIMINATE_DUPLICATES
-	cout << "Eliminate duplicates of edge combinations: Yes" << endl;
-	#else
-	cout << "Eliminate duplicates of edge combinations: No" << endl;
-	#endif // PP_ELIMINATE_DUPLICATES
 
 	#ifndef PP_MAXPROJECTION
 	cout << "Pseudoprojection method: BIP" << endl;
@@ -2503,6 +2480,141 @@ namespace SF {
 		return s;
 	}
 
+	static inline void OMP__FlatProjection(int* flatHyperplanes, int m_flat, PT_vector_T v, int projectionMode, double eps_projection, int maxProjectingIter, PT_vector_T w, int* exitCode) {
+		PT_vector_T w_prev;
+		bool outerLoopExit = false;
+		int notIdleCount;
+
+		*exitCode = 1;
+
+		OMP_RoundRobin(flatHyperplanes, m_flat);
+
+		if (projectionMode == PP_BIPPROJECTION_MODE) {
+			notIdleCount = 0;
+			for (int thread_i = 0; thread_i < PP_OMP_NUM_THREADS; thread_i++)
+				if (PD_omp_m[thread_i] > 0)
+					notIdleCount++;
+		}
+
+		Vector_Copy(v, w);
+
+		do {
+			Vector_Copy(w, w_prev);
+
+			// Begin of parallel region
+			#pragma omp parallel for  default(shared) num_threads(PP_OMP_NUM_THREADS)
+			for (int thread_i = 0; thread_i < PP_OMP_NUM_THREADS; thread_i++) {
+				static PT_vector_T p;
+				static PT_vector_T p_max;
+				static PT_vector_T r;
+				static PT_vector_T my_w;
+				static int my_hyperplanes[PP_MM];
+				double max_length_p = 0;
+				bool innerLoopExit = false;
+				double norm_p;
+				int my_m;
+
+				if (PD_omp_m[thread_i] == 0)
+					continue;
+
+				my_m = PD_omp_m[thread_i];
+
+				for (int i = 0; i < my_m; i++)
+					my_hyperplanes[i] = PD_omp_hyperplanes[thread_i][i];
+
+				Vector_Copy(w, my_w);
+
+				do {
+					if (projectionMode == PP_BIPPROJECTION_MODE)
+						Vector_Zeroing(r);
+					if (projectionMode == PP_MAXPROJECTION_MODE) {
+						Vector_Zeroing(p_max);
+						max_length_p = 0;
+					}
+
+					for (int i = 0; i < my_m; i++) {
+						OrthogonalProjectingVectorOntoHyperplane_i(my_w, my_hyperplanes[i], p);
+
+						if (projectionMode == PP_BIPPROJECTION_MODE)
+							Vector_PlusEquals(r, p);
+
+						if (projectionMode == PP_MAXPROJECTION_MODE) {
+							norm_p = Vector_Norm(p);
+							if (norm_p > max_length_p) {
+								max_length_p = norm_p;
+								Vector_Copy(p, p_max);
+							}
+						}
+					}
+
+					if (projectionMode == PP_BIPPROJECTION_MODE) {
+						Vector_DivideEquals(r, my_m);
+						Vector_PlusEquals(my_w, r);
+						innerLoopExit = Vector_Norm(r) < eps_projection;
+					}
+
+					if (projectionMode == PP_MAXPROJECTION_MODE) {
+						Vector_PlusEquals(my_w, p_max);
+						innerLoopExit = max_length_p < eps_projection;
+					}
+
+				} while (!innerLoopExit);
+
+				Vector_Copy(my_w, PD_omp_w[thread_i]);
+			}
+			// End of parallel region
+
+
+			if (projectionMode == PP_BIPPROJECTION_MODE) {
+				Vector_Zeroing(w);
+				for (int thread_i = 0; thread_i < PP_OMP_NUM_THREADS; thread_i++)
+					if (PD_omp_m[thread_i] != 0)
+						Vector_PlusEquals(w, PD_omp_w[thread_i]);
+
+				Vector_DivideEquals(w, notIdleCount);
+				outerLoopExit = Distance_PointToPoint(w, w_prev) < eps_projection;
+			}
+
+			if (projectionMode == PP_MAXPROJECTION_MODE) {
+				double max_dist = 0;
+				PT_vector_T max_omp_w;
+				Vector_Zeroing(max_omp_w);
+				for (int thread_i = 0; thread_i < PP_OMP_NUM_THREADS; thread_i++) {
+					if (PD_omp_m[thread_i] == 0)
+						continue;
+					double dist = Distance_PointToPoint(w_prev, PD_omp_w[thread_i]);
+					if (dist > max_dist) {
+						Vector_Copy(PD_omp_w[thread_i], max_omp_w);
+						max_dist = dist;
+					}
+				}
+				if (max_dist > 0)
+					Vector_Copy(max_omp_w, w);
+				outerLoopExit = max_dist < eps_projection;
+			}
+
+		} while (!outerLoopExit);
+	}
+
+	static inline void OMP_RoundRobin(int* flatHyperplanes, int m_flat) {
+		for (int thread_i = 0; thread_i < PP_OMP_NUM_THREADS; thread_i++)
+			PD_omp_m[thread_i] = 0;
+
+		int im = 0;
+		while (im < m_flat) {
+			for (int thread_i = 0; thread_i < PP_OMP_NUM_THREADS; thread_i++) {
+				if (im < m_flat) {
+					PD_omp_hyperplanes[thread_i][PD_omp_m[thread_i]] = flatHyperplanes[im];
+					assert(PD_omp_m[thread_i] < PP_MM);
+					PD_omp_m[thread_i]++;
+					im++;
+				}
+				else
+					break;
+			}
+		}
+	}
+
 	static inline void OrthogonalProjectingVectorOntoHalfspace_i(PT_vector_T z, int i, PT_vector_T r, bool* success) {
 		double factor;
 		double a_DoT_z_MinuS_b = Vector_DotProduct(PD_A[i], z) - PD_b[i]; // <a,z> - b
@@ -2736,7 +2848,7 @@ namespace SF {
 		B = 0;
 		while (!done) {
 			TWIDDLE_Run(&x, &y, &z, p, &done);
-			assert(B < PF_INT_MAX);
+			if (B == PF_INT_MAX) cout << "TWIDDLE__BinomialCoefficient warning: value of integer variable B has exceeded PF_INT_MAX = " << PF_INT_MAX << endl;
 			B++;
 		}
 		return B;
@@ -2835,7 +2947,6 @@ namespace SF {
 		for (int j = 0; j < PD_n; j++)
 			z[j] = x[j] + y[j];
 	}
-
 
 	static inline void Vector_Copy(PT_vector_T fromPoint, PT_vector_T toPoint) { // toPoint = fromPoint
 		for (int j = 0; j < PD_n; j++)

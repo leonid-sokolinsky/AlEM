@@ -18,19 +18,21 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 // P_EPS_ZERO - inverse dependence on PP_OBJECTIVE_VECTOR_LENGTH.
 //------------------------------------------------------------------------------
 #ifndef PP_GRADIENT
-#define PP_EPS_ZERO					1E-11				// Accuracy for comparison with zero
-#define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*10)	// Accuracy of belonging to hyperplane
-#define PP_EPS_PROJECTION			PP_EPS_ZERO			// Accuracy of belonging to hyperplane
-#define PP_OBJECTIVE_VECTOR_LENGTH	1E+7				// Length of Objective Vector
+#define PP_EPS_ZERO					1E-11			// Accuracy for comparison with zero
+#define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*10)// Accuracy of belonging to hyperplane
+#define PP_EPS_PROJECTION			PP_EPS_ZERO		// Accuracy of belonging to hyperplane
+#define PP_OBJECTIVE_VECTOR_LENGTH	1E+7			// Length of Objective Vector
 //-------------------------- Compilation Modes ---------------------------------
 #define PP_MAXPROJECTION // It can cause a stuck in the loop. In this case, you should increase PP_EPS_PROJECTION or decrease PP_OBJECTIVE_VECTOR_LENGTH.
 //------------------------------------------------------------------------------
 #endif
+#define PP_EPS_RELATIVE_ERROR		1E-3			// Used if defined PP_CHECK_MAX_OBJ_VALUE 
 //------------------------------ ifdef PP_DEBUG --------------------------------
-#define PP_PROJECTION_COUNT			100000000			// Each PP_PROJECTION_COUNT iteration to be outputted inside Flat_MaxProjection(*)
+#define PP_PROJECTION_COUNT				100000000			// Each PP_PROJECTION_COUNT iteration to be outputted inside Flat_MaxProjection(*)
+#define PP_MAX_PSEUDOPROJECTING_ITER	100000000			// Maximum acceptable number of iterations in Pseudoprojection on flat
 //------------------------------------------------------------------------------
 
-/*============================== Klee-Minty5 LP problem ========================*/
+/*============================== Klee-Minty5 LP problem ========================*
 #define PP_PROBLEM_NAME	"Klee-Minty5"
 #define PP_D 5			// Space dimension
 #define PP_M PP_D		// Number of equations (number of rows in *.mtx)
@@ -38,9 +40,9 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_MAX_OBJ_VALUE 3125
 //------------------------------------------------------------------------------
 #ifdef PP_GRADIENT
-#define PP_EPS_ZERO					1E-11				// Accuracy for comparison with zero
-#define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*10000)	// Accuracy of belonging to hyperplane
+#define PP_EPS_ZERO					1E-10				// Accuracy for comparison with zero
 #define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)	// Accuracy of belonging to hyperplane
+#define PP_EPS_ON_HYPERPLANE		(PP_EPS_PROJECTION*1000)	// Accuracy of belonging to hyperplane
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+7				// Length of Objective Vector
 #endif
 //------------------------------------------------------------------------------
@@ -53,9 +55,9 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_MAX_OBJ_VALUE 15625
 //------------------------------------------------------------------------------
 #ifdef PP_GRADIENT
-#define PP_EPS_ZERO					1E-11				// Accuracy for comparison with zero
-#define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*10000)	// Accuracy of belonging to hyperplane
+#define PP_EPS_ZERO					1E-10				// Accuracy for comparison with zero
 #define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)	// Accuracy of belonging to hyperplane
+#define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*10000)	// Accuracy of belonging to hyperplane
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+7				// Length of Objective Vector
 #endif
 //------------------------------------------------------------------------------
@@ -90,7 +92,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #endif
 //------------------------------------------------------------------------------
 
-/*============================== Klee-Minty9 LP problem ========================*
+/*============================== Klee-Minty9 LP problem ========================*/
 #define PP_PROBLEM_NAME	"Klee-Minty9"
 #define PP_D 9			// Space dimension
 #define PP_M PP_D		// Number of equations (number of rows in *.mtx)

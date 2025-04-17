@@ -213,7 +213,8 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 			if (t60 + t >= 60) { // Once-per-minute display.
 				t60 = -t;
 				gauge = (100 * (double)iterCounter / edgesPerWorker);
-				cout << "Map progress: " << setprecision(2) << gauge << "%" << setprecision(PP_SETW / 2) << "\tTime = " << t0 + t << endl;
+				cout << "Map progress: " << setprecision(2) << gauge << "%" << setprecision(PP_SETW / 2) << "\tTime = " 
+					<< t0 + t << "\tedge_i = " << edge_i << endl;
 			}
 		}
 		#endif // PP_GAUGE
@@ -283,6 +284,10 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 		#ifdef PP_ELIMINATE_DUPLICATES
 		Vector_Copy(w, PD_incidentEdges_u[PD_mie_u]);
 		PD_mie_u++;
+
+		if (PD_mie_u >= PP_MM)
+			cout << "PC_bsf_MapF error: value of variable PD_mie_u has exceeded PP_MM = " << PP_MM
+			<< ". You should increas the parameter PP_EPS_ON_HYPERPLANE." << endl;
 		assert(PD_mie_u < PP_MM);
 		#endif // PP_ELIMINATE_DUPLICATES
 
@@ -365,7 +370,13 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 			cout << "Worker " << BSF_sv_mpiRank << ": "
 				<< "\t ObjF = " << setprecision(PP_SETW / 2) << objF_nex
 				<< "\tNumber of edge combinations: " << degree_u_nex << "\t\t\t---> Movement is possible" << endl;
-			//if (MTX_SavePoint(u_nex, PP_MTX_POSTFIX_V)) cout << "Current approximation is saved into file *.v" << endl;
+	#ifdef PP_SAVE_ITER_RESULT
+	char buf[6];
+	sprintf(buf, "%d", PD_iterNo);
+	string postfix = "_v(" + string(buf) + ").mtx";
+	if (MTX_SavePoint(PD_u_cur, postfix))
+		cout << "Current approximation is saved into file *_v(*).mtx" << endl;
+	#endif // PP_SAVE_ITER_RESULT
 			#endif // PP_DEBUG /**/
 			reduceElem->numOfEdgeCombinations = degree_u_nex;
 			reduceElem->objF_nex = objF_nex;
@@ -2736,7 +2747,7 @@ namespace SF {
 		B = 0;
 		while (!done) {
 			TWIDDLE_Run(&x, &y, &z, p, &done);
-			assert(B < PF_INT_MAX);
+			if (B == PF_INT_MAX) cout << "TWIDDLE__BinomialCoefficient warning: value of integer variable B has exceeded PF_INT_MAX = " << PF_INT_MAX << endl;
 			B++;
 		}
 		return B;

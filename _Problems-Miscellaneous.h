@@ -26,7 +26,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_MPS_FORMAT
 #define PP_M 4		// Number of constrains
 #define PP_N 5		// Number of variables
-#define PP_MAX_OBJ_VALUE 21.4549732313098289182562
+#define PP_MAX_OBJ_VALUE 21.4549732313103937997312
 //------------------------------------------------------------------------------
 #define PP_EPS_ZERO					1E-11					// Precision for comparison with zero
 #define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)		// Accuracy of belonging to hyperplane
@@ -34,7 +34,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+6					// Length of Objective Vector
 //-------------------------- Compilation Modes ---------------------------------
 #define PP_GRADIENT
-//#define PP_MAXPROJECTION 
+#define PP_MAXPROJECTION 
 //#define PP_MIN_OF_DEGREE
 //------------------------------------------------------------------------------
 // Elapsed time: 0
@@ -91,7 +91,6 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 //-------------------------- Compilation Modes ---------------------------------
 //#define PP_GRADIENT
 #define PP_MAXPROJECTION
-#define PP_ELIMINATE_DUPLICATES // Eliminate duplicates of edge combinations
 //------------------------------------------------------------------------------
 // Elapsed time: 0
 // Number of iterations: 3
@@ -114,7 +113,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+6					// Length of Objective Vector
 //-------------------------- Compilation Modes ---------------------------------
 #define PP_GRADIENT
-//#define PP_MAXPROJECTION 
+#define PP_MAXPROJECTION 
 //------------------------------------------------------------------------------
 // Elapsed time: 0
 // Number of iterations: 1
@@ -241,13 +240,13 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+6					// Length of Objective Vector
 //-------------------------- Compilation Modes ---------------------------------
 //#define PP_GRADIENT
-//#define PP_MAXPROJECTION 
+#define PP_MAXPROJECTION 
 //------------------------------------------------------------------------------
 // Elapsed time: 0
 // Number of iterations: 1
-// Computed objective value: 55000.0000000001164153218
+// Computed objective value: 55000.0000000000072759576
 // Maximal objective value:  55000
-// Relative error = 2.12e-15
+// Relative error = 1.32e-16
 //------------------------------------------------------------------------------
 
 /*============================== simple1min LP problem =========================*
@@ -262,13 +261,13 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+6					// Length of Objective Vector
 //-------------------------- Compilation Modes ---------------------------------
 //#define PP_GRADIENT
-//#define PP_MAXPROJECTION 
+#define PP_MAXPROJECTION 
 //------------------------------------------------------------------------------
 // Elapsed time: 0
 // Number of iterations: 2
-// Computed objective value: -4999.99999999999636202119
+// Computed objective value: -4999.9999999999990905053
 // Maximal objective value:  -5000
-// Relative error = 7.28e-16
+// Relative error = 1.82e-16
 //------------------------------------------------------------------------------
 
 /*============================== simple_zcv LP problem =========================*
@@ -283,13 +282,13 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+6					// Length of Objective Vector
 //-------------------------- Compilation Modes ---------------------------------
 #define PP_GRADIENT
-//#define PP_MAXPROJECTION 
+#define PP_MAXPROJECTION 
 //------------------------------------------------------------------------------
-/// Elapsed time: 0
+// Elapsed time: 0
 // Number of iterations: 3
-// Computed objective value: 49999.9999999999854480848
+// Computed objective value: 50000
 // Maximal objective value:  50000
-// Relative error = 2.91e-16
+// Relative error = 0
 //------------------------------------------------------------------------------
 
 /*============================== simple_lcv LP problem =========================*
@@ -402,7 +401,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_PROBLEM_NAME	"rnd3_3_Olkhovsky56"
 #define PP_M 6		// Number of equations (number of rows in *.mtx)
 #define PP_N 9		// Number of variables (number of cols in *.mtx)
-#define PP_MAX_OBJ_VALUE 990.797118755359292663343
+#define PP_MAX_OBJ_VALUE 990.797118755359406350181
 //------------------------------------------------------------------------------
 #define PP_EPS_ZERO					1E-11					// Precision for comparison with zero
 #define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)		// Accuracy of belonging to hyperplane
@@ -413,8 +412,8 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 //------------------------------------------------------------------------------
 // Elapsed time: 0
 // Number of iterations: 2
-// Computed objective value: 990.797118755359292663343
-// Maximal objective value:  990.797118755359292663343
+// Computed objective value: 990.797118755359406350181
+// Maximal objective value:  990.797118755359406350181
 // Relative error = 0
 //------------------------------------------------------------------------------
 
@@ -422,7 +421,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_PROBLEM_NAME	"rnd3_3_Olkhovsky289"
 #define PP_M 6		// Number of equations (number of rows in *.mtx)
 #define PP_N 9		// Number of variables (number of cols in *.mtx)
-#define PP_MAX_OBJ_VALUE 671.952494859795933734858
+#define PP_MAX_OBJ_VALUE 671.952494859796388482209
 //------------------------------------------------------------------------------
 #define PP_EPS_ZERO					1E-11					// Precision for comparison with zero
 #define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)		// Accuracy of belonging to hyperplane
@@ -433,16 +432,16 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 //------------------------------------------------------------------------------
 // Elapsed time: 0
 // Number of iterations: 3
-// Computed objective value: 671.952494859795933734858
+// Computed objective value: 671.952494859796388482209
 // Maximal objective value:  671.952494859795933734858
-// Relative error = 0
+// Relative error = 6.77e-16
 //------------------------------------------------------------------------------
 
 /*============================== rnd3_3_Olkhovsky331 LP problem ================*
 #define PP_PROBLEM_NAME	"rnd3_3_Olkhovsky331"
 #define PP_M 6		// Number of equations (number of rows in *.mtx)
 #define PP_N 9		// Number of variables (number of cols in *.mtx)
-#define PP_MAX_OBJ_VALUE 714.535477965318250426208
+#define PP_MAX_OBJ_VALUE 714.535477965318023052532
 //------------------------------------------------------------------------------
 #define PP_EPS_ZERO					1E-11					// Precision for comparison with zero
 #define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)		// Accuracy of belonging to hyperplane
@@ -454,8 +453,8 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 //------------------------------------------------------------------------------
 // Elapsed time: 0
 // Number of iterations: 3
-// Computed objective value: 714.535477965318250426208
-// Maximal objective value:  714.535477965318250426208
+// Computed objective value: 714.535477965318023052532
+// Maximal objective value:  714.535477965318023052532
 // Relative error = 0
 //------------------------------------------------------------------------------
 
@@ -463,7 +462,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_PROBLEM_NAME	"rnd3_3_Olkhovsky336"
 #define PP_M 6		// Number of equations (number of rows in *.mtx)
 #define PP_N 9		// Number of variables (number of cols in *.mtx)
-#define PP_MAX_OBJ_VALUE 998.193448648739376949379
+#define PP_MAX_OBJ_VALUE 998.193448648739490636217
 //------------------------------------------------------------------------------
 #define PP_EPS_ZERO					1E-11					// Precision for comparison with zero
 #define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)		// Accuracy of belonging to hyperplane
@@ -475,8 +474,8 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 //------------------------------------------------------------------------------
 // Elapsed time: 0
 // Number of iterations: 2
-// Computed objective value: 998.193448648739376949379
-// Maximal objective value:  998.193448648739376949379
+// Computed objective value: 998.193448648739490636217
+// Maximal objective value:  998.193448648739490636217
 // Relative error = 0
 //------------------------------------------------------------------------------
 
@@ -505,14 +504,14 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_PROBLEM_NAME	"rnd5-100"
 #define PP_M 105		// Number of equations (number of rows in *.mtx)
 #define PP_N 110		// Number of variables (number of cols in *.mtx)
-#define PP_MAX_OBJ_VALUE 1848.43708056834998387785
+#define PP_MAX_OBJ_VALUE 1848.43708056819696139428
 //------------------------------------------------------------------------------
 #define PP_EPS_ZERO					1E-11					// Precision for comparison with zero
 #define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)		// Accuracy of belonging to hyperplane
-#define PP_EPS_ON_HYPERPLANE		(PP_EPS_PROJECTION*10)	// Accuracy of belonging to hyperplane
+#define PP_EPS_ON_HYPERPLANE		(PP_EPS_PROJECTION*100)	// Accuracy of belonging to hyperplane
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+6					// Length of Objective Vector
 //-------------------------- Compilation Modes ---------------------------------
-//#define PP_GRADIENT
+#define PP_GRADIENT
 //#define PP_MAXPROJECTION 
 //------------------------------------------------------------------------------
 // Elapsed time: 0

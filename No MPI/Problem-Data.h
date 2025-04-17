@@ -37,9 +37,10 @@ static int PD_edgeAlHyperplanes[PP_N - 1];	// Index of all hyperplanes used for 
 static PT_bitscale_T PD_edgeBitscale;		// Bit scale that tags all hyperplanes forming the edge
 static int PD_TWIDDLE_p[PP_MM + 2];			// Auxiliary array for TWIDDLE_Run algorithm
 
-#ifdef PP_ELIMINATE_DUPLICATES
-static PT_matrix_T PD_incidentEdges_u;		// Edge is determined by the second point w
-static int PD_mie_u;
-#endif // PP_ELIMINATE_DUPLICATES
-//========================== Input/Output ====================================
+//------------------------- Used in Flat_OmpProjection() ----------------------
+static int PD_omp_numOfThreads;
+static int PD_omp_hyperplanes[PP_OMP_NUM_THREADS][PP_MM]; 
+static int PD_omp_m[PP_OMP_NUM_THREADS]; 
+static double PD_omp_w[PP_OMP_NUM_THREADS][PP_N];
+//========================== Input/Output =====================================
 static string PD_problemName;
