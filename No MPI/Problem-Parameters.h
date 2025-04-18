@@ -47,9 +47,6 @@ This source code has been produced with using BSF-skeleton
 #define PP_CHECK_MAX_OBJ_VALUE // Exit if relative error of computed maximum of objective function is less than PP_EPS_RELATIVE_ERROR (demands #define PP_MAX_OBJ_VALUE)
 #define PP_GAUGE
 //#define PP_OPT_MIN // Optimization by minimum
-//--------------------------- OpenMP Parameters ---------------------------
-#define PP_OMP
-#define PP_OMP_NUM_THREADS 6
 
 //================================ Problem Paramrters ==========================
 #define PP_MM							(PP_M+2*PP_N)	// Maximal number of constraints
@@ -79,6 +76,3 @@ This source code has been produced with using BSF-skeleton
 #define PP_ON_HYPERPLANE			1
 #define PP_INSIDE_HALFSPACE			2
 #define PP_OUTSIDE_HALFSPACE		3
-//------------- Projection mode -------------
-#define  PP_BIPPROJECTION_MODE		1
-#define  PP_MAXPROJECTION_MODE		2

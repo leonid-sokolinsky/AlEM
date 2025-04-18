@@ -189,10 +189,6 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 	reduceElem->numOfEdgeCombinations = PF_INT_MAX;
 	reduceElem->objF_grd = -PP_INFINITY;
 
-	#ifdef PP_ELIMINATE_DUPLICATES
-	PD_mie_u = 0;
-	#endif // PP_ELIMINATE_DUPLICATES
-
 	while (true) {
 		PT_vector_T  u_nex;		// Next vertex
 		double objF_nex;
@@ -218,20 +214,6 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 			}
 		}
 		#endif // PP_GAUGE
-
-		#ifdef PP_ELIMINATE_DUPLICATES
-		if (PD_mie_u > 0) {
-			bool sameEdge = false;
-			for (int i = 0; i < PD_mie_u; i++) {
-				if (PointBelongsToFlat(PD_incidentEdges_u[i], PD_edgeNeHyperplanes, PD_neq - 1, PP_EPS_ON_HYPERPLANE)) {
-					sameEdge = true;
-					break;
-				}
-			}
-			if (sameEdge)
-				continue;
-		}
-		#endif // PP_ELIMINATE_DUPLICATES
 
 		for (int i = PD_meq; i < PD_n - 1; i++)
 			PD_edgeAlHyperplanes[i] = PD_edgeNeHyperplanes[i - PD_meq];
@@ -280,16 +262,6 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 			cout << "Minimum PP_EPS_ON_HYPERPLANE should be " << eps_on_flat << endl;
 		}
 		#endif // PP_DEBUG /**/
-
-		#ifdef PP_ELIMINATE_DUPLICATES
-		Vector_Copy(w, PD_incidentEdges_u[PD_mie_u]);
-		PD_mie_u++;
-
-		if (PD_mie_u >= PP_MM)
-			cout << "PC_bsf_MapF error: value of variable PD_mie_u has exceeded PP_MM = " << PP_MM
-			<< ". You should increas the parameter PP_EPS_ON_HYPERPLANE." << endl;
-		assert(PD_mie_u < PP_MM);
-		#endif // PP_ELIMINATE_DUPLICATES
 
 		PT_vector_T jumpVector;
 		if (ObjF(w) > objF_u_cur)
@@ -370,13 +342,13 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 			cout << "Worker " << BSF_sv_mpiRank << ": "
 				<< "\t ObjF = " << setprecision(PP_SETW / 2) << objF_nex
 				<< "\tNumber of edge combinations: " << degree_u_nex << "\t\t\t---> Movement is possible" << endl;
-	#ifdef PP_SAVE_ITER_RESULT
-	char buf[6];
-	sprintf(buf, "%d", PD_iterNo);
-	string postfix = "_v(" + string(buf) + ").mtx";
-	if (MTX_SavePoint(PD_u_cur, postfix))
-		cout << "Current approximation is saved into file *_v(*).mtx" << endl;
-	#endif // PP_SAVE_ITER_RESULT
+			#ifdef PP_SAVE_ITER_RESULT
+			char buf[6];
+			sprintf(buf, "%d", PD_iterNo);
+			string postfix = "_v(" + string(buf) + ").mtx";
+			if (MTX_SavePoint(PD_u_cur, postfix))
+				cout << "Current approximation is saved into file *_v(*).mtx" << endl;
+			#endif // PP_SAVE_ITER_RESULT
 			#endif // PP_DEBUG /**/
 			reduceElem->numOfEdgeCombinations = degree_u_nex;
 			reduceElem->objF_nex = objF_nex;
@@ -401,13 +373,6 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 		#endif // PP_DEBUG /**/
 		return;
 	}
-
-	/*DEBUG PC_bsf_MapF*/
-	#ifdef PP_DEBUG
-	#ifdef PP_ELIMINATE_DUPLICATES
-	cout << "Worker " << BSF_sv_mpiRank << ": Number of different edges: " << PD_mie_u << endl;
-	#endif // PP_ELIMINATE_DUPLICATES
-	#endif // PP_DEBUG /**/
 
 	/*DEBUG PC_bsf_MapF**
 	#ifdef PP_DEBUG
@@ -455,17 +420,11 @@ void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
 	else
 		cout << "Number of Workers: " << BSF_sv_numOfWorkers << endl;
 
-	/**
-	#ifdef PP_BSF_OMP
-	#ifdef PP_BSF_NUM_THREADS
-	cout << "Number of Threads: " << PP_BSF_NUM_THREADS << endl;
-	#else
-	cout << "Number of Threads: " << omp_get_num_procs() << endl;
-	#endif // PP_BSF_NUM_THREADS
+	#ifdef PP_OMP
+	cout << "OpenMP is on. " << "Number of Threads: " << PP_OMP_NUM_THREADS << endl;
 	#else
 	cout << "OpenMP is turned off!" << endl;
-	#endif // PP_BSF_OMP
-	/**/
+	#endif // PP_OMP
 
 	/**
 	#ifdef PP_BSF_FRAGMENTED_MAP_LIST
@@ -498,12 +457,6 @@ void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
 	#else
 	cout << "Use random vector for pseudoprojection: No" << endl;
 	#endif // PP_RANDOM_OBJ_VECTOR
-
-	#ifdef PP_ELIMINATE_DUPLICATES
-	cout << "Eliminate duplicates of edge combinations: Yes" << endl;
-	#else
-	cout << "Eliminate duplicates of edge combinations: No" << endl;
-	#endif // PP_ELIMINATE_DUPLICATES
 
 	#ifndef PP_MAXPROJECTION
 	cout << "Pseudoprojection method: BIP" << endl;

@@ -37,9 +37,5 @@ static int PD_edgeAlHyperplanes[PP_N - 1];	// Index of all hyperplanes used for 
 static PT_bitscale_T PD_edgeBitscale;		// Bit scale that tags all hyperplanes forming the edge
 static int PD_TWIDDLE_p[PP_MM + 2];			// Auxiliary array for TWIDDLE_Run algorithm
 
-#ifdef PP_ELIMINATE_DUPLICATES
-static double PD_incidentEdges_u[PP_MM][PP_N];		// Edge is determined by the second point w
-static int PD_mie_u;
-#endif // PP_ELIMINATE_DUPLICATES
 //========================== Input/Output ====================================
 static string PD_problemName;

@@ -66,8 +66,6 @@ namespace SF {
 	void	MTX_SkipComments(FILE* stream);
 	int		Number_IncludingNeHyperplanes(PT_vector_T x, double eps_on_hyperplane);
 	double	ObjF(PT_vector_T x);
-	void	OMP__FlatProjection(int* flatHyperplanes, int m_flat, PT_vector_T v, int projectionMode, double eps_projection, int maxProjectingIter, PT_vector_T w, int* exitCode);
-	void	OMP_RoundRobin(int* flatHyperplanes, int m_flat);
 	void	OrthogonalProjectingVectorOntoHalfspace_i(PT_vector_T z, int i, PT_vector_T r, bool* success);
 	void	OrthogonalProjectingVectorOntoHyperplane_i(PT_vector_T x, int i, PT_vector_T p);
 	bool	PointBelongsToFlat(PT_vector_T x, int* hyperplaneList, int hyperplaneCount, double eps_on_hyperplane);
