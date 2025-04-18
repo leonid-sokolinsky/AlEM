@@ -47,7 +47,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 // Relative error = 4.14e-12
 //------------------------------------------------------------------------------
 
-/*============================== afiro LP problem ==============================*/
+/*============================== afiro LP problem ==============================*
 // Number of equations : 8
 // Subspace dimension : 24
 #define PP_PROBLEM_NAME	"afiro"
@@ -188,7 +188,9 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 // Relative error = 2.03e-16
 //--------------------------------------------------------------------------
 
-/*============================== sc105 LP problem ==============================*
+/*============================== sc105 LP problem ==============================*/
+// Number of equations: 45
+// Subspace dimension: 58
 #define PP_PROBLEM_NAME		"sc105"
 #define PP_M 104	// Number of constraints in *.mps
 #define PP_N 103	// Number of variables in *.mps

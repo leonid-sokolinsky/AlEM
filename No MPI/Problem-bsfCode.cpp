@@ -2504,14 +2504,14 @@ namespace SF {
 			// Begin of parallel region
 			#pragma omp parallel for  default(shared) num_threads(PP_OMP_NUM_THREADS)
 			for (int thread_i = 0; thread_i < PP_OMP_NUM_THREADS; thread_i++) {
-				static PT_vector_T p;
-				static PT_vector_T p_max;
-				static PT_vector_T r;
-				static PT_vector_T my_w;
-				static int my_hyperplanes[PP_MM];
+				PT_vector_T p;
+				PT_vector_T p_max;
+				PT_vector_T r;
+				PT_vector_T my_w;
 				double max_length_p = 0;
 				bool innerLoopExit = false;
 				double norm_p;
+				int my_hyperplanes[PP_MM];
 				int my_m;
 
 				if (PD_omp_m[thread_i] == 0)

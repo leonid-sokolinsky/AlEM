@@ -19,7 +19,7 @@ This source code has been produced with using BSF-skeleton
 #include "../_Problems10-1.h"
 #define PP_PATH "../../Set-of-LP-Problems/Rnd-LP/"
 
-/**/
+/**
 #include "../_Problems100_1000-0.h"
 #define PP_PATH "../../Set-of-LP-Problems/Rnd-LP/"
 
@@ -31,7 +31,7 @@ This source code has been produced with using BSF-skeleton
 #include "../_Problems-Miscellaneous.h"
 #define PP_PATH "../../Set-of-LP-Problems/Miscellaneous-LP/"
 
-/**
+/**/
 #include "../_Problems-NetLib-LP.h"
 #define PP_PATH "../../Set-of-LP-Problems/NetLib-LP/"
 
@@ -49,7 +49,7 @@ This source code has been produced with using BSF-skeleton
 //#define PP_OPT_MIN // Optimization by minimum
 //--------------------------- OpenMP Parameters ---------------------------
 #define PP_OMP
-#define PP_OMP_NUM_THREADS 12
+#define PP_OMP_NUM_THREADS 6
 
 //================================ Problem Paramrters ==========================
 #define PP_MM							(PP_M+2*PP_N)	// Maximal number of constraints
