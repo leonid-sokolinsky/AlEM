@@ -37,5 +37,14 @@ static int PD_edgeAlHyperplanes[PP_N - 1];	// Index of all hyperplanes used for 
 static PT_bitscale_T PD_edgeBitscale;		// Bit scale that tags all hyperplanes forming the edge
 static int PD_TWIDDLE_p[PP_MM + 2];			// Auxiliary array for TWIDDLE_Run algorithm
 
+//------------------------- Orthogonal projection onto line ---------------
+static double PD_D[PP_N][PP_N];		// Main matrix D
+static double PD_B[PP_N];			// Column B
+static double PD_Dv_B[PP_N];		// Dv-B
+static double PD_DT[PP_N][PP_N];	// Transposed D
+static double PD_DDT[PP_N][PP_N];	// D*DT
+//static double PD_DDT_[PP_N][PP_N];	// Copy of D*DT
+static double PD_DDTI[PP_N][PP_N];  // Inverse matrix to D*DT
+static double PD_DTDDTI[PP_N][PP_N];
 //========================== Input/Output =====================================
 static string PD_problemName;

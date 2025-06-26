@@ -17,7 +17,6 @@ namespace PF {
 namespace SF {
 	unsigned long long BinomialCoefficient(int n, int k);
 	void	Bitscale_Create(bool* bitscale, int m, int* hyperplanes, int mh);
-	bool	CheckEpsilons(double eps_zero, double eps_projection, double eps_on_hyperplane);
 	double	Distance_PointToHalfspace_i(PT_vector_T x, int i);
 	double	Distance_PointToHyperplane_i(PT_vector_T x, int i);
 	double	Distance_PointToPoint(PT_vector_T x, PT_vector_T y);
@@ -66,7 +65,15 @@ namespace SF {
 	void	MTX_SkipComments(FILE* stream);
 	int		Number_IncludingNeHyperplanes(PT_vector_T x, double eps_on_hyperplane);
 	double	ObjF(PT_vector_T x);
-	void	OrthogonalProjectingVectorOntoHalfspace_i(PT_vector_T z, int i, PT_vector_T r, bool* success);
+	void	Ort__Projecting(int* flatHyperplanes, int m_flat, PT_vector_T v, PT_vector_T w, bool* success);
+	void	Ort_D_and_B(int* flatHyperplanes, int m, int n);
+	//bool	Ort_Check_DDT_DDTI(int m);
+	void	Ort_DDT(int m, int n);
+	void	Ort_DDTI(int m, bool* success);
+	void	Ort_DT(int m, int n);
+	void	Ort_DTDDTI(int m, int n);
+	void	Ort_Dv_B(PT_vector_T v, int m, int n);
+	void	Ort_r(PT_vector_T w, int m, int n);
 	void	OrthogonalProjectingVectorOntoHyperplane_i(PT_vector_T x, int i, PT_vector_T p);
 	bool	PointBelongsToFlat(PT_vector_T x, int* hyperplaneList, int hyperplaneCount, double eps_on_hyperplane);
 	bool	PointBelongsToHalfspace_i(PT_vector_T point, int i, double eps_on_hyperplane);
@@ -97,6 +104,7 @@ namespace SF {
 	double	Vector_DotProduct(PT_vector_T x, PT_vector_T y);
 	void	Vector_MakeLike(PT_vector_T x, double lengthOfLikeVector, PT_vector_T likeVector);
 	void	Vector_MakeMinus_e(PT_vector_T minus_e);
+	void	Vector_Median(PT_vector_T x, double length);
 	void	Vector_MinusEquals(PT_vector_T equalPoint, PT_vector_T minusVector);
 	void	Vector_MultiplyByNumber(PT_vector_T x, double r, PT_vector_T y);
 	void	Vector_MultiplyEquals(PT_vector_T x, double r);

@@ -12,7 +12,6 @@ This source code has been produced with using BSF-skeleton
 #include <iomanip>
 #include <iostream>
 #include <math.h>
-#include <omp.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
