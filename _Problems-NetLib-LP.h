@@ -27,23 +27,25 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 //------------------------------------------------------------------------------
 #define PP_EPS_ZERO					1E-11					// Accuracy for comparison with zero
 #define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)		// Accuracy of calculating pseudoprojection
-#define PP_EPS_ON_HYPERPLANE		(PP_EPS_PROJECTION*1000)	// Accuracy of belonging to hyperplane
+#define PP_EPS_ON_HYPERPLANE		1E-5	// Accuracy of belonging to hyperplane
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+6					// Length of Objective Vector
 //------------------------------------------------------------------------------
 #define PP_EPS_RELATIVE_ERROR			1E-8				// Used if defined PP_CHECK_MAX_OBJ_VALUE 
-#define PP_MAX_PSEUDOPROJECTING_ITER	1000000000			// Maximum acceptable number of iterations in Pseudoprojection on flat
+
 //------------------------------ ifdef PP_DEBUG --------------------------------
 #define PP_PROJECTION_COUNT				100000000			// Each PP_PROJECTION_COUNT-th iteration to be outputted inside Flat_MaxProjection(*) or Flat_BipProjection(*)
 //-------------------------- Compilation Modes ---------------------------------
 #define PP_MEDIAN_LAUNCH_VECTOR
 //------------------------------------------------------------------------------
+// Elapsed time: 0.009524107
 // Number of iterations: 1
-// Computed objective value: -225494.963161337713245302
+// Computed objective value: -225494.963163598149549216
 // Maximal objective value:  -225494.963162380387075245
-// Relative error = 4.62e-12
+// Relative error = 5.4e-12
+// Distance to polytope: 2.0950381e-08
 //------------------------------------------------------------------------------
 
-/*============================== afiro LP problem ==============================*/
+/*============================== afiro LP problem ==============================*
 // Number of equations : 8
 // Subspace dimension : 24
 #define PP_PROBLEM_NAME	"afiro"
@@ -55,7 +57,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_EPS_PROJECTION				(PP_EPS_ZERO*10)		// Accuracy of calculating pseudoprojection
 #define PP_EPS_ON_HYPERPLANE			(PP_EPS_PROJECTION*100)	// Accuracy of belonging to hyperplane
 #define PP_OBJECTIVE_VECTOR_LENGTH		1E+6					// Length of Objective Vector
-#define PP_MAX_PSEUDOPROJECTING_ITER	1000000000				// Maximum acceptable number of iterations in Pseudoprojection on flat
+
 //------------------------------ ifdef PP_CHECK_MAX_OBJ_VALUE ------------------
 #define PP_EPS_RELATIVE_ERROR			1E-8					// Used if defined PP_CHECK_MAX_OBJ_VALUE 
 //------------------------------ ifdef PP_DEBUG --------------------------------
@@ -67,11 +69,36 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 //#define PP_MAXPROJECTION
 //#define PP_MIN_OF_DEGREE // Prefer vertex with lowest degree
 //------------------------------------------------------------------------------
-// Elapsed time: 141.94531
-// Number of iterations: 3
-// Computed objective value: 464.753142857212083072227
+// Elapsed time: 132.09289
+// Number of iterations: 1
+// Computed objective value: 464.753142857175475910481
 // Maximal objective value:  464.753142857142847788054
-// Relative error = 1.49e-13
+// Relative error = 7.02e-14
+// Distance to polytope: 1.1526033e-11
+//------------------------------------------------------------------------------
+
+/*============================== beaconfd LP problem ===========================*
+// Number of equations: 140
+// Subspace dimension: 122
+#define PP_PROBLEM_NAME		"beaconfd"
+#define PP_M 173	// Number of constraints in mps-file
+#define PP_N 262	// Number of variables in mps-file
+#define PP_MAX_OBJ_VALUE -33592.4858072
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+#define PP_EPS_ZERO						1E-11					// Accuracy for comparison with zero
+#define PP_EPS_PROJECTION				(PP_EPS_ZERO*10)		// Accuracy of calculating pseudoprojection
+#define PP_EPS_ON_HYPERPLANE			1E-6	// Accuracy of belonging to hyperplane
+#define PP_OBJECTIVE_VECTOR_LENGTH		1E+6					// Length of Objective Vector
+
+//------------------------------ ifdef PP_CHECK_MAX_OBJ_VALUE ------------------
+#define PP_EPS_RELATIVE_ERROR			1E-8					// Used if defined PP_CHECK_MAX_OBJ_VALUE 
+//------------------------------ ifdef PP_DEBUG --------------------------------
+#define PP_PROJECTION_COUNT				100000000				// Each PP_PROJECTION_COUNT-th iteration to be outputted inside Flat_MaxProjection(*) or Flat_BipProjection(*)
+//------------------------------ ifdef PP_SAVE_ITER_RESULT ---------------------
+#define PP_SCALE_FACTOR					1E+6					// #ifdef PP_SAVE_LOCAL_RESULT; makes 9 digits before the decimal point of PP_MAX_OBJ_VALUE
+//-------------------------- Compilation Modes ---------------------------------
+//TWIDDLE__BinomialCoefficient warning: value of integer variable B has exceeded PF_INT_MAX = 2147483647
 //------------------------------------------------------------------------------
 
 /*============================== blend LP problem ==============================*
@@ -88,7 +115,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+1					// Length of Objective Vector
 //------------------------------------------------------------------------------
 #define PP_EPS_RELATIVE_ERROR			1E-8				// Used if defined PP_CHECK_MAX_OBJ_VALUE 
-#define PP_MAX_PSEUDOPROJECTING_ITER	1000000000			// Maximum acceptable number of iterations in Pseudoprojection on flat
+
 //------------------------------ ifdef PP_DEBUG --------------------------------
 #define PP_PROJECTION_COUNT				10000000			// Each PP_PROJECTION_COUNT-th iteration to be outputted inside Flat_MaxProjection(*) or Flat_BipProjection(*)
 //-------------------------- Compilation Modes ---------------------------------
@@ -114,7 +141,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)		// Precision to calculate projection
 #define PP_EPS_ON_HYPERPLANE		(PP_EPS_PROJECTION*100)	// Accuracy of belonging to hyperplane
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+2					// Length of Objective Vector
-#define PP_MAX_PSEUDOPROJECTING_ITER	1000000000			// Maximum acceptable number of iterations in Pseudoprojection on flat
+
 //------------------------------ ifdef PP_CHECK_MAX_OBJ_VALUE ------------------
 #define PP_EPS_RELATIVE_ERROR			(PP_EPS_ZERO*10)		// Used if defined PP_CHECK_MAX_OBJ_VALUE 
 //------------------------------ ifdef PP_DEBUG --------------------------------
@@ -130,7 +157,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 
 //------------------------------------------------------------------------------
 
-/*============================== grow7 LP problem ============================*
+/*============================== grow7 LP problem ============================*/
 // Number of equations: 140
 // Subspace dimension: 161
 #define PP_PROBLEM_NAME		"grow7"
@@ -142,7 +169,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_EPS_PROJECTION				(PP_EPS_ZERO*10)		// Precision to calculate projection
 #define PP_EPS_ON_HYPERPLANE			(PP_EPS_PROJECTION*10)	// Accuracy of belonging to hyperplane
 #define PP_OBJECTIVE_VECTOR_LENGTH		1E+10					// Length of Objective Vector
-#define PP_MAX_PSEUDOPROJECTING_ITER	1000000000				// Maximum acceptable number of iterations in Pseudoprojection on flat
+
 //------------------------------ ifdef PP_CHECK_MAX_OBJ_VALUE ------------------
 #define PP_EPS_RELATIVE_ERROR			(PP_EPS_ZERO/10)				// Used if defined PP_CHECK_MAX_OBJ_VALUE 
 //------------------------------ ifdef PP_DEBUG --------------------------------
@@ -151,7 +178,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_SCALE_FACTOR					1E+1					// #ifdef PP_SAVE_LOCAL_RESULT; makes 9 digits before the decimal point of PP_MAX_OBJ_VALUE
 //-------------------------- Compilation Modes ---------------------------------
 #define PP_MAXPROJECTION
-#define PP_RANDOM_LAUNCH_VECTOR
+#define PP_MEDIAN_LAUNCH_VECTOR
 //#define PP_MIN_OF_DEGREE		// Prefer vertex with lowest degree
 //------------------------------------------------------------------------------
 // Elapsed time: 270739.86
@@ -172,7 +199,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_EPS_PROJECTION				(PP_EPS_ZERO*10)		// Precision to calculate projection
 #define PP_EPS_ON_HYPERPLANE			(PP_EPS_PROJECTION*10)	// Accuracy of belonging to hyperplane
 #define PP_OBJECTIVE_VECTOR_LENGTH		1E+5					// Length of Objective Vector
-#define PP_MAX_PSEUDOPROJECTING_ITER	1000000000				// Maximum acceptable number of iterations in Pseudoprojection on flat
+
 //------------------------------ ifdef PP_CHECK_MAX_OBJ_VALUE ------------------
 #define PP_EPS_RELATIVE_ERROR			(PP_EPS_ZERO*100)		// Used if defined PP_CHECK_MAX_OBJ_VALUE 
 //------------------------------ ifdef PP_DEBUG --------------------------------
@@ -199,7 +226,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)		// Accuracy of calculating pseudoprojection
 #define PP_EPS_ON_HYPERPLANE		(PP_EPS_PROJECTION*10)	// Accuracy of belonging to hyperplane
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+6					// Length of Objective Vector
-#define PP_MAX_PSEUDOPROJECTING_ITER	1000000000			// Maximum acceptable number of iterations in Pseudoprojection on flat
+
 //------------------------------ ifdef PP_CHECK_MAX_OBJ_VALUE ------------------
 #define PP_EPS_RELATIVE_ERROR			1E-8				// Used if defined PP_CHECK_MAX_OBJ_VALUE 
 //------------------------------ ifdef PP_DEBUG --------------------------------
@@ -227,7 +254,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+6					// Length of Objective Vector
 //----------------------------------------------------------------------------
 #define PP_EPS_RELATIVE_ERROR			1E-4				// Used if defined PP_CHECK_MAX_OBJ_VALUE 
-#define PP_MAX_PSEUDOPROJECTING_ITER	100000000			// Maximum acceptable number of iterations in Pseudoprojection on flat
+
 //------------------------------ ifdef PP_DEBUG --------------------------------
 #define PP_PROJECTION_COUNT				100000000			// Each PP_PROJECTION_COUNT-th iteration to be outputted inside Flat_MaxProjection(*) or Flat_BipProjection(*)
 //-------------------------- Compilation Modes ---------------------------------
@@ -254,7 +281,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+6					// Length of Objective Vector
 //----------------------------------------------------------------------------
 #define PP_EPS_RELATIVE_ERROR			1E-4				// Used if defined PP_CHECK_MAX_OBJ_VALUE 
-#define PP_MAX_PSEUDOPROJECTING_ITER	100000000			// Maximum acceptable number of iterations in Pseudoprojection on flat
+
 //------------------------------ ifdef PP_DEBUG --------------------------------
 #define PP_PROJECTION_COUNT				100000000			// Each PP_PROJECTION_COUNT-th iteration to be outputted inside Flat_MaxProjection(*) or Flat_BipProjection(*)
 //-------------------------- Compilation Modes ---------------------------------
@@ -282,7 +309,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+6					// Length of Objective Vector
 //------------------------------------------------------------------------------
 #define PP_EPS_RELATIVE_ERROR	1E-5						// Used if defined PP_CHECK_MAX_OBJ_VALUE
-#define PP_MAX_PSEUDOPROJECTING_ITER	100000000			// Maximum acceptable number of iterations in Pseudoprojection on flat
+
 //------------------------------ ifdef PP_DEBUG --------------------------------
 #define PP_PROJECTION_COUNT				10000000			// Each PP_PROJECTION_COUNT-th iteration to be outputted inside Flat_MaxProjection(*) or Flat_BipProjection(*)
 //-------------------------- Compilation Modes ---------------------------------
@@ -310,7 +337,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+6				// Length of Objective Vector
 //----------------------------------------------------------------------------
 #define PP_EPS_RELATIVE_ERROR			1E-4				// Used if defined PP_CHECK_MAX_OBJ_VALUE 
-#define PP_MAX_PSEUDOPROJECTING_ITER	100000000			// Maximum acceptable number of iterations in Pseudoprojection on flat
+
 //------------------------------ ifdef PP_DEBUG --------------------------------
 #define PP_PROJECTION_COUNT				100000000			// Each PP_PROJECTION_COUNT-th iteration to be outputted inside Flat_MaxProjection(*) or Flat_BipProjection(*)
 //-------------------------- Compilation Modes ---------------------------------

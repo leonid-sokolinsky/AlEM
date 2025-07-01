@@ -252,7 +252,7 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 
 
 		#ifdef PP_MAXPROJECTION
-		Flat_BipProjection(PD_edgeAlHyperplanes, PD_n - 1, v, PP_EPS_PROJECTION, PP_MAX_PSEUDOPROJECTING_ITER, w, &exitCode);
+		Flat_MaxProjection(PD_edgeAlHyperplanes, PD_n - 1, v, PP_EPS_PROJECTION, PP_MAX_PSEUDOPROJECTING_ITER, w, &exitCode);
 		#endif // PP_MAXPROJECTION
 
 		#ifndef PP_MAXPROJECTION
@@ -536,6 +536,9 @@ void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
 	#ifdef PP_MAXPROJECTION
 	cout << "PP_EPS_PROJECTION\t\t" << PP_EPS_PROJECTION << endl;
 	#endif // PP_MAXPROJECTION
+	#ifdef PP_BIPPROJECTION
+	cout << "PP_EPS_PROJECTION\t\t" << PP_EPS_PROJECTION << endl;
+	#endif // PP_BIPPROJECTION
 	cout << "PP_EPS_ON_HYPERPLANE\t\t" << PP_EPS_ON_HYPERPLANE << endl;
 	cout << "PP_OBJECTIVE_VECTOR_LENGTH\t" << PP_OBJECTIVE_VECTOR_LENGTH << endl;
 
@@ -895,9 +898,11 @@ namespace SF {
 			#endif // PP_DEBUG
 
 			iterCount++;
-			if (iterCount > maxProjectingIter) {
-				*exitCode = -2;
-				break;
+			if (maxProjectingIter > 0) {
+				if (iterCount > maxProjectingIter) {
+					*exitCode = -2;
+					break;
+				}
 			}
 
 			length_r = Vector_Norm(r);
@@ -941,9 +946,11 @@ namespace SF {
 			Vector_PlusEquals(w, p_max);
 
 			iterCount++;
-			if (iterCount > maxProjectingIter) {
-				*exitCode = -2;
-				break;
+			if (maxProjectingIter > 0) {
+				if (iterCount > maxProjectingIter) {
+					*exitCode = -2;
+					break;
+				}
 			}
 
 			/*DEBUG Flat_MaxProjection*/
@@ -1273,7 +1280,7 @@ namespace SF {
 
 		if (PD_n != PP_N) {
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-				cout << "MPS__MakeProblem error: Number of variables in mps-file = " << PD_n << " not equal to PP_M = " << PP_N << "." << endl;
+				cout << "MPS__MakeProblem error: Number of variables in mps-file = " << PD_n << " not equal to PP_N = " << PP_N << "." << endl;
 			return false;
 		}
 

@@ -21,7 +21,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 // P_EPS_ZERO - inverse dependence on PP_OBJECTIVE_VECTOR_LENGTH.
 //------------------------------ ifdef PP_DEBUG --------------------------------
 #define PP_PROJECTION_COUNT				100000				// Each PP_PROJECTION_COUNT iteration to be outputted inside Flat_MaxProjection(*)
-#define PP_MAX_PSEUDOPROJECTING_ITER	100000000			// Maximum acceptable number of iterations in Pseudoprojection on flat
+
 //-----------------------------------------------------------------------------
 #define PP_EPS_ZERO					1E-11			// Accuracy for comparison with zero
 #define PP_EPS_ON_HYPERPLANE		(PP_EPS_ZERO*100)// Accuracy of belonging to hyperplane

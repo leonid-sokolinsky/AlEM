@@ -15,11 +15,11 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 // PP_EPS_PROJECTION -	inverse dependence on PP_OBJECTIVE_VECTOR_LENGTH. 
 //						This parameter affects terminate condition when 
 //						calculating pseudoprojection.
-#define PP_EPS_RELATIVE_ERROR		1E-5				// Used if defined PP_CHECK_MAX_OBJ_VALUE 
+#define PP_EPS_RELATIVE_ERROR			1E-5				// Used if defined PP_CHECK_MAX_OBJ_VALUE 
+
+#define PP_SCALE_FACTOR					1					// #ifdef PP_SAVE_LOCAL_RESULT; makes 9 digits before the decimal point of PP_MAX_OBJ_VALUE
 //------------------------------ ifdef PP_DEBUG --------------------------------
 #define PP_PROJECTION_COUNT				100000				// Each PP_PROJECTION_COUNT iteration to be outputted inside Flat_MaxProjection(*)
-#define PP_MAX_PSEUDOPROJECTING_ITER	100000000			// Maximum acceptable number of iterations in Pseudoprojection on flat
-#define PP_SCALE_FACTOR					1					// #ifdef PP_SAVE_LOCAL_RESULT; makes 9 digits before the decimal point of PP_MAX_OBJ_VALUE
 //==============================================================================
 
 /*============================== nguyen5 LP problem ============================*
