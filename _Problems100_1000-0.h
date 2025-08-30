@@ -14,7 +14,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 //-------------------------- Compilation Modes ---------------------------------
 //#define PP_GRADIENT
 //------------------------------------------------------------------------------
-#define PP_EPS_RELATIVE_ERROR			1E-6			// Used if defined PP_CHECK_MAX_OBJ_VALUE 
+#define PP_EPS_RELATIVE_ERROR			1E-11			// Used if defined PP_CHECK_MAX_OBJ_VALUE 
 #define PP_MAX_PSEUDOPROJECTING_ITER	100000000		// Maximum acceptable number of iterations in Pseudoprojection on flat
 
 //============================== Problem Parameters ============================
@@ -25,6 +25,8 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_EPS_PROJECTION			(PP_EPS_ZERO*10)		// Accuracy of belonging to hyperplane
 #define PP_EPS_ON_HYPERPLANE		(PP_EPS_PROJECTION*100)	// Accuracy of belonging to hyperplane
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+7					// Length of Objective Vector
+//------------------------------ ifdef PP_DEBUG --------------------------------
+#define PP_PROJECTION_COUNT			100000000	// Each PP_PROJECTION_COUNT-th iteration to be outputted inside Flat_MaxProjection(*) or Flat_BipProjection(*)
 //==============================================================================
 
 /*============================== rnd100-0 LP problem ===========================*
@@ -54,7 +56,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_MAX_OBJ_VALUE 2264900
 //-----------------------------------------------------------------------------
 
-/*============================== rnd200-0 LP problem ==========================*/
+/*============================== rnd200-0 LP problem ==========================*
 #define PP_PROBLEM_NAME	"rnd200-0"
 #define PP_KK	200		// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
 #define PP_M	201		// Number of equations (number of rows in *.mtx)
@@ -99,8 +101,8 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_MAX_OBJ_VALUE 64079900
 //-----------------------------------------------------------------------------
 
-/*============================== rnd1000-0 LP problem =========================*
-#define PP_PROBLEM_NAME	"rnd1000-0"
+/*============================== tcube1K LP problem =========================*/
+#define PP_PROBLEM_NAME	"tcube1K" // Truncated hypercube
 #define PP_KK	1000		// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
 #define PP_M	1001		// Number of equations (number of rows in *.mtx)
 #define PP_N	2001	// Number of variables (number of cols in *.mtx)

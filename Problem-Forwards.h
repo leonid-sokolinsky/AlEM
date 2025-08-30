@@ -9,8 +9,9 @@ This source code has been produced with using BSF-skeleton
 #include "Problem-Types.h"
 //====================== Private Functions ===========================
 namespace PF {
-	void	CalculateNumberOfEdges(int neq, int mneh_u, int* med_u);
-	int		Vertex_Degree(PT_vector_T x, double eps_on_hyperplane);
+	void	CalculateNumberOfCombinations(int neq, int mneh_u, int* med_u);
+	int		Vertex_CoDegree(PT_vector_T x, double eps_on_hyperplane);
+	bool	PointIsVertex(PT_vector_T x, double eps_on_hyperplane);
 	void	PreparationForIteration(PT_vector_T u);
 }
 //====================== Shared Functions ===========================
@@ -27,7 +28,10 @@ namespace SF {
 	void	JumpingOnPolytope(PT_vector_T startPoint, PT_vector_T direcionVector, PT_vector_T finishPoint, double eps_jump_vector_len, double eps_on_hyperplane, double eps_zero, bool* parallelHPlanes, int* exitCode);
 	void	MakeColumnOfNorms(PT_matrix_T A, PT_column_T norm_a);
 	void	MakeListOfNotIncludingHalfspaces(PT_vector_T x, int* notIncludingHalfspacesList, double eps);
-	void	MakeNeHyperplaneList(PT_vector_T u, int* neHyperplanes_u, int* mneh_u, double eps);
+	void	MakeNeHyperplaneList(PT_vector_T u, int* neHyperplanes_all, int mneh_all, int* neHyperplanes_u, int* mneh_u, double eps_on_hyperplane);
+	void	Matrix__Basis(int* list_i, int* mi, double eps_zero);
+	void	Matrix__Rank(int* list_i, int mi, double eps_zero, int* rank);
+	void	Matrix_CopyConstraintsToD(int* list_i, int count);
 	bool	MPS___Load_Problem();
 	bool	MPS__MakeProblem(PT_MPS_row_T* row, int n_row, PT_MPS_column_T* column, int n_col, double* loBound, PT_MPS_upBound_T* upBounds, int n_up, PT_MPS_fxVariable_T* fxVariable, int n_fx);
 	bool	MPS__ReadBounds(FILE* stream, PT_MPS_column_T* column, int n_col, double* loBound, PT_MPS_upBound_T* upBound, int* n_up, PT_MPS_fxVariable_T* fxVariable, int* n_fx);
@@ -65,11 +69,11 @@ namespace SF {
 	void	MTX_SkipComments(FILE* stream);
 	int		Number_IncludingNeHyperplanes(PT_vector_T x, double eps_on_hyperplane);
 	double	ObjF(PT_vector_T x);
-	void	Ort__Projecting(int* flatHyperplanes, int m_flat, PT_vector_T v, PT_vector_T w, bool* success);
+	void	Ort__Projecting(int* flatHyperplanes, int m_flat, PT_vector_T v, PT_vector_T w, double eps_zero, bool* success);
 	void	Ort_D_and_B(int* flatHyperplanes, int m, int n);
 	//bool	Ort_Check_DDT_DDTI(int m);
 	void	Ort_DDT(int m, int n);
-	void	Ort_DDTI(int m, bool* success);
+	void	Ort_DDTI(int m, double eps_zero, bool* success);
 	void	Ort_DT(int m, int n);
 	void	Ort_DTDDTI(int m, int n);
 	void	Ort_Dv_B(PT_vector_T v, int m, int n);
@@ -81,7 +85,6 @@ namespace SF {
 	bool	PointBelongsToPolytope(PT_vector_T x, double eps_on_hyperplane);
 	bool	PointInsideHalfspace_i(PT_vector_T x, int i, double eps_on_hyperplane);
 	bool	PointIsBoundary(PT_vector_T x, double eps_on_hyperplane);
-	bool	PointIsVertex(PT_vector_T x, double eps_on_hyperplane);
 	int		PointLocation_i(PT_vector_T x, int i, double eps, double* a_DoT_x_MinuS_b);
 	void	Print_Constraints();
 	void	Print_HalfspacesIncludingPoint(PT_vector_T x, double eps_on_hyperplane);

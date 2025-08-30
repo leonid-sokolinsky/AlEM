@@ -9,7 +9,7 @@ This source code has been produced with using BSF-skeleton
 
 /*----------------------------- Problems ---------------------------------------*/
 
-//#define PP_PATH "Problems/"
+#define PP_PATH "Problems/"
 
 /**
 #include "_Problems10-1.h"
@@ -25,23 +25,21 @@ This source code has been produced with using BSF-skeleton
 
 /**/
 #include "_Problems-NetLib-LP.h"
-#define PP_PATH "../../Set-of-LP-Problems/NetLib-LP/"
+//#define PP_PATH "../../Set-of-LP-Problems/NetLib-LP/"
 
 /*------------------------------------------------------------------------------*/
 
 #define PP_METHOD_NAME "AlEM"
 
 //-------------------------- Compilation Modes ---------------------------------
-#define PP_DEBUG
+//#define PP_DEBUG
+//#define PP_MATRIX_OUTPUT
 //#define PP_GAUGE
 //#define PP_SAVE_LOCAL_RESULT
 //#define PP_SAVE_ITER_RESULT
 //#define PP_SAVE_RESULT
 #define PP_CHECK_MAX_OBJ_VALUE // Exit if relative error of computed maximum of objective function is less than PP_EPS_RELATIVE_ERROR (demands #define PP_MAX_OBJ_VALUE)
-//#define PP_MATRIX_OUTPUT
 //#define PP_OPT_MIN // Optimization by minimum
-
-#define PP_MAX_PSEUDOPROJECTING_ITER	0		// Maximum acceptable number of iterations in Pseudoprojection on flat
 
 //================================ Problem Paramrters ==========================
 #define PP_MM							(PP_M+2*PP_N)	// Maximal number of constraints
