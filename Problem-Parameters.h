@@ -32,7 +32,7 @@ This source code has been produced with using BSF-skeleton
 #define PP_METHOD_NAME "AlEM"
 
 //-------------------------- Compilation Modes ---------------------------------
-//#define PP_DEBUG
+#define PP_DEBUG
 //#define PP_MATRIX_OUTPUT
 //#define PP_GAUGE
 //#define PP_SAVE_LOCAL_RESULT

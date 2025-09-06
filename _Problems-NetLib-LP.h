@@ -16,8 +16,9 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 // PP_OBJECTIVE_VECTOR_LENGTH - direct dependence on dimension PD_n.
 // P_EPS_ZERO - inverse dependence on PP_OBJECTIVE_VECTOR_LENGTH.
 //------------------------------------------------------------------------------
+#define PP_MAX_PSEUDOPROJECTING_ITER	100000000		// Maximum acceptable number of iterations in Pseudoprojection on flat
 
-/*============================== adlittle LP problem ===========================*
+/*============================== adlittle LP problem ===========================*/
 // Number of equations: 15
 // Subspace dimension: 82
 #define PP_PROBLEM_NAME		"adlittle"
@@ -32,11 +33,10 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 //------------------------------ ifdef PP_DEBUG --------------------------------
 #define PP_PROJECTION_COUNT			100000000	// Each PP_PROJECTION_COUNT-th iteration to be outputted inside Flat_MaxProjection(*) or Flat_BipProjection(*)
 //------------------------------ ifdef PP_SAVE_ITER_RESULT ---------------------
-#define PP_SCALE_FACTOR					1E+3		// #ifdef PP_SAVE_LOCAL_RESULT; makes 9 digits before the decimal point of PP_MAX_OBJ_VALUE
+#define PP_SCALE_FACTOR					1E+3	// #ifdef PP_SAVE_LOCAL_RESULT; makes 9 digits before the decimal point of PP_MAX_OBJ_VALUE
 //-------------------------- Compilation Modes ---------------------------------
 //#define PP_GRADIENT
 //#define PP_RANDOM_LAUNCH_VECTOR 0
-//#define PP_MIN_OF_DEGREE // Prefer vertex with lowest degree
 //------------------------------------------------------------------------------
 // Elapsed time: 0.0048772
 // Number of iterations: 1
@@ -66,7 +66,6 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_SCALE_FACTOR					1E+6		// #ifdef PP_SAVE_LOCAL_RESULT; makes 9 digits before the decimal point of PP_MAX_OBJ_VALUE
 //-------------------------- Compilation Modes ---------------------------------
 #define PP_GRADIENT
-//#define PP_MIN_OF_DEGREE // Prefer vertex with lowest degree
 //#define PP_MAXPROJECTION
 //#define PP_MEDIAN_LAUNCH_VECTOR
 //#define PP_RANDOM_LAUNCH_VECTOR 283
@@ -100,7 +99,6 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_SCALE_FACTOR					1E+3					// #ifdef PP_SAVE_LOCAL_RESULT; makes 9 digits before the decimal point of PP_MAX_OBJ_VALUE
 //-------------------------- Compilation Modes ---------------------------------
 #define PP_GRADIENT
-#define PP_MIN_OF_DEGREE // Prefer vertex with lowest degree
 //------------------------------------------------------------------------------
 //TWIDDLE__BinomialCoefficient warning: value of integer variable B has exceeded PF_INT_MAX = 2147483647
 //------------------------------------------------------------------------------
@@ -143,7 +141,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_MAX_OBJ_VALUE 9146.3780924209269467749025024617	// Exact maximum value of objective function
 //------------------------------------------------------------------------------
 #define PP_EPS_ZERO					1E-11	// Accuracy for comparison with zero
-#define PP_EPS_ON_HYPERPLANE		1E-5	// Accuracy of belonging to hyperplane
+#define PP_EPS_ON_HYPERPLANE		1E-6	// Accuracy of belonging to hyperplane
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+6	// Length of Objective Vector
 #define PP_EPS_RELATIVE_ERROR		1E-11		 
 //------------------------------ ifdef PP_DEBUG --------------------------------
@@ -152,12 +150,11 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_SCALE_FACTOR					1E+5					// #ifdef PP_SAVE_LOCAL_RESULT; makes 9 digits before the decimal point of PP_MAX_OBJ_VALUE
 //-------------------------- Compilation Modes ---------------------------------
 //#define PP_GRADIENT
-//#define PP_MIN_OF_DEGREE // Prefer vertex with lowest degree
 //#define PP_MAXPROJECTION
 //#define PP_MEDIAN_LAUNCH_VECTOR
 //#define PP_RANDOM_LAUNCH_VECTOR			283
 //------------------------------------------------------------------------------
-//TWIDDLE__BinomialCoefficient warning: value of integer variable B has exceeded PF_INT_MAX = 2147483647
+// Precision loss
 //------------------------------------------------------------------------------
 
 /*============================== grow7 LP problem ============================*
@@ -189,7 +186,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 // Distance to polytope: 5.3484396e-06
 //------------------------------------------------------------------------------
 
-/*============================== israel LP problem =========================*/
+/*============================== israel LP problem =========================*
 // Number of equations: 0
 #define PP_PROBLEM_NAME		"israel"
 #define PP_M 174	// Number of constraints in mps-file
@@ -197,7 +194,6 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_MAX_OBJ_VALUE 896644.82186304572966200464196045	// Exact maximum value of objective function
 //------------------------------------------------------------------------------
 #define PP_EPS_ZERO					1E-8	// Accuracy for comparison with zero
-//#define PP_EPS_PROJECTION			1E-10	// Precision to calculate projection
 #define PP_EPS_ON_HYPERPLANE		2E-3	// Accuracy of belonging to hyperplane
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+6	// Length of Objective Vector
 #define PP_EPS_RELATIVE_ERROR		1E-9	// Termination criteria 
@@ -236,10 +232,12 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 //-------------------------- Compilation Modes ---------------------------------
 //#define PP_MAXPROJECTION
 //------------------------------------------------------------------------------
-// Number of iterations: 2
-// Computed objective value: 1749.90013012646932111238
+// Elapsed time: 0.0109538
+// Number of iterations: 16
+// Computed objective value: 1749.90012192081326247717
 // Maximal objective value:  1749.90012990620562050026
-// Relative error = 1.26e-10
+// Relative error = 4.56e-09
+// Distance to polytope: 3.4918643e-06
 //------------------------------------------------------------------------------
 
 /*============================== recipe LP problem =============================*
@@ -300,7 +298,6 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_SCALE_FACTOR				1E+7					// #ifdef PP_SAVE_LOCAL_RESULT; makes 9 digits before the decimal point of PP_MAX_OBJ_VALUE
 //-------------------------- Compilation Modes ---------------------------------
 //#define PP_GRADIENT
-//#define PP_MIN_OF_DEGREE // Prefer vertex with lowest degree
 //----------------------------------------------------------------------------
 // Number of iterations: 4
 // Computed objective value: 64.5750770586504359016544
@@ -326,7 +323,6 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_PROJECTION_COUNT				100000000			// Each PP_PROJECTION_COUNT-th iteration to be outputted inside Flat_MaxProjection(*) or Flat_BipProjection(*)
 //-------------------------- Compilation Modes ---------------------------------
 //#define PP_GRADIENT
-//#define PP_MIN_OF_DEGREE // Prefer vertex with lowest degree
 //--------------------------------------------------------------------------
 // Elapsed time: 3.747997
 // Number of iterations: 1
@@ -355,10 +351,40 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 //#define PP_GRADIENT
 //#define PP_BASIC_VECTORS_ONLY
 //------------------------------------------------------------------------------
-// Number of iterations: 2
-// Computed objective value: 415.732240914285966937314
+// Elapsed time: 0.0594301
+// Number of iterations: 6
+// Computed objective value: 415.732255369600750327663
 // Maximal objective value:  415.732240741419502683129
-// Relative error = 4.16e-10
+// Relative error = 3.52e-08
+// Distance to polytope: 1.8331818e-07
+//------------------------------------------------------------------------------
+
+/*============================== scagr7 LP problem =============================*
+// Number of equations : 84
+// Subspace dimension : 56
+#define PP_PROBLEM_NAME	"scagr7"
+#define PP_M 129		// Number of constraints in mps-file
+#define PP_N 140		// Number of variables in mps-file
+#define PP_MAX_OBJ_VALUE 2331389.824330984	// Exact maximum value of objective function
+//------------------------------------------------------------------------------
+#define PP_EPS_ZERO					1E-11	// Accuracy for comparison with zero
+#define PP_EPS_ON_HYPERPLANE		2E-5	// Accuracy of belonging to hyperplane
+#define PP_OBJECTIVE_VECTOR_LENGTH	1E+6	// Length of Objective Vector
+#define PP_EPS_RELATIVE_ERROR		1E-8	// Termination criteria 
+//------------------------------ ifdef PP_SAVE_ITER_RESULT ---------------------
+#define PP_SCALE_FACTOR				1E+6	// #ifdef PP_SAVE_LOCAL_RESULT; makes 9 digits before the decimal point of PP_MAX_OBJ_VALUE
+//------------------------------ ifdef PP_DEBUG --------------------------------
+#define PP_PROJECTION_COUNT				10000000			// Each PP_PROJECTION_COUNT-th iteration to be outputted inside Flat_MaxProjection(*) or Flat_BipProjection(*)
+//-------------------------- Compilation Modes ---------------------------------
+//#define PP_RANDOM_LAUNCH_VECTOR 113
+#define PP_MEDIAN_LAUNCH_VECTOR
+//------------------------------------------------------------------------------
+// Elapsed time: 12.0677
+// Number of iterations: 19
+// Computed objective value: 2331389.82462500780820847
+// Maximal objective value:  2331389.8243309841491282
+// Relative error = 1.26e-10
+// Distance to polytope: 1.5948626e-07
 //------------------------------------------------------------------------------
 
 /*============================== stocfor1 LP problem ============================*

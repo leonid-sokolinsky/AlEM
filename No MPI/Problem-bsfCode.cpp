@@ -56,21 +56,23 @@ void PC_bsf_Init(bool* success) {
 			PD_meq_total++;
 		}
 
-	int rankEq;
-	Matrix__Rank(PD_edgeAlHyperplanes, PD_meq_total, PP_EPS_ZERO, &rankEq);
-	if (PD_meq_total != rankEq) {
-		#ifdef PP_BASIC_VECTORS_ONLY	
-		PD_meq_basic = PD_meq_total;
-		Matrix__Basis(PD_edgeAlHyperplanes, &PD_meq_basic, PP_EPS_ZERO);
-		#else  // !PP_BASIC_VECTORS_ONLY
-		if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-			cout << "Number of equations = " << PD_meq_basic << " < rank = " << rankEq << ".\nYou should define the option PP_BASIC_VECTORS_ONLY." << endl;
-		*success = false;
-		return;
-		#endif // PP_BASIC_VECTORS_ONLY
+	PD_meq_basic = PD_meq_total;
+
+	if (PD_meq_total > 0) {
+		int rankEq;
+		Matrix__Rank(PD_edgeAlHyperplanes, PD_meq_total, PP_EPS_ZERO, &rankEq);
+		if (PD_meq_total != rankEq) {
+			#ifdef PP_BASIC_VECTORS_ONLY	
+			PD_meq_basic = PD_meq_total;
+			Matrix__Basis(PD_edgeAlHyperplanes, &PD_meq_basic, PP_EPS_ZERO);
+			#else  // !PP_BASIC_VECTORS_ONLY
+			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
+				cout << "Number of equations = " << PD_meq_basic << " < rank = " << rankEq << ".\nYou should define the option PP_BASIC_VECTORS_ONLY." << endl;
+			*success = false;
+			return;
+			#endif // PP_BASIC_VECTORS_ONLY
+		}
 	}
-	else
-		PD_meq_basic = PD_meq_total;
 
 	PD_supportSubspaceDim = PD_n - PD_meq_basic;	// Dimension of the subspace of intersection of support hyperplanes
 
@@ -215,7 +217,7 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 	#endif // PP_BATCH_SIZE
 
 	for (int coi = 0; coi < batch_size; coi++) {
-		PT_vector_T  u_nex;		// Next vertex
+		PT_vector_T  v_nex;		// Next vertex
 		double objF_nex;
 		#ifdef PP_GRADIENT
 		double objF_grd;
@@ -320,7 +322,7 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 			Vector_Subtraction(u_cur, w, jumpVector);
 
 		int jmpExitCode = 1;
-		JumpingOnPolytope(u_cur, jumpVector, u_nex, PP_EPS_JUMP_VECTOR_LEN, PP_EPS_ON_HYPERPLANE, PP_EPS_ZERO, PD_edgeBitscale, &jmpExitCode);
+		JumpingOnPolytope(u_cur, jumpVector, v_nex, PP_EPS_JUMP_VECTOR_LEN, PP_EPS_ON_HYPERPLANE, PP_EPS_ZERO, PD_edgeBitscale, &jmpExitCode);
 		if (jmpExitCode != 1) {
 			/*DEBUG PC_bsf_MapF**
 			#ifdef PP_DEBUG
@@ -329,35 +331,35 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 			continue;
 		}
 
-		if (Distance_PointToPoint(u_cur, u_nex) < PP_EPS_ZERO) {
+		if (Distance_PointToPoint(u_cur, v_nex) < PP_EPS_ZERO) {
 			/*DEBUG PC_bsf_MapF**
 			#ifdef PP_DEBUG
-			cout << "Worker " << BSF_sv_mpiRank << ":\t||u_nex - u_cur|| < PP_EPS_ZERO ===>>> movement is impossible." << endl;
+			cout << "Worker " << BSF_sv_mpiRank << ":\t||v_nex - u_cur|| < PP_EPS_ZERO ===>>> movement is impossible." << endl;
 			#endif // PP_DEBUG /**/
 			continue;
 		}
 
 		/**/
 		#ifdef PP_DEBUG
-		if (!PointBelongsToPolytope(u_nex, PP_EPS_ON_HYPERPLANE)) {
-			cout << "Worker " << BSF_sv_mpiRank << ": PC_bsf_MapF warning: u_nex does not belong to polytope with precision of PP_EPS_ON_HYPERPLANE = "
+		if (!PointBelongsToPolytope(v_nex, PP_EPS_ON_HYPERPLANE)) {
+			cout << "Worker " << BSF_sv_mpiRank << ": PC_bsf_MapF warning: v_nex does not belong to polytope with precision of PP_EPS_ON_HYPERPLANE = "
 				<< PP_EPS_ON_HYPERPLANE << endl;
 			double eps_on_polytope = PP_EPS_ON_HYPERPLANE;
-			Tuning_Eps_PointBelongsToPolytope(u_nex, &eps_on_polytope);
+			Tuning_Eps_PointBelongsToPolytope(v_nex, &eps_on_polytope);
 			cout << "Minimum PP_EPS_ON_HYPERPLANE should be " << eps_on_polytope << endl;
 		}
 		#endif // PP_DEBUG /**/
 
-		objF_nex = ObjF(u_nex);
+		objF_nex = ObjF(v_nex);
 
 		#ifdef PP_MIN_OF_DEGREE
-		int degree_u_nex = Vertex_CoDegree(u_nex, PP_EPS_ON_HYPERPLANE);
+		int degree_u_nex = Vertex_CoDegree(v_nex, PP_EPS_ON_HYPERPLANE);
 		#endif // PP_MIN_OF_DEGREE
 
 		#ifdef PP_GRADIENT
 		PT_vector_T u_grd;
 		PT_vector_T d;
-		Vector_Subtraction(u_nex, u_cur, d);
+		Vector_Subtraction(v_nex, u_cur, d);
 		Shift(u_cur, d, 1 / Vector_Norm(d), u_grd);
 		objF_grd = ObjF(u_grd);
 
@@ -374,7 +376,7 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 			cout << "Worker " << BSF_sv_mpiRank << ": coi = " << coi
 				<< "\tF(u_grd) = " << setprecision(PP_SETW / 2) << objF_grd
 				<< "\tObjF = " << setprecision(PP_SETW / 2) << objF_nex << "\t\t\t---> Movement is possible" << endl;
-			//if (MTX_SavePoint(u_nex, PP_MTX_POSTFIX_V)) cout << "Current approximation is saved into file *.v" << endl;
+			//if (MTX_SavePoint(v_nex, PP_MTX_POSTFIX_V)) cout << "Current approximation is saved into file *.v" << endl;
 			#endif // PP_DEBUG /**/
 
 			#ifdef PP_MIN_OF_DEGREE
@@ -382,7 +384,7 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 			#endif // PP_MIN_OF_DEGREE
 			reduceElem->objF_grd = objF_grd;
 			reduceElem->objF_nex = objF_nex;
-			Vector_Copy(u_nex, reduceElem->u_nex);
+			Vector_Copy(v_nex, reduceElem->v_nex);
 		}
 		#else // !PP_GRADIENT
 
@@ -411,7 +413,7 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 			#endif // PP_MIN_OF_DEGREE
 
 			reduceElem->objF_nex = objF_nex;
-			Vector_Copy(u_nex, reduceElem->u_nex);
+			Vector_Copy(v_nex, reduceElem->v_nex);
 		}
 		#endif // PP_GRADIENT
 	}
@@ -426,7 +428,7 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 		#ifdef PP_GRADIENT
 		reduceElem->objF_grd = -PP_INFINITY;
 		#endif // PP_GRADIENT
-		Vector_Copy(u_cur, reduceElem->u_nex);
+		Vector_Copy(u_cur, reduceElem->v_nex);
 		/*DEBUG PC_bsf_MapF**
 		#ifdef PP_DEBUG
 		cout << "Worker " << BSF_sv_mpiRank << ": ===>>> Movement is impossible." << endl;
@@ -441,14 +443,14 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 	cout << "\tF(u_grd_max) = " << reduceElem->objF_grd;
 	#endif // PP_GRADIENT
 	cout << "\tF(u_nex_max) = " << setw(PP_SETW) << reduceElem->objF_nex << "\t\t\t\t---> Movement is possible." << endl;;
-	//cout << "\n u_nex_max = "; Print_Vector(reduceElem->u_nex); cout << endl;
+	//cout << "\n u_nex_max = "; Print_Vector(reduceElem->v_nex); cout << endl;
 	#endif // PP_DEBUG /**/
 
 	#ifdef PP_SAVE_LOCAL_RESULT
 	char buf[10];
 	sprintf(buf, "%d", (int)(reduceElem->objF_nex * PP_SCALE_FACTOR));
 	string postfix = "_v_" + string(buf) + ".mtx";
-	if (MTX_SavePoint(reduceElem->u_nex, postfix))
+	if (MTX_SavePoint(reduceElem->v_nex, postfix))
 		cout << "Worker " << BSF_sv_mpiRank << ": Local result is saved into file *_v_<objF value>.mtx" << endl;
 	#endif // PP_SAVE_LOCAL_RESULT
 
@@ -631,7 +633,7 @@ void PC_bsf_ProblemOutput_3(PT_bsf_reduceElem_T_3* reduceResult, int reduceCount
 
 void PC_bsf_ProcessResults(PT_bsf_reduceElem_T* reduceResult, int reduceCounter, PT_bsf_parameter_T* parameter, int* nextJob, bool* exit) {
 
-	double jumpLength = Distance_PointToPoint(reduceResult->u_nex, PD_u);
+	double jumpLength = Distance_PointToPoint(reduceResult->v_nex, PD_u);
 
 	/*DEBUG PC_bsf_ProcessResults*/
 	#ifdef PP_DEBUG
@@ -643,12 +645,12 @@ void PC_bsf_ProcessResults(PT_bsf_reduceElem_T* reduceResult, int reduceCounter,
 		return;
 	}
 
-	Vector_Copy(reduceResult->u_nex, PD_u);
+	Vector_Copy(reduceResult->v_nex, PD_u);
 
 	if (reduceResult->objF_nex == -PP_INFINITY) {
 		/*DEBUG PC_bsf_ProcessResults*/
 		#ifdef PP_DEBUG
-		cout << "F(u_nex) ==  -PP_INFINITY == " << -PP_INFINITY << endl;
+		cout << "F(v_nex) ==  -PP_INFINITY == " << -PP_INFINITY << endl;
 		#endif // PP_DEBUG /**/
 
 		* exit = true;
@@ -663,7 +665,7 @@ void PC_bsf_ProcessResults(PT_bsf_reduceElem_T* reduceResult, int reduceCounter,
 
 		/*DEBUG PC_bsf_ProcessResults*/
 		#ifdef PP_DEBUG
-		//cout << "u_nex = "; Print_Vector(reduceResult->u_nex); cout << "\t";
+		//cout << "v_nex = "; Print_Vector(reduceResult->v_nex); cout << "\t";
 		cout << "|F(u_cur)-ObjF|/|F(u_cur)| = " << RelativeError(PD_objF_cur, reduceResult->objF_nex) << " < PP_EPS_ZERO = " << PP_EPS_ZERO << endl;
 		#endif // PP_DEBUG /**/
 
@@ -680,7 +682,7 @@ void PC_bsf_ProcessResults(PT_bsf_reduceElem_T* reduceResult, int reduceCounter,
 
 		/*DEBUG PC_bsf_ProcessResults*/
 		#ifdef PP_DEBUG
-		cout << "|PP_MAX_OBJ_VALUE-F(u_nex)|/|PP_MAX_OBJ_VALUE| = " << RelativeError(PP_MAX_OBJ_VALUE, reduceResult->objF_nex) << " < PP_EPS_RELATIVE_ERROR = " << PP_EPS_RELATIVE_ERROR << endl;
+		cout << "|PP_MAX_OBJ_VALUE-F(v_nex)|/|PP_MAX_OBJ_VALUE| = " << RelativeError(PP_MAX_OBJ_VALUE, reduceResult->objF_nex) << " < PP_EPS_RELATIVE_ERROR = " << PP_EPS_RELATIVE_ERROR << endl;
 		#endif // PP_DEBUG /**/
 
 		* exit = true;
@@ -703,15 +705,15 @@ void PC_bsf_ProcessResults(PT_bsf_reduceElem_T* reduceResult, int reduceCounter,
 
 	#ifdef PP_DEBUG
 	//cout << "Distance to polytope: " << Distance_PointToPolytope(PD_u) << endl;
-	//cout << "Number of hyperplanes including u_nex: " << Number_IncludingNeHyperplanes(PD_u, PP_EPS_ON_HYPERPLANE) << endl;
-	//cout << "u_nex:\t"; Print_Vector(reduceResult->u_nex);  cout << endl;
-	//cout << "u_nex hyperplanes:\t"; Print_HyperplanesIncludingPoint(reduceResult->u_nex, PP_EPS_ON_HYPERPLANE); cout << endl;
+	//cout << "Number of hyperplanes including v_nex: " << Number_IncludingNeHyperplanes(PD_u, PP_EPS_ON_HYPERPLANE) << endl;
+	//cout << "v_nex:\t"; Print_Vector(reduceResult->v_nex);  cout << endl;
+	//cout << "v_nex hyperplanes:\t"; Print_HyperplanesIncludingPoint(reduceResult->v_nex, PP_EPS_ON_HYPERPLANE); cout << endl;
 	#endif // PP_DEBUG
 	cout << "ObjF = " << ObjF(PD_u) << "\tNumber of edge combinations: " << PD_mco_u << endl;
 	cout << "_________________________________________________ " << PD_iterNo + 1 << " _____________________________________________________" << endl;
 
 	if (!PointBelongsToPolytope(PD_u, PP_EPS_ON_HYPERPLANE)) {
-		cout << "PC_bsf_ProcessResults error: u_nex does not belong to polytope with precision of PP_EPS_ON_HYPERPLANE = "
+		cout << "PC_bsf_ProcessResults error: v_nex does not belong to polytope with precision of PP_EPS_ON_HYPERPLANE = "
 			<< PP_EPS_ON_HYPERPLANE << endl;
 
 		/*DEBUG PC_bsf_ProcessResults*/
@@ -726,7 +728,7 @@ void PC_bsf_ProcessResults(PT_bsf_reduceElem_T* reduceResult, int reduceCounter,
 	}
 
 	if (!PointIsVertex(PD_u, PP_EPS_ON_HYPERPLANE)) {
-		cout << "PC_bsf_ProcessResults error: u_nex is NOT vertex with precision of PP_EPS_ON_HYPERPLANE = "
+		cout << "PC_bsf_ProcessResults error: v_nex is NOT vertex with precision of PP_EPS_ON_HYPERPLANE = "
 			<< PP_EPS_ON_HYPERPLANE << endl;
 		*exit = true;
 		return;
@@ -767,7 +769,7 @@ void PC_bsf_ReduceF(PT_bsf_reduceElem_T* x, PT_bsf_reduceElem_T* y, PT_bsf_reduc
 		#ifdef PP_MIN_OF_DEGREE
 		z->numOfEdgeCombinations = x->numOfEdgeCombinations;
 		#endif // PP_MIN_OF_DEGREE
-		Vector_Copy((*x).u_nex, (*z).u_nex);
+		Vector_Copy((*x).v_nex, (*z).v_nex);
 	}
 	else {
 		z->objF_grd = y->objF_grd;
@@ -775,7 +777,7 @@ void PC_bsf_ReduceF(PT_bsf_reduceElem_T* x, PT_bsf_reduceElem_T* y, PT_bsf_reduc
 		#ifdef PP_MIN_OF_DEGREE
 		z->numOfEdgeCombinations = y->numOfEdgeCombinations;
 		#endif // PP_MIN_OF_DEGREE
-		Vector_Copy((*y).u_nex, (*z).u_nex);
+		Vector_Copy((*y).v_nex, (*z).v_nex);
 	}
 	#else
 	#ifdef PP_MIN_OF_DEGREE
@@ -788,14 +790,14 @@ void PC_bsf_ReduceF(PT_bsf_reduceElem_T* x, PT_bsf_reduceElem_T* y, PT_bsf_reduc
 		#ifdef PP_MIN_OF_DEGREE
 		z->numOfEdgeCombinations = x->numOfEdgeCombinations;
 		#endif // PP_MIN_OF_DEGREE
-		Vector_Copy((*x).u_nex, (*z).u_nex);
+		Vector_Copy((*x).v_nex, (*z).v_nex);
 	}
 	else {
 		z->objF_nex = y->objF_nex;
 		#ifdef PP_MIN_OF_DEGREE
 		z->numOfEdgeCombinations = y->numOfEdgeCombinations;
 		#endif // PP_MIN_OF_DEGREE
-		Vector_Copy((*y).u_nex, (*z).u_nex);
+		Vector_Copy((*y).v_nex, (*z).v_nex);
 	}
 	#endif // PP_GRADIENT
 }
@@ -2832,7 +2834,6 @@ namespace SF {
 		for (int j = 0; j < m; j++) {
 
 			if (fabs(PD_DDT[j][j]) <= eps_zero) { // Search for a non-zero below
-				PD_DDT[j][j] = 0;
 				int i_ne_0 = -1;
 				for (int i = j + 1; i < m; i++)
 					if (fabs(PD_DDT[i][j]) > eps_zero) {
@@ -2860,7 +2861,6 @@ namespace SF {
 						}
 
 					if (j_ne_0 == -1) {
-
 						/* Debug Ort_DDTI**
 						cout << "Row " << j << endl;
 						for (int jj = j + 1; jj < m; jj++)

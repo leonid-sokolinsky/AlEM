@@ -18,8 +18,8 @@ struct PT_bsf_mapElem_T {		// Type of map-list elements
 };
 
 struct PT_bsf_reduceElem_T {	// Type of reduce-list elements for Job 0 (default)	
-	PT_vector_T u_nex;	// Next vertex
-	double objF_nex;	// F(u_nex)
+	PT_vector_T v_nex;	// Next vertex
+	double objF_nex;	// F(v_nex)
 	double objF_grd;	// Value of objective function after one unit movement
 	#ifdef PP_MIN_OF_DEGREE
 	int numOfEdgeCombinations;		// Number of edge combinations in the next vertex
