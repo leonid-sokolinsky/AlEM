@@ -265,7 +265,7 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 		#ifndef PP_MAXPROJECTION
 		#ifndef PP_BIPPROJECTION
 		bool success;
-		Ort__Projecting(PD_edgeAlHyperplanes, PD_n - 1, v, w, PP_EPS_ZERO, &success);
+		OrtProjecting(PD_edgeAlHyperplanes, PD_n - 1, v, w, PP_EPS_ZERO, &success);
 		if (!success) {
 			/*DEBUG PC_bsf_MapF*
 			#ifdef PP_DEBUG
@@ -1163,6 +1163,11 @@ namespace SF {
 		double factor;
 		int maxRank = PF_MIN(PD_n, mi);
 
+		if (mi == 1) {
+			*rank = 1;
+			return;
+		}
+
 		Matrix_CopyConstraintsToD(list_i, mi);
 
 		/* Debug Matrix__Rank **
@@ -1183,15 +1188,18 @@ namespace SF {
 		for (int j = 0; j < maxRank; j++) {
 
 			if (fabs(PD_D[j][j]) <= eps_zero) {
-				PD_D[j][j] = 0;
 
 				int i_ne_0 = -1; // Search for a non-zero below
 				for (int i = j + 1; i < mi; i++) {
-					if (fabs(PD_D[i][j]) > eps_zero) {
-						i_ne_0 = i;
-						break;
+
+					if (i_ne_0 == -1) {
+						if (fabs(PD_D[i][j]) > eps_zero)
+							i_ne_0 = i;
 					}
-					PD_D[i][j] = 0;
+					else {
+						if (fabs(PD_D[i][j]) > fabs(PD_D[i_ne_0][j]))
+							i_ne_0 = i;
+					}
 				}
 
 				if (i_ne_0 > -1) {
@@ -1215,11 +1223,16 @@ namespace SF {
 				else {
 
 					int j_ne_0 = -1; // Search for a non-zero on the right
-					for (int lj = j + 1; lj < PD_n; lj++)
-						if (fabs(PD_D[j][lj]) > eps_zero) {
-							j_ne_0 = lj;
-							break;
+					for (int lj = j + 1; lj < PD_n; lj++) {
+						if (j_ne_0 == -1) {
+							if (fabs(PD_D[j][lj]) > eps_zero)
+								j_ne_0 = lj;
 						}
+						else {
+							if (fabs(PD_D[j][lj]) > fabs(PD_D[j][j_ne_0]))
+								j_ne_0 = lj;
+						}
+					}
 
 					if (j_ne_0 == -1)
 						continue;
@@ -2754,195 +2767,6 @@ namespace SF {
 		return s;
 	}
 
-	/* Direct orthogonal projection:
-	[Murty K.G. Computational and Algorithmic Linear Algebra and n-Dimensional Geometry. Singapore: World Scientific, 2011. xxi, 552 p. DOI:https://doi.org/10.1142/8261]
-	p. 361, Nearest Point When S = {x : Ax = b}. */
-	static inline void Ort__Projecting(int* flatHyperplanes, int m_flat, PT_vector_T v, PT_vector_T w, double eps_zero, bool* success) {
-		PT_vector_T r;
-		assert(m_flat <= PD_n);
-
-		Ort_D_and_B(flatHyperplanes, m_flat, PD_n);
-		Ort_Dv_B(v, m_flat, PD_n);
-		Ort_DT(m_flat, PD_n);
-		Ort_DDT(m_flat, PD_n);
-		Ort_DDTI(m_flat, eps_zero, success);
-		if (!*success)
-			return;
-		//assert(Ort_Check_DDT_DDTI(m_flat));
-		Ort_DTDDTI(m_flat, PD_n);
-		Ort_r(r, m_flat, PD_n);
-		Vector_Subtraction(v, r, w);
-	}
-
-	/**
-	static inline bool Ort_Check_DDT_DDTI(int m) {
-		bool res = true;
-
-		for (int i = 0; i < m; i++) {
-			for (int j = 0; j < m; j++) {
-				double x = 0;
-				for (int l = 0; l < m; l++) {
-					x = x + PD_DDT_[i][l] * PD_DDTI[l][j];
-				}
-				if (i == j) {
-					if (fabs(x-1)> PF_DBL_EPSILON) {
-						res = false;
-						break;
-					};
-				}
-				else {
-					if (fabs(x) > PF_DBL_EPSILON) {
-						res = false;
-						break;
-					};
-				}
-			}
-			if (!res)
-				return res;
-		}
-		return res;
-	}/**/
-
-	static inline void Ort_D_and_B(int* flatHyperplanes, int m, int n) {
-		for (int i = 0; i < m; i++) {
-			for (int j = 0; j < n; j++)
-				PD_D[i][j] = PD_A[flatHyperplanes[i]][j];
-			PD_B[i] = PD_b[flatHyperplanes[i]];
-		}
-	}
-
-	static inline void Ort_DDT(int m, int n) {
-		for (int i = 0; i < m; i++)
-			for (int j = 0; j < m; j++) {
-				PD_DDT[i][j] = 0;
-				for (int l = 0; l < n; l++)
-					PD_DDT[i][j] = PD_DDT[i][j] + PD_D[i][l] * PD_DT[l][j];
-			}
-	}
-
-	static inline void Ort_DDTI(int m, double eps_zero, bool* success) {
-		double factor;
-
-		*success = true;
-
-		for (int i = 0; i < m; i++) { // identity matrix
-			for (int j = 0; j < m; j++)
-				PD_DDTI[i][j] = 0;
-			PD_DDTI[i][i] = 1;
-		}
-
-		for (int j = 0; j < m; j++) {
-
-			if (fabs(PD_DDT[j][j]) <= eps_zero) { // Search for a non-zero below
-				int i_ne_0 = -1;
-				for (int i = j + 1; i < m; i++)
-					if (fabs(PD_DDT[i][j]) > eps_zero) {
-						i_ne_0 = i;
-						break;
-					}
-
-				if (i_ne_0 > -1) { // Permute the rows
-					for (int l = 0; l < m; l++) {
-						double buf;
-						buf = PD_DDT[j][l];
-						PD_DDT[j][l] = PD_DDT[i_ne_0][l];
-						PD_DDT[i_ne_0][l] = buf;
-						buf = PD_DDTI[j][l];
-						PD_DDTI[j][l] = PD_DDTI[i_ne_0][l];
-						PD_DDTI[i_ne_0][l] = buf;
-					}
-				}
-				else {
-					int j_ne_0 = -1; // Search for a non-zero on the right
-					for (int lj = j + 1; lj < m; lj++)
-						if (fabs(PD_DDT[j][lj]) > eps_zero) {
-							j_ne_0 = lj;
-							break;
-						}
-
-					if (j_ne_0 == -1) {
-						/* Debug Ort_DDTI**
-						cout << "Row " << j << endl;
-						for (int jj = j + 1; jj < m; jj++)
-							cout << PD_DDT[j][jj] << "\t";
-						cout <<"\nColumn " << j << endl;
-						for (int ii = j + 1; ii < m; ii++)
-							cout << PD_DDT[ii][j] << "\t";
-						cout << endl;
-						/* End Debug Ort_DDTI*/
-						*success = false;
-						return;
-					}
-
-					for (int i = 0; i < m; i++) { // Permute the columns
-						double buf;
-						buf = PD_DDT[i][j];
-						PD_DDT[i][j] = PD_DDT[i][j_ne_0];
-						PD_DDT[i][j_ne_0] = buf;
-						buf = PD_DDTI[i][j];
-						PD_DDTI[i][j] = PD_DDTI[i][j_ne_0];
-						PD_DDTI[i][j_ne_0] = buf;
-					}
-				}
-			}
-
-			factor = PD_DDT[j][j];
-			for (int l = 0; l < m; l++) { // make 1
-				PD_DDT[j][l] = PD_DDT[j][l] / factor;
-				PD_DDTI[j][l] = PD_DDTI[j][l] / factor;
-			}
-
-			for (int i = j + 1; i < m; i++) {
-				factor = PD_DDT[i][j];
-				for (int l = 0; l < m; l++) {
-					PD_DDT[i][l] = PD_DDT[i][l] - PD_DDT[j][l] * factor;
-					PD_DDTI[i][l] = PD_DDTI[i][l] - PD_DDTI[j][l] * factor;
-				}
-			}
-		}
-
-		for (int i = m - 1; i > 0; i--)
-			for (int k = i - 1; k >= 0; k--) {
-				factor = PD_DDT[k][i];
-				for (int j = 0; j < m; j++) {
-					PD_DDT[k][j] = PD_DDT[k][j] - PD_DDT[i][j] * factor;
-					PD_DDTI[k][j] = PD_DDTI[k][j] - PD_DDTI[i][j] * factor;
-				}
-			}
-	}
-
-	static inline void Ort_DT(int m, int n) {
-		for (int i = 0; i < m; i++)
-			for (int j = 0; j < n; j++)
-				PD_DT[j][i] = PD_D[i][j];
-	}
-
-	static inline void Ort_DTDDTI(int m, int n) {
-		for (int i = 0; i < n; i++)
-			for (int j = 0; j < m; j++) {
-				PD_DTDDTI[i][j] = 0;
-				for (int l = 0; l < m; l++)
-					PD_DTDDTI[i][j] = PD_DTDDTI[i][j] + PD_DT[i][l] * PD_DDTI[l][j];
-			}
-	}
-
-	static inline void Ort_Dv_B(PT_vector_T v, int m, int n) {
-		for (int i = 0; i < m; i++) {
-			PD_Dv[i] = 0;
-			for (int j = 0; j < n; j++)
-				PD_Dv[i] = PD_Dv[i] + PD_D[i][j] * v[j];
-			PD_Dv_B[i] = PD_Dv[i] - PD_B[i];
-		}
-	}
-
-	static inline void Ort_r(PT_vector_T r, int m, int n) {
-		for (int i = 0; i < n; i++) {
-			r[i] = 0;
-			for (int j = 0; j < m; j++)
-				r[i] = r[i] + PD_DTDDTI[i][j] * PD_Dv_B[j];
-		}
-	}
-
 	static inline void OrthogonalProjectingVectorOntoHyperplane_i(PT_vector_T x, int i, PT_vector_T p) {
 		double ns = Vector_NormSquare(PD_A[i]);
 		Vector_MultiplyByNumber(PD_A[i], -(Vector_DotProduct(PD_A[i], x) - PD_b[i]) / ns, p);
@@ -3389,28 +3213,175 @@ namespace PF {
 		}
 	}
 
-	static inline int Vertex_CoDegree(PT_vector_T x, double eps_on_hyperplane) {
-		int mne;
-		int res;
+	static inline void Ort_D_and_B(int* flatHyperplanes, int m, int n) {
+		for (int i = 0; i < m; i++) {
+			for (int j = 0; j < n; j++)
+				PD_D[i][j] = PD_A[flatHyperplanes[i]][j];
+			PD_B[i] = PD_b[flatHyperplanes[i]];
+		}
+	}
 
-		mne = 0;
-		for (int i = 0; i < PD_m; i++) {
-			if (PD_isEquation[i])
-				continue;
-			if (PointBelongsToHyperplane_i(x, i, eps_on_hyperplane))
-				mne++;
+	static inline void Ort_DDT(int m, int n) {
+		for (int i = 0; i < m; i++)
+			for (int j = 0; j < m; j++) {
+				PD_DDT[i][j] = 0;
+				for (int l = 0; l < n; l++)
+					PD_DDT[i][j] = PD_DDT[i][j] + PD_D[i][l] * PD_DT[l][j];
+			}
+	}
+
+	static inline void Ort_DDTI(int m, double eps_zero, bool* success) {
+		double factor;
+
+
+		*success = true;
+
+		for (int i = 0; i < m; i++) { // identity matrix
+			for (int j = 0; j < m; j++)
+				PD_DDTI[i][j] = 0;
+			PD_DDTI[i][i] = 1;
 		}
 
-		if (mne == PD_supportSubspaceDim)
-			res = mne;
-		else {
-			if (mne < 63)
-				res = (int)BinomialCoefficient(mne, PD_supportSubspaceDim - 1);
-			else
-				res = TWIDDLE__BinomialCoefficient(mne, PD_supportSubspaceDim - 1, PD_TWIDDLE_p);
+		for (int j = 0; j < m; j++) {
+
+			if (fabs(PD_DDT[j][j]) <= eps_zero) { // Search for a non-zero below
+				int i_ne_0 = -1;
+				for (int i = j + 1; i < m; i++) {
+					if (i_ne_0 == -1) {
+						if (fabs(PD_DDT[i][j]) > eps_zero)
+							i_ne_0 = i;
+					}
+					else {
+						if (fabs(PD_DDT[i][j]) > fabs(PD_DDT[i_ne_0][j]))
+							i_ne_0 = i;
+					}
+				}
+
+				if (i_ne_0 > -1) { // Permute the rows
+					for (int l = 0; l < m; l++) {
+						double buf;
+						buf = PD_DDT[j][l];
+						PD_DDT[j][l] = PD_DDT[i_ne_0][l];
+						PD_DDT[i_ne_0][l] = buf;
+						buf = PD_DDTI[j][l];
+						PD_DDTI[j][l] = PD_DDTI[i_ne_0][l];
+						PD_DDTI[i_ne_0][l] = buf;
+					}
+				}
+				else {
+					int j_ne_0 = -1; // Search for a non-zero on the right
+					for (int lj = j + 1; lj < m; lj++) {
+						if (j_ne_0 == -1) {
+							if (fabs(PD_DDT[j][lj]) > eps_zero)
+								j_ne_0 = lj;
+						}
+						else {
+							if (fabs(PD_DDT[j][lj]) > fabs(PD_DDT[j][j_ne_0]))
+								j_ne_0 = lj;
+						}
+					}
+
+					if (j_ne_0 == -1) {
+						/* Debug Ort_DDTI**
+						cout << "Row " << j << endl;
+						for (int jj = j + 1; jj < m; jj++)
+							cout << PD_DDT[j][jj] << "\t";
+						cout <<"\nColumn " << j << endl;
+						for (int ii = j + 1; ii < m; ii++)
+							cout << PD_DDT[ii][j] << "\t";
+						cout << endl;
+						/* End Debug Ort_DDTI*/
+						*success = false;
+						return;
+					}
+
+					for (int i = 0; i < m; i++) { // Permute the columns
+						double buf;
+						buf = PD_DDT[i][j];
+						PD_DDT[i][j] = PD_DDT[i][j_ne_0];
+						PD_DDT[i][j_ne_0] = buf;
+						buf = PD_DDTI[i][j];
+						PD_DDTI[i][j] = PD_DDTI[i][j_ne_0];
+						PD_DDTI[i][j_ne_0] = buf;
+					}
+				}
+			}
+
+			factor = PD_DDT[j][j];
+			for (int l = 0; l < m; l++) { // make 1
+				PD_DDT[j][l] = PD_DDT[j][l] / factor;
+				PD_DDTI[j][l] = PD_DDTI[j][l] / factor;
+			}
+
+			for (int i = j + 1; i < m; i++) {
+				factor = PD_DDT[i][j];
+				for (int l = 0; l < m; l++) {
+					PD_DDT[i][l] = PD_DDT[i][l] - PD_DDT[j][l] * factor;
+					PD_DDTI[i][l] = PD_DDTI[i][l] - PD_DDTI[j][l] * factor;
+				}
+			}
 		}
 
-		return res;
+		for (int i = m - 1; i > 0; i--)
+			for (int k = i - 1; k >= 0; k--) {
+				factor = PD_DDT[k][i];
+				for (int j = 0; j < m; j++) {
+					PD_DDT[k][j] = PD_DDT[k][j] - PD_DDT[i][j] * factor;
+					PD_DDTI[k][j] = PD_DDTI[k][j] - PD_DDTI[i][j] * factor;
+				}
+			}
+	}
+
+	static inline void Ort_DT(int m, int n) {
+		for (int i = 0; i < m; i++)
+			for (int j = 0; j < n; j++)
+				PD_DT[j][i] = PD_D[i][j];
+	}
+
+	static inline void Ort_DTDDTI(int m, int n) {
+		for (int i = 0; i < n; i++)
+			for (int j = 0; j < m; j++) {
+				PD_DTDDTI[i][j] = 0;
+				for (int l = 0; l < m; l++)
+					PD_DTDDTI[i][j] = PD_DTDDTI[i][j] + PD_DT[i][l] * PD_DDTI[l][j];
+			}
+	}
+
+	static inline void Ort_Dv_B(PT_vector_T v, int m, int n) {
+		for (int i = 0; i < m; i++) {
+			PD_Dv[i] = 0;
+			for (int j = 0; j < n; j++)
+				PD_Dv[i] = PD_Dv[i] + PD_D[i][j] * v[j];
+			PD_Dv_B[i] = PD_Dv[i] - PD_B[i];
+		}
+	}
+
+	static inline void Ort_r(PT_vector_T r, int m, int n) {
+		for (int i = 0; i < n; i++) {
+			r[i] = 0;
+			for (int j = 0; j < m; j++)
+				r[i] = r[i] + PD_DTDDTI[i][j] * PD_Dv_B[j];
+		}
+	}
+
+	/* Direct orthogonal projection:
+	[Murty K.G. Computational and Algorithmic Linear Algebra and n-Dimensional Geometry. Singapore: World Scientific, 2011. xxi, 552 p. DOI:https://doi.org/10.1142/8261]
+	p. 361, Nearest Point When S = {x : Ax = b}. */
+	static inline void OrtProjecting(int* flatHyperplanes, int m_flat, PT_vector_T v, PT_vector_T w, double eps_zero, bool* success) {
+		PT_vector_T r;
+		assert(m_flat <= PD_n);
+
+		Ort_D_and_B(flatHyperplanes, m_flat, PD_n);
+		Ort_Dv_B(v, m_flat, PD_n);
+		Ort_DT(m_flat, PD_n);
+		Ort_DDT(m_flat, PD_n);
+		Ort_DDTI(m_flat, eps_zero, success);
+		if (!*success)
+			return;
+		//assert(Ort_Check_DDT_DDTI(m_flat));
+		Ort_DTDDTI(m_flat, PD_n);
+		Ort_r(r, m_flat, PD_n);
+		Vector_Subtraction(v, r, w);
 	}
 
 	static inline bool PointIsVertex(PT_vector_T u, double eps_on_hyperplane) {
@@ -3434,5 +3405,29 @@ namespace PF {
 		if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
 			cout << "PreparationForIteration: Number of edge combinations: " << PD_mco_u << endl;
 		#endif // PP_DEBUG /**/
+	}
+
+	static inline int Vertex_CoDegree(PT_vector_T x, double eps_on_hyperplane) {
+		int mne;
+		int res;
+
+		mne = 0;
+		for (int i = 0; i < PD_m; i++) {
+			if (PD_isEquation[i])
+				continue;
+			if (PointBelongsToHyperplane_i(x, i, eps_on_hyperplane))
+				mne++;
+		}
+
+		if (mne == PD_supportSubspaceDim)
+			res = mne;
+		else {
+			if (mne < 63)
+				res = (int)BinomialCoefficient(mne, PD_supportSubspaceDim - 1);
+			else
+				res = TWIDDLE__BinomialCoefficient(mne, PD_supportSubspaceDim - 1, PD_TWIDDLE_p);
+		}
+
+		return res;
 	}
 }

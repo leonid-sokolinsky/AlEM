@@ -10,9 +10,10 @@ This source code has been produced with using BSF-skeleton
 //====================== Private Functions ===========================
 namespace PF {
 	void	CalculateNumberOfCombinations(int neq, int mneh_u, int* med_u);
-	int		Vertex_CoDegree(PT_vector_T x, double eps_on_hyperplane);
+	void	OrtProjecting(int* flatHyperplanes, int m_flat, PT_vector_T v, PT_vector_T w, double eps_zero, bool* success);
 	bool	PointIsVertex(PT_vector_T x, double eps_on_hyperplane);
 	void	PreparationForIteration(PT_vector_T u);
+	int		Vertex_CoDegree(PT_vector_T x, double eps_on_hyperplane);
 }
 //====================== Shared Functions ===========================
 namespace SF {
@@ -69,15 +70,6 @@ namespace SF {
 	void	MTX_SkipComments(FILE* stream);
 	int		Number_IncludingNeHyperplanes(PT_vector_T x, double eps_on_hyperplane);
 	double	ObjF(PT_vector_T x);
-	void	Ort__Projecting(int* flatHyperplanes, int m_flat, PT_vector_T v, PT_vector_T w, double eps_zero, bool* success);
-	void	Ort_D_and_B(int* flatHyperplanes, int m, int n);
-	//bool	Ort_Check_DDT_DDTI(int m);
-	void	Ort_DDT(int m, int n);
-	void	Ort_DDTI(int m, double eps_zero, bool* success);
-	void	Ort_DT(int m, int n);
-	void	Ort_DTDDTI(int m, int n);
-	void	Ort_Dv_B(PT_vector_T v, int m, int n);
-	void	Ort_r(PT_vector_T w, int m, int n);
 	void	OrthogonalProjectingVectorOntoHyperplane_i(PT_vector_T x, int i, PT_vector_T p);
 	bool	PointBelongsToFlat(PT_vector_T x, int* hyperplaneList, int hyperplaneCount, double eps_on_hyperplane);
 	bool	PointBelongsToHalfspace_i(PT_vector_T point, int i, double eps_on_hyperplane);

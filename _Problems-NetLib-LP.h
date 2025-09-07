@@ -111,25 +111,20 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_N 83			// Number of variables in mps-file
 #define PP_MAX_OBJ_VALUE 30.812149845828220173774356124984	// Exact maximum value of objective function
 //------------------------------------------------------------------------------
-#define PP_EPS_ZERO					1E-10	// Accuracy for comparison with zero
+#define PP_EPS_ZERO					1E-6	// Accuracy for comparison with zero
 #define PP_EPS_PROJECTION			1E-8	// Accuracy of calculating pseudoprojection
-#define PP_EPS_ON_HYPERPLANE		1E-7	// Accuracy of belonging to hyperplane
+#define PP_EPS_ON_HYPERPLANE		6	// Accuracy of belonging to hyperplane
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+7	// Length of Objective Vector
 #define PP_EPS_RELATIVE_ERROR		1E-8	// Termination criteria 
 //------------------------------ ifdef PP_DEBUG --------------------------------
 #define PP_PROJECTION_COUNT				10000000			// Each PP_PROJECTION_COUNT-th iteration to be outputted inside Flat_MaxProjection(*) or Flat_BipProjection(*)
 //-------------------------- Compilation Modes ---------------------------------
-#define PP_MAXPROJECTION
+//#define PP_MAXPROJECTION
 //#define PP_GRADIENT
 //#define PP_MEDIAN_LAUNCH_VECTOR
 //#define PP_RANDOM_LAUNCH_VECTOR 283
 //------------------------------------------------------------------------------
-// Elapsed time: 604.31811
-// Number of iterations: 2
-// Computed objective value: 30.8121498459986398188448
-// Maximal objective value:  30.8121498458282196963864
-// Relative error = 5.53e-12
-// Distance to polytope: 2.9670308e-12
+// TWIDDLE__BinomialCoefficient warning : value of integer variable B has exceeded PF_INT_MAX = 2147483647
 //------------------------------------------------------------------------------
 
 /*============================== fit1d LP problem ==============================*
@@ -140,7 +135,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_N 1026	// Number of variables
 #define PP_MAX_OBJ_VALUE 9146.3780924209269467749025024617	// Exact maximum value of objective function
 //------------------------------------------------------------------------------
-#define PP_EPS_ZERO					1E-11	// Accuracy for comparison with zero
+#define PP_EPS_ZERO					1E-4	// Accuracy for comparison with zero
 #define PP_EPS_ON_HYPERPLANE		1E-6	// Accuracy of belonging to hyperplane
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+6	// Length of Objective Vector
 #define PP_EPS_RELATIVE_ERROR		1E-11		 
@@ -154,7 +149,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 //#define PP_MEDIAN_LAUNCH_VECTOR
 //#define PP_RANDOM_LAUNCH_VECTOR			283
 //------------------------------------------------------------------------------
-// Precision loss
+// ?
 //------------------------------------------------------------------------------
 
 /*============================== grow7 LP problem ============================*
