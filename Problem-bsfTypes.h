@@ -10,7 +10,7 @@ This source code is a part of BSF Skeleton
 #include "Problem-Types.h"		// Problem Types 
 //=========================== BSF Types =========================
 struct PT_bsf_parameter_T {		// Type of Parameter for workers (current approximation)
-	PT_vector_T u_cur;				// Current vertex
+	PT_vector_T v_cur;				// Current vertex
 };
 
 struct PT_bsf_mapElem_T {		// Type of map-list elements
