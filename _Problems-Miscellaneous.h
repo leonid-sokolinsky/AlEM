@@ -108,6 +108,26 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 // Relative error = 0
 //------------------------------------------------------------------------------
 
+/*============================== square4D LP problem =========================*/
+#define PP_MPS_FORMAT
+#define PP_PROBLEM_NAME	"square4D"
+#define PP_M 7		// Number of constrains
+#define PP_N 4		// Number of variables
+#define PP_MAX_OBJ_VALUE 		36200
+//------------------------------------------------------------------------------
+#define PP_EPS_ZERO					1E-11					// Precision for comparison with zero
+#define PP_EPS_ON_HYPERPLANE		1E-9	// Accuracy of belonging to hyperplane
+//-------------------------- Compilation Modes ---------------------------------
+#define PP_BASIC_VECTORS_ONLY
+//------------------------------------------------------------------------------
+// Elapsed time: 0
+// Number of iterations: 2
+// Computed objective value: 36200
+// Maximal objective value:  36200
+// Relative error = 0
+// Distance to polytope: 0
+//------------------------------------------------------------------------------
+
 /*============================== pyramid LP problem =========================*
 #define PP_MPS_FORMAT
 #define PP_PROBLEM_NAME	"pyramid"
