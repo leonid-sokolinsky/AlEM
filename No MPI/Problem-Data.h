@@ -22,7 +22,7 @@ static int PD_supportSubspaceDim;	// Dimension of of support subspace (PD_n = PD
 static int PD_iterNo;				// Number of iterations
 static double PD_objF_cur;			// Objective function value in curerent point
 //========================== Algorithm structures ================================
-static PT_vector_T PD_u;				// Current point
+static PT_vector_T PD_v;				// Current point
 static PT_vector_T PD_hi;				// Higher bound
 static PT_vector_T PD_lo;				// Lower bound
 static PT_column_T PD_norm_a;			// Column of norms of matrix rows
@@ -31,10 +31,10 @@ static PT_vector_T PD_launchVector;		// Used for projecting
 static int PD_neHyperplanes_all[PP_MM];	// Index of all [non-redundant] boundary hyperplanes
 static int PD_mneh_all;					// Number of all [non-redundant] boundary hyperplanes
 
-static int PD_neHyperplanes_u[PP_MM];	// Index of boundary hyperplanes that include point u
-static int PD_mneh_u;					// Number of boundary hyperplanes that include point u
+static int PD_neHyperplanes_v[PP_MM];	// Index of boundary hyperplanes that include point u
+static int PD_mneh_v;					// Number of boundary hyperplanes that include point u
 
-static int PD_edgeAlHyperplanes[PP_N - 1];	// Index of all hyperplanes used for pseudoprojection
+static int PD_edgeAlHyperplanes[PP_N - 1];	// Index of all hyperplanes used for projection
 
 static int PD_mco_u;					// Number of edge combinations in the vertex u
 
