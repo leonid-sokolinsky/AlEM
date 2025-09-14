@@ -22,7 +22,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_PROJECTION_COUNT				100000				// Each PP_PROJECTION_COUNT iteration to be outputted inside Flat_MaxProjection(*)
 //==============================================================================
 
-/*============================== nguyen5 LP problem ============================*/
+/*============================== nguyen5 LP problem ============================*
 #define PP_PROBLEM_NAME	"nguyen5"
 #define PP_MPS_FORMAT
 #define PP_M 4		// Number of constrains
@@ -96,10 +96,9 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_N 3		// Number of variables
 #define PP_MAX_OBJ_VALUE 		50000
 //------------------------------------------------------------------------------
-#define PP_EPS_ZERO					1E-11					// Precision for comparison with zero
-
+#define PP_EPS_ZERO					1E-11	// Precision for comparison with zero
 #define PP_EPS_ON_HYPERPLANE		1E-9	// Accuracy of belonging to hyperplane
-#define PP_OBJECTIVE_VECTOR_LENGTH	1E+6					// Length of Objective Vector
+#define PP_OBJECTIVE_VECTOR_LENGTH	1E+6	// Length of Objective Vector
 //------------------------------------------------------------------------------
 // Elapsed time: 0
 // Number of iterations: 3
@@ -115,8 +114,9 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_N 4		// Number of variables
 #define PP_MAX_OBJ_VALUE 		36200
 //------------------------------------------------------------------------------
-#define PP_EPS_ZERO					1E-11					// Precision for comparison with zero
+#define PP_EPS_ZERO					1E-11	// Precision for comparison with zero
 #define PP_EPS_ON_HYPERPLANE		1E-9	// Accuracy of belonging to hyperplane
+#define PP_OBJECTIVE_VECTOR_LENGTH	1E+6	// Length of Objective Vector
 //-------------------------- Compilation Modes ---------------------------------
 #define PP_BASIC_VECTORS_ONLY
 //------------------------------------------------------------------------------

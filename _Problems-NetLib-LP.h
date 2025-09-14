@@ -26,24 +26,21 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_N 97	// Number of variables in mps-file
 #define PP_MAX_OBJ_VALUE 		-225494.96316238038228101176621492
 //------------------------------------------------------------------------------
-#define PP_EPS_ZERO					1E-10		// Accuracy for comparison with zero
-#define PP_EPS_ON_HYPERPLANE		2E-5		// Accuracy of belonging to hyperplane
+#define PP_EPS_ZERO					1E-11		// Accuracy for comparison with zero
+#define PP_EPS_ON_HYPERPLANE		1E-5		// Accuracy of belonging to hyperplane
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+6		// Length of Objective Vector
 #define PP_EPS_RELATIVE_ERROR		1E-8		// Termination criteria 
 //------------------------------ ifdef PP_DEBUG --------------------------------
 #define PP_PROJECTION_COUNT			100000000	// Each PP_PROJECTION_COUNT-th iteration to be outputted inside Flat_MaxProjection(*) or Flat_BipProjection(*)
 //------------------------------ ifdef PP_SAVE_ITER_RESULT ---------------------
 #define PP_SCALE_FACTOR					1E+3	// #ifdef PP_SAVE_LOCAL_RESULT; makes 9 digits before the decimal point of PP_MAX_OBJ_VALUE
-//-------------------------- Compilation Modes ---------------------------------
-//#define PP_GRADIENT
-//#define PP_RANDOM_LAUNCH_VECTOR 0
 //------------------------------------------------------------------------------
-// Elapsed time: 0.0048772
-// Number of iterations: 1
-// Computed objective value: -225494.963166259927675128
+// Elapsed time: 0.3448453
+// Number of iterations: 3
+// Computed objective value: -225494.963163837848696858
 // Maximal objective value:  -225494.963162380387075245
-// Relative error = 1.72e-11
-// Distance to polytope: 5.7768526e-09
+// Relative error = 6.46e-12
+// Distance to polytope: 6.0309014e-09
 //------------------------------------------------------------------------------
 
 /*============================== afiro LP problem ==============================*
@@ -55,7 +52,6 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_MAX_OBJ_VALUE 464.75314285714285714285714285714
 //------------------------------------------------------------------------------
 #define PP_EPS_ZERO						1E-11		// Accuracy for comparison with zero
-//#define PP_EPS_PROJECTION				1E-10		// Accuracy of calculating pseudoprojection
 #define PP_EPS_ON_HYPERPLANE			1E-8		// Accuracy of belonging to hyperplane
 #define PP_OBJECTIVE_VECTOR_LENGTH		1E+6		// Length of Objective Vector
 #define PP_EPS_RELATIVE_ERROR			1E-8		// Termination criteria 
@@ -119,7 +115,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 //------------------------------ ifdef PP_DEBUG --------------------------------
 #define PP_PROJECTION_COUNT				10000000			// Each PP_PROJECTION_COUNT-th iteration to be outputted inside Flat_MaxProjection(*) or Flat_BipProjection(*)
 //-------------------------- Compilation Modes ---------------------------------
-//#define PP_MAXPROJECTION
+// #define PP_MAXPROJECTION
 //#define PP_GRADIENT
 //#define PP_MEDIAN_LAUNCH_VECTOR
 //#define PP_RANDOM_LAUNCH_VECTOR 283
@@ -161,7 +157,6 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_MAX_OBJ_VALUE 47787811.814711502616766956242865	// Exact maximum value of objective function
 //------------------------------------------------------------------------------
 #define PP_EPS_ZERO						1E-11	// Accuracy for comparison with zero
-//#define PP_EPS_PROJECTION				1E-10	// Precision to calculate projection
 #define PP_EPS_ON_HYPERPLANE			1E-2	// Accuracy of belonging to hyperplane
 #define PP_OBJECTIVE_VECTOR_LENGTH		1E+7	// Length of Objective Vector
 #define PP_EPS_RELATIVE_ERROR			1E-11				 
@@ -169,9 +164,6 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_PROJECTION_COUNT				50000000				// Each PP_PROJECTION_COUNT-th iteration to be outputted inside Flat_MaxProjection(*) or Flat_BipProjection(*)
 //------------------------------ ifdef PP_SAVE_ITER_RESULT ---------------------
 #define PP_SCALE_FACTOR					1E+1					// #ifdef PP_SAVE_LOCAL_RESULT; makes 9 digits before the decimal point of PP_MAX_OBJ_VALUE
-//-------------------------- Compilation Modes ---------------------------------
-//#define PP_MAXPROJECTION
-//#define PP_MEDIAN_LAUNCH_VECTOR
 //------------------------------------------------------------------------------
 // Elapsed time: 12.21888
 // Number of iterations: 11

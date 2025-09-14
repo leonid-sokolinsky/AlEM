@@ -15,26 +15,27 @@ static PT_matrix_T PD_A;			// Matrix of constraint coefficients
 static PT_bitscale_T PD_isEquation;	// Constraint is equation
 static PT_column_T PD_b;			// Column of constant terms (right-hand parts)
 static PT_vector_T PD_c;			// Gradient of Objective Function
-//========================== Algorithm variables =================================
-static int PD_meq_total;			// Number of total constraints being equations
-static int PD_meq_basic;			// Number of basic constraints being equations
-static int PD_supportSubspaceDim;	// Dimension of of support subspace (PD_n = PD_supportSubspaceDim + PD_meq_basic)
+//========================== Algorithm variables ===============================
+static int PD_supportSubspaceDim;	// Dimension of of support subspace (PD_n = PD_supportSubspaceDim + PD_meq_basis)
 static int PD_iterNo;				// Number of iterations
 static double PD_objF_cur;			// Objective function value in curerent point
-//========================== Algorithm structures ================================
+//========================== Algorithm structures ==============================
 static PT_vector_T PD_v;				// Current point
 static PT_vector_T PD_hi;				// Higher bound
 static PT_vector_T PD_lo;				// Lower bound
 static PT_column_T PD_norm_a;			// Column of norms of matrix rows
 static PT_vector_T PD_launchVector;		// Used for projecting
 
-static int PD_neHyperplanes_all[PP_MM];	// Index of all [non-redundant] boundary hyperplanes
-static int PD_mneh_all;					// Number of all [non-redundant] boundary hyperplanes
+static int PD_meq;						// Number of all base hyperplanes
+static int PD_meq_basis;				// Number of base hyperplanes included into basis 
 
-static int PD_neHyperplanes_v[PP_MM];	// Index of boundary hyperplanes that include point u
-static int PD_mneh_v;					// Number of boundary hyperplanes that include point u
+static int PD_neHyperplanes[PP_MM];		// Index of all boundary hyperplanes (correcpond to inequalityes)
+static int PD_mne;						// Number of all boundary hyperplanes
 
-static int PD_edgeAlHyperplanes[PP_N - 1];	// Index of all hyperplanes used for pseudoprojection
+static int PD_neHyperplanes_v[PP_MM];	// Index of boundary hyperplanes that include vertex v
+static int PD_mne_v;					// Number of boundary hyperplanes that include vertex v
+
+static int PD_edgeBasis_v[PP_N - 1];	// Index of all hyperplanes used for projection
 
 static int PD_mco_u;					// Number of edge combinations in the vertex u
 
