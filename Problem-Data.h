@@ -16,7 +16,7 @@ static PT_bitscale_T PD_isEquation;	// Constraint is equation
 static PT_column_T PD_b;			// Column of constant terms (right-hand parts)
 static PT_vector_T PD_c;			// Gradient of Objective Function
 //========================== Algorithm variables ===============================
-static int PD_supportSubspaceDim;	// Dimension of of support subspace (PD_n = PD_supportSubspaceDim + PD_meq_basis)
+static int PD_subspaceDim;	// Dimension of of support subspace (PD_n = PD_subspaceDim + PD_meq_basis)
 static int PD_iterNo;				// Number of iterations
 static double PD_objF_cur;			// Objective function value in curerent point
 //========================== Algorithm structures ==============================
@@ -37,7 +37,7 @@ static int PD_mne_v;					// Number of boundary hyperplanes that include vertex v
 
 static int PD_edgeBasis_v[PP_N - 1];	// Index of all hyperplanes used for projection
 
-static int PD_mco_u;					// Number of edge combinations in the vertex u
+static int PD_mco_v;					// Number of edge combinations in the vertex u
 
 static int PD_edgeNeHyperplanes[PP_N - 1];	// Index of boundary hyperplanes used for projection
 static int PD_mne_p;						// Number of boundary hyperplanes used for projection

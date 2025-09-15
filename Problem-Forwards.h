@@ -9,7 +9,7 @@ This source code has been produced with using BSF-skeleton
 #include "Problem-Types.h"
 //====================== Private Functions =====================================
 namespace PF {
-	void	CalculateNumberOfCombinations(int neq, int mneh_u, int* med_u);
+	void	CalculateNumberOfCombinations(int neq, int mne_v, int subspaceDim, int* TWIDDLE_p, int* mco_v);
 	void	OrtProjecting(int* flatHyperplanes, int m_flat, PT_vector_T v, PT_vector_T w, double eps_zero, bool* success);
 	bool	Point_PD_v_isVertex(void);
 	void	PreparationForIteration(PT_vector_T u);

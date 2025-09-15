@@ -22,12 +22,12 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_PROJECTION_COUNT				100000				// Each PP_PROJECTION_COUNT iteration to be outputted inside Flat_MaxProjection(*)
 //==============================================================================
 
-/*============================== nguyen5 LP problem ============================*
+/*============================== nguyen5 LP problem ============================*/
 #define PP_PROBLEM_NAME	"nguyen5"
 #define PP_MPS_FORMAT
 #define PP_M 4		// Number of constrains
 #define PP_N 5		// Number of variables
-#define PP_MAX_OBJ_VALUE 21.4549732313097933911195
+#define PP_MAX_OBJ_VALUE 21.4549732313098893143888
 //------------------------------------------------------------------------------
 #define PP_EPS_ZERO					1E-11	// Precision for comparison with zero
 #define PP_EPS_ON_HYPERPLANE		1E-9	// Accuracy of belonging to hyperplane
@@ -35,10 +35,10 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 //------------------------------------------------------------------------------
 // Elapsed time: 0
 // Number of iterations: 4
-// Computed objective value: 21.4549732313107242021033
+// Computed objective value: 21.4549732313098893143888
 // Maximal objective value:  21.4549732313097933911195
-// Relative error = 4.34e-14
-// Distance to polytope: 1.9565951e-14
+// Relative error = 4.47e-15
+// Distance to polytope: 1.7897091e-15
 //------------------------------------------------------------------------------
 
 /*============================== wiki LP problem ============================*
@@ -107,7 +107,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 // Relative error = 0
 //------------------------------------------------------------------------------
 
-/*============================== square4D LP problem =========================*/
+/*============================== square4D LP problem =========================*
 #define PP_MPS_FORMAT
 #define PP_PROBLEM_NAME	"square4D"
 #define PP_M 7		// Number of constrains

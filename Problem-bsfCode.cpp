@@ -82,7 +82,7 @@ void PC_bsf_Init(bool* success) {
 		}
 	}
 
-	PD_supportSubspaceDim = PD_n - PD_meq_basis;	// Dimension of the subspace of intersection of support hyperplanes
+	PD_subspaceDim = PD_n - PD_meq_basis;	// Dimension of the subspace of intersection of support hyperplanes
 
 	List_inequalities(PD_isEquation, PD_neHyperplanes, &PD_mne);
 
@@ -189,7 +189,7 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 	int edge_i = BSF_sv_mpiRank - BSF_sv_numOfWorkers;
 	bool TWIDDLE_done = false;
 	int iterCounter = -1;
-	double combinationsPerWorker = PF_MAX(PD_mco_u / (double)BSF_sv_numOfWorkers, 1);;
+	double combinationsPerWorker = PF_MAX(PD_mco_v / (double)BSF_sv_numOfWorkers, 1);;
 	int exitCode = 1;
 	#ifdef PP_GAUGE
 	int t0 = -(int)time(NULL);
@@ -229,7 +229,7 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 
 		iterCounter++;
 		edge_i += BSF_sv_numOfWorkers;
-		TWIDDLE__CodeToSubset(edge_i, PD_neHyperplanes_v, PD_edgeNeHyperplanes, PD_mne_v, PD_supportSubspaceDim - 1, PD_TWIDDLE_p, &TWIDDLE_done);
+		TWIDDLE__CodeToSubset(edge_i, PD_neHyperplanes_v, PD_edgeNeHyperplanes, PD_mne_v, PD_subspaceDim - 1, PD_TWIDDLE_p, &TWIDDLE_done);
 		if (TWIDDLE_done) break;
 
 		#ifdef PP_GAUGE
@@ -499,7 +499,7 @@ void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
 	#endif // PP_BASIC_VECTORS_ONLY
 
 	if (PD_meq_basis > 0)
-		cout << "Subspace dimension: " << PD_supportSubspaceDim << endl;
+		cout << "Subspace dimension: " << PD_subspaceDim << endl;
 
 	/**
 	#ifdef PP_BSF_FRAGMENTED_MAP_LIST
@@ -668,7 +668,7 @@ void PC_bsf_ProcessResults(PT_bsf_reduceElem_T* reduceResult, int reduceCounter,
 	if (RelativeError(PD_objF_cur, reduceResult->objF_nex) < PP_EPS_ZERO) {
 
 		#ifdef PP_DEBUG
-		cout << "ObjF = " << setprecision(PP_SETW / 2) << reduceResult->objF_nex << "\tNumber of edge combinations: " << PD_mco_u << endl;
+		cout << "ObjF = " << setprecision(PP_SETW / 2) << reduceResult->objF_nex << "\tNumber of edge combinations: " << PD_mco_v << endl;
 		#endif // PP_DEBUG
 
 		/*DEBUG PC_bsf_ProcessResults*/
@@ -685,7 +685,7 @@ void PC_bsf_ProcessResults(PT_bsf_reduceElem_T* reduceResult, int reduceCounter,
 	if (RelativeError(PP_MAX_OBJ_VALUE, reduceResult->objF_nex) < PP_EPS_RELATIVE_ERROR) {
 
 		#ifdef PP_DEBUG
-		cout << "ObjF = " << setprecision(PP_SETW / 2) << ObjF(PD_v) << "\tNumber of edge combinations: " << PD_mco_u << endl;
+		cout << "ObjF = " << setprecision(PP_SETW / 2) << ObjF(PD_v) << "\tNumber of edge combinations: " << PD_mco_v << endl;
 		#endif // PP_DEBUG
 
 		/*DEBUG PC_bsf_ProcessResults*/
@@ -717,7 +717,7 @@ void PC_bsf_ProcessResults(PT_bsf_reduceElem_T* reduceResult, int reduceCounter,
 	//cout << "v_nex:\t"; Vector_Print(reduceResult->v_nex);  cout << endl;
 	//cout << "v_nex hyperplanes:\t"; Print_HyperplanesIncludingPoint(reduceResult->v_nex, PP_EPS_ON_HYPERPLANE); cout << endl;
 	#endif // PP_DEBUG
-	cout << "ObjF = " << ObjF(PD_v) << "\tNumber of edge combinations: " << PD_mco_u << endl;
+	cout << "ObjF = " << ObjF(PD_v) << "\tNumber of edge combinations: " << PD_mco_v << endl;
 	cout << "_________________________________________________ " << PD_iterNo + 1 << " _____________________________________________________" << endl;
 
 	if (!PointBelongsToPolytope(PD_v, PP_EPS_ON_HYPERPLANE)) {
@@ -3319,14 +3319,14 @@ namespace SF {
 namespace PF {
 	using namespace SF;
 
-	static inline void CalculateNumberOfCombinations(int neq, int mneh_u, int* med_u) {
-		if (mneh_u == neq)
-			*med_u = mneh_u;
+	static inline void CalculateNumberOfCombinations(int neq, int mne_v, int subspaceDim, int* TWIDDLE_p, int* mco_v) {
+		if (mne_v == neq)
+			*mco_v = mne_v;
 		else {
-			if (mneh_u < 63)
-				*med_u = (int)BinomialCoefficient(mneh_u, PD_supportSubspaceDim - 1);
+			if (mne_v < 63)
+				*mco_v = (int)BinomialCoefficient(mne_v, subspaceDim - 1);
 			else
-				*med_u = TWIDDLE__BinomialCoefficient(mneh_u, PD_supportSubspaceDim - 1, PD_TWIDDLE_p);
+				*mco_v = TWIDDLE__BinomialCoefficient(mne_v, subspaceDim - 1, PD_TWIDDLE_p);
 		}
 	}
 
@@ -3514,10 +3514,10 @@ namespace PF {
 	static inline void PreparationForIteration(PT_vector_T v) {
 		MakeNeHyperplane_x(v, PD_neHyperplanes, PD_mne, PD_neHyperplanes_v, &PD_mne_v, PP_EPS_ON_HYPERPLANE);
 		assert(PD_mne_v <= PP_MM);
-		CalculateNumberOfCombinations(PD_supportSubspaceDim, PD_mne_v, &PD_mco_u);
+		CalculateNumberOfCombinations(PD_subspaceDim, PD_mne_v, PD_subspaceDim, PD_TWIDDLE_p, &PD_mco_v);
 		#ifdef PP_DEBUG
 		if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-			cout << "PreparationForIteration: Number of edge combinations: " << PD_mco_u << endl;
+			cout << "PreparationForIteration: Number of edge combinations: " << PD_mco_v << endl;
 		#endif // PP_DEBUG /**/
 	}
 
@@ -3533,13 +3533,13 @@ namespace PF {
 				mne++;
 		}
 
-		if (mne == PD_supportSubspaceDim)
+		if (mne == PD_subspaceDim)
 			res = mne;
 		else {
 			if (mne < 63)
-				res = (int)BinomialCoefficient(mne, PD_supportSubspaceDim - 1);
+				res = (int)BinomialCoefficient(mne, PD_subspaceDim - 1);
 			else
-				res = TWIDDLE__BinomialCoefficient(mne, PD_supportSubspaceDim - 1, PD_TWIDDLE_p);
+				res = TWIDDLE__BinomialCoefficient(mne, PD_subspaceDim - 1, PD_TWIDDLE_p);
 		}
 
 		return res;
