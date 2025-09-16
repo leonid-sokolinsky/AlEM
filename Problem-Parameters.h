@@ -20,6 +20,10 @@ This source code has been produced with using BSF-skeleton
 #define PP_PATH "../../Set-of-LP-Problems/Rnd-LP/"
 
 /**
+#include "_Problems-Klee-Minty-Cube.h"
+#define PP_PATH "../../Set-of-LP-Problems/Klee-Minty-Cube/"
+
+/**
 #include "_Problems-Miscellaneous.h"
 #define PP_PATH "../../Set-of-LP-Problems/Miscellaneous-LP/"
 

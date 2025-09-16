@@ -418,7 +418,7 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 			Vector_Copy(v_nex, reduceElem->v_nex);
 		}
 		#endif // PP_GRADIENT
-	}
+}
 
 	#ifdef PP_GAUGE
 	//if (BSF_sv_mpiRank == 0)
