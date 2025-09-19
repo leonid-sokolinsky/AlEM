@@ -59,7 +59,7 @@ void PC_bsf_Init(bool* success) {
 	#endif // PP_MATRIX_OUTPUT
 
 	#ifdef PP_NORMALIZATION
-	Matrix_Normalization();
+	Matrix_Normalize();
 	#endif // PP_NORMALIZATION
 
 	List_equations(PD_isEquation, PD_edgeBasis_v, &PD_meq);
@@ -225,7 +225,7 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 		double objF_grd;
 		#endif // PP_GRADIENT
 		PT_vector_T v;	// v = u + PD_launchVector (||PD_launchVector|| = PP_OBJECTIVE_VECTOR_LENGTH)
-		PT_vector_T w;	// pseudiprojection of v
+		PT_vector_T w;	// projection of v
 
 		iterCounter++;
 		edge_i += BSF_sv_numOfWorkers;
@@ -298,6 +298,7 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 		#endif // PP_BIPPROJECTION
 		#endif // !PP_MAXPROJECTION
 
+		/**
 		#ifdef PP_DEBUG
 		if (exitCode == -2) {
 			cout << "Worker " << BSF_sv_mpiRank
@@ -309,10 +310,11 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 		/*DEBUG PC_bsf_MapF*/
 		#ifdef PP_DEBUG
 		if (!PointBelongsToFlat(w, PD_edgeBasis_v, PD_n - 1, PP_EPS_ON_HYPERPLANE)) {
-			cout << "Worker " << BSF_sv_mpiRank << ": PC_bsf_MapF warning: w does not belong to flat with precision of PP_EPS_ON_HYPERPLANE = "
+			cout << "Worker " << BSF_sv_mpiRank 
+				<< ": PC_bsf_MapF warning: w does not belong to flat with precision of PP_EPS_ON_HYPERPLANE = " 
 				<< PP_EPS_ON_HYPERPLANE << endl;
 			double eps_on_flat = PP_EPS_ON_HYPERPLANE;
-			Tuning_Eps_PointBelongsToFlat(w, PD_edgeBasis_v, PD_n - 1, &eps_on_flat);
+			Tuning_Eps_PointBelongsToFlat(w, PD_edgeBasis_v, PD_n - 1, &eps_on_flat); 
 			cout << "Minimum PP_EPS_ON_HYPERPLANE should be " << eps_on_flat << endl;
 		}
 		#endif // PP_DEBUG /**/
@@ -483,12 +485,11 @@ void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
 	cout << "Problem name: " << PD_problemName << endl;
 
 	#ifdef PP_MPS_FORMAT
-	cout << "Input format: MPS" << endl;
-	cout << "m = " << PD_m << " n = " << PD_n << endl;
+	cout << "MPS input format: " << "m = " << PD_m << " n = " << PD_n << endl;
 	#else
-	cout << "Input format: MTX (with elimination of free variables)" << endl;
-	cout << "Before elimination: m =\t" << PP_M << "\tn = " << PP_N << endl;
-	cout << "After elimination:  m =\t" << PD_m << "\tn = " << PD_n << endl;
+	cout << "MTX input format (with elimination of free variables)" << endl;
+	cout << "\tbefore elimination: m =\t" << PP_M << "\tn = " << PP_N << endl;
+	cout << "\tafter elimination:  m =\t" << PD_m << "\tn = " << PD_n << endl;
 	#endif // PP_MPS_FORMAT
 
 	#ifdef PP_BASIC_VECTORS_ONLY	
@@ -589,8 +590,10 @@ void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
 	#endif // PP_MATRIX_OUTPUT
 
 	cout << endl;
-	cout << "ObjF = " << setprecision(PP_SETW) << ObjF(PD_v) << setprecision(PP_SETW / 2) << endl;
+	cout << "Starting ObjF = " << setprecision(PP_SETW) << ObjF(PD_v) << setprecision(PP_SETW / 2) << endl;
+	#ifdef PP_DEBUG
 	cout << "Number of inequality hyperplanes including v:\t" << Number_IncludingNeHyperplanes(PD_v, PP_EPS_ON_HYPERPLANE) << endl;
+	#endif // PP_DEBUG
 	cout << "_________________________________________________ " << 1 << " _____________________________________________________" << endl;
 
 	/*DEBUG PC_bsf_ParametersOutput**
@@ -649,6 +652,7 @@ void PC_bsf_ProcessResults(PT_bsf_reduceElem_T* reduceResult, int reduceCounter,
 	#endif // PP_DEBUG /**/
 
 	if (jumpLength == 0) {
+		cout << "ObjF = " << ObjF(PD_v) << endl;
 		*exit = true;
 		return;
 	}
@@ -684,8 +688,9 @@ void PC_bsf_ProcessResults(PT_bsf_reduceElem_T* reduceResult, int reduceCounter,
 	#ifdef PP_MAX_OBJ_VALUE
 	if (RelativeError(PP_MAX_OBJ_VALUE, reduceResult->objF_nex) < PP_EPS_RELATIVE_ERROR) {
 
+		cout << "ObjF = " << setprecision(PP_SETW / 2) << ObjF(PD_v) << endl;
 		#ifdef PP_DEBUG
-		cout << "ObjF = " << setprecision(PP_SETW / 2) << ObjF(PD_v) << "\tNumber of edge combinations: " << PD_mco_v << endl;
+		cout << "Number of edge combinations: " << PD_mco_v << endl;
 		#endif // PP_DEBUG
 
 		/*DEBUG PC_bsf_ProcessResults*/
@@ -962,7 +967,7 @@ namespace SF {
 
 			length_r = Vector_Norm(r);
 
-			/*DEBUG Flat_BipProjection*/
+			/*DEBUG Flat_BipProjection**
 			#ifdef PP_DEBUG
 			if (iterCount % PP_PROJECTION_COUNT == 0)
 				//if (BSF_sv_mpiRank == 0)
@@ -1008,7 +1013,7 @@ namespace SF {
 				}
 			}
 
-			/*DEBUG Flat_MaxProjection*/
+			/*DEBUG Flat_MaxProjection**
 			#ifdef PP_DEBUG
 			if (iterCount % PP_PROJECTION_COUNT == 0)
 				//if (BSF_sv_mpiRank == 0)
@@ -1231,7 +1236,7 @@ namespace SF {
 		}
 	}
 
-	static void Matrix_Normalization(void) {
+	static void Matrix_Normalize(void) {
 		for (int i = 0; i < _m; i++) {
 			Vector_DivideEquals(_A[i], _norm_a[i]);
 			_b[i] /= _norm_a[i];
@@ -3332,7 +3337,7 @@ namespace PF {
 
 	static inline void Ort_D_and_B(int* flatHyperplanes, int m, int n) {
 		for (int i = 0; i < m; i++) {
-			for (int j = 0; j < n; j++)
+			for (int j = 0; j < n; j++) 
 				_D[i][j] = _A[flatHyperplanes[i]][j];
 			PD_B[i] = _b[flatHyperplanes[i]];
 		}
@@ -3342,7 +3347,7 @@ namespace PF {
 		for (int i = 0; i < m; i++)
 			for (int j = 0; j < m; j++) {
 				PD_DDT[i][j] = 0;
-				for (int l = 0; l < n; l++)
+				for (int l = 0; l < n; l++) 
 					PD_DDT[i][j] = PD_DDT[i][j] + _D[i][l] * PD_DT[l][j];
 			}
 	}
@@ -3433,6 +3438,7 @@ namespace PF {
 				factor = PD_DDT[i][j];
 				for (int l = 0; l < m; l++) {
 					PD_DDT[i][l] = PD_DDT[i][l] - PD_DDT[j][l] * factor;
+
 					PD_DDTI[i][l] = PD_DDTI[i][l] - PD_DDTI[j][l] * factor;
 				}
 			}

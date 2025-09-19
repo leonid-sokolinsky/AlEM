@@ -35,7 +35,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 //------------------------------ ifdef PP_SAVE_ITER_RESULT ---------------------
 #define PP_SCALE_FACTOR					1E+3	// #ifdef PP_SAVE_LOCAL_RESULT; makes 9 digits before the decimal point of PP_MAX_OBJ_VALUE
 //------------------------------------------------------------------------------
-// Elapsed time: 0.3448453
+// Elapsed time: 0.4083998
 // Number of iterations: 3
 // Computed objective value: -225494.963163837848696858
 // Maximal objective value:  -225494.963162380387075245

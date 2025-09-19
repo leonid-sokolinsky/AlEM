@@ -20,7 +20,6 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_EPS_ON_HYPERPLANE		1E-3	// Accuracy of belonging to hyperplane
 #define PP_OBJECTIVE_VECTOR_LENGTH	1E+8	// Length of Objective Vector
 #define PP_EPS_RELATIVE_ERROR		1E-3	// Used if defined PP_CHECK_MAX_OBJ_VALUE 
-#define PP_MAX_PSEUDOPROJECTING_ITER	100000000	// Maximum acceptable number of iterations in Pseudoprojection on flat
 #define PP_PROJECTION_COUNT				100000000	// Each PP_PROJECTION_COUNT iteration to be outputted inside Flat_MaxProjection(*)
 //-------------------------- Compilation Modes ---------------------------------
 #define PP_GRADIENT

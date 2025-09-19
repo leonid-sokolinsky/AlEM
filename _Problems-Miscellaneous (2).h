@@ -42,9 +42,9 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_MAX_OBJ_VALUE 3.25
 //------------------------------------------------------------------------------
 #undef PP_EPS_ON_HYPERPLANE
-#define PP_EPS_ON_HYPERPLANE		1E-9	// Accuracy of belonging to hyperplane
+#define PP_EPS_ON_HYPERPLANE		1E-7	// Accuracy of belonging to hyperplane
 //-------------------------- Compilation Modes ---------------------------------
-//#define PP_GRADIENT 
+#define PP_GRADIENT 
 //------------------------------------------------------------------------------
 // Elapsed time: 0
 // Number of iterations: 2
@@ -52,26 +52,6 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 // Maximal objective value:  3.25
 // Relative error = 4.1e-15
 // Distance to polytope: 0
-//------------------------------------------------------------------------------
-
-/*============================== hamck26s LP problem ============================*/
-#define PP_PROBLEM_NAME	"hamck26s"
-#define PP_MPS_FORMAT
-#define PP_M 5		// Number of constrains
-#define PP_N 4		// Number of variables
-#define PP_MAX_OBJ_VALUE 1.25
-//------------------------------------------------------------------------------
-#undef PP_EPS_ON_HYPERPLANE
-#define PP_EPS_ON_HYPERPLANE		1E-7	// Accuracy of belonging to hyperplane
-//-------------------------- Compilation Modes ---------------------------------
-//#define PP_GRADIENT 
-//------------------------------------------------------------------------------
-// Elapsed time: 0
-// Number of iterations: 1
-// Computed objective value: 1.25000000000000355271368
-// Maximal objective value:  1.25
-// Relative error = 2.84e-15
-// Distance to polytope: 6.5494818e-16
 //------------------------------------------------------------------------------
 
 /*============================== wiki LP problem ============================*
