@@ -147,7 +147,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 // Distance to polytope: 0
 //------------------------------------------------------------------------------
 
-/*============================== pyramid LP problem =========================*/
+/*============================== pyramid LP problem =========================*
 #define PP_MPS_FORMAT
 #define PP_PROBLEM_NAME	"pyramid"
 #define PP_M 3		// Number of constrains
@@ -159,10 +159,11 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 // p.plot()
 //------------------------------------------------------------------------------
 // Elapsed time: 0
-// Number of iterations: 3
-// Computed objective value: 50000
-// Maximal objective value:  50000
+// Number of iterations: 1
+// Computed objective value: 60000
+// Maximal objective value:  60000
 // Relative error = 0
+// Distance to polytope: 0
 //------------------------------------------------------------------------------
 
 /*============================== featheredCube LP problem ======================*
@@ -185,7 +186,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 // Distance to polytope: 0
 //------------------------------------------------------------------------------
 
-/*============================== cubeAndHyperplane LP problem ===================*
+/*============================== cubeAndHyperplane LP problem ===================*/
 #define PP_MPS_FORMAT
 #define PP_PROBLEM_NAME	"cubeAndHyperplane"
 #define PP_M 4		// Number of constrains
@@ -193,10 +194,10 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_MAX_OBJ_VALUE 		90000
 //------------------------------------------------------------------------------
 // Elapsed time: 0
-// Number of iterations: 2
-// Computed objective value: 89999.9999999999854480848
+// Number of iterations: 1
+// Computed objective value: 90000.0000000000291038305
 // Maximal objective value:  90000
-// Relative error = 1.62e-16
+// Relative error = 3.23e-16
 // Distance to polytope: 5.6843419e-14
 //------------------------------------------------------------------------------
 
