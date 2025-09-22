@@ -34,7 +34,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 // Distance to polytope: 1.7897091e-15
 //------------------------------------------------------------------------------
 
-/*============================== hamck26e LP problem ============================*
+/*============================== hamck26e LP problem ============================*/
 // https://doi.org/10.1007/s10107-003-0488-1
 #define PP_PROBLEM_NAME	"hamck26e"
 #define PP_MPS_FORMAT
@@ -43,7 +43,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_MAX_OBJ_VALUE 3.25
 //------------------------------------------------------------------------------
 #undef PP_EPS_ON_HYPERPLANE
-#define PP_EPS_ON_HYPERPLANE		1E-9	// Accuracy of belonging to hyperplane
+#define PP_EPS_ON_HYPERPLANE		1E-7	// Accuracy of belonging to hyperplane
 //-------------------------- Compilation Modes ---------------------------------
 //#define PP_GRADIENT 
 //------------------------------------------------------------------------------
@@ -186,7 +186,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 // Distance to polytope: 0
 //------------------------------------------------------------------------------
 
-/*============================== cubeAndHyperplane LP problem ===================*/
+/*============================== cubeAndHyperplane LP problem ===================*
 #define PP_MPS_FORMAT
 #define PP_PROBLEM_NAME	"cubeAndHyperplane"
 #define PP_M 4		// Number of constrains
