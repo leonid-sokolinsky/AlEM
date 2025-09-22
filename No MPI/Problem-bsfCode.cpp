@@ -519,16 +519,16 @@ void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
 	#endif // PP_OPT_MIN
 
 	#ifdef PP_GRADIENT
-	cout << "Strategy: The best gradient" << endl;
+	cout << "Strategy: The steepest edge" << endl;
 	#else
 	cout << "Strategy: The best vertex" << endl;
 	#endif // PP_GRADIENT
 
-	#ifdef PP_MIN_OF_DEGREE
-	cout << "Prefer vertex with lowest degree: Yes" << endl;
-	#else
-	cout << "Prefer vertex with lowest degree: No" << endl;
-	#endif // PP_MIN_OF_DEGREE
+	#ifdef PP_NORMALIZATION
+	cout << "Matrix normalization: On" << endl;
+	#else 
+	cout << "Matrix normalization: Off" << endl;
+	#endif // PP_NORMALIZATION
 
 	#ifdef PP_MEDIAN_LAUNCH_VECTOR
 	cout << "Launch vector: Median" << endl;
@@ -546,6 +546,13 @@ void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
 	#endif
 	#endif
 
+	#ifdef PP_DEBUG
+	#ifdef PP_MIN_OF_DEGREE
+	cout << "Prefer vertex with lowest degree: Yes" << endl;
+	#else
+	cout << "Prefer vertex with lowest degree: No" << endl;
+	#endif // PP_MIN_OF_DEGREE
+
 	#ifdef PP_MAXPROJECTION
 	cout << "Projection method: Pseudoprojection Max" << endl;
 	#endif // PP_MAXPROJECTION
@@ -561,12 +568,7 @@ void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
 	cout << "Projection method: Direct orthogonal projection" << endl;
 	#endif // !PP_BIPPROJECTION
 	#endif // !PP_MAXPROJECTION
-
-	#ifdef PP_NORMALIZATION
-	cout << "Matrix normalization: On" << endl;
-	#else 
-	cout << "Matrix normalization: Off" << endl;
-	#endif // PP_NORMALIZATION
+	#endif // PP_DEBUG
 
 	cout << endl;
 
@@ -3438,7 +3440,6 @@ namespace PF {
 				factor = PD_DDT[i][j];
 				for (int l = 0; l < m; l++) {
 					PD_DDT[i][l] = PD_DDT[i][l] - PD_DDT[j][l] * factor;
-
 					PD_DDTI[i][l] = PD_DDTI[i][l] - PD_DDTI[j][l] * factor;
 				}
 			}
