@@ -19,352 +19,6 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_SCALE_FACTOR				1		// #ifdef PP_SAVE_LOCAL_RESULT; makes 9 digits before the decimal point of PP_MAX_OBJ_VALUE
 //==============================================================================
 
-/*============================== nguyen5 LP problem ============================*
-#define PP_PROBLEM_NAME	"nguyen5"
-#define PP_MPS_FORMAT
-#define PP_M 4		// Number of constrains
-#define PP_N 5		// Number of variables
-#define PP_MAX_OBJ_VALUE 21.4549732313098893143888
-//------------------------------------------------------------------------------
-// Elapsed time: 0
-// Number of iterations: 4
-// Computed objective value: 21.4549732313098893143888
-// Maximal objective value:  21.4549732313097933911195
-// Relative error = 4.47e-15
-// Distance to polytope: 1.7897091e-15
-//------------------------------------------------------------------------------
-
-/*============================== hamck26e LP problem ============================*/
-// https://doi.org/10.1007/s10107-003-0488-1
-#define PP_PROBLEM_NAME	"hamck26e"
-#define PP_MPS_FORMAT
-#define PP_M 4		// Number of constrains
-#define PP_N 4		// Number of variables
-#define PP_MAX_OBJ_VALUE 3.25
-//------------------------------------------------------------------------------
-#undef PP_EPS_ON_HYPERPLANE
-#define PP_EPS_ON_HYPERPLANE		1E-7	// Accuracy of belonging to hyperplane
-//-------------------------- Compilation Modes ---------------------------------
-//#define PP_GRADIENT 
-//------------------------------------------------------------------------------
-// Elapsed time: 0
-// Number of iterations: 2
-// Computed objective value: 3.2499999999999866773237
-// Maximal objective value:  3.25
-// Relative error = 4.1e-15
-// Distance to polytope: 0
-//------------------------------------------------------------------------------
-
-/*============================== hamck26s LP problem ============================*
-// https://doi.org/10.1007/s10107-003-0488-1
-#define PP_PROBLEM_NAME	"hamck26s"
-#define PP_MPS_FORMAT
-#define PP_M 5		// Number of constrains
-#define PP_N 4		// Number of variables
-#define PP_MAX_OBJ_VALUE 1.25
-//------------------------------------------------------------------------------
-#undef PP_EPS_ON_HYPERPLANE
-#define PP_EPS_ON_HYPERPLANE		1E-7	// Accuracy of belonging to hyperplane
-//-------------------------- Compilation Modes ---------------------------------
-//#define PP_GRADIENT 
-//------------------------------------------------------------------------------
-// Elapsed time: 0
-// Number of iterations: 1
-// Computed objective value: 1.25000000000000355271368
-// Maximal objective value:  1.25
-// Relative error = 2.84e-15
-// Distance to polytope: 6.5494818e-16
-//------------------------------------------------------------------------------
-
-/*============================== wiki LP problem ============================*
-#define PP_PROBLEM_NAME	"wiki"
-#define PP_MPS_FORMAT
-#define PP_M 2		// Number of constrains
-#define PP_N 3		// Number of variables
-#define PP_MAX_OBJ_VALUE 20
-// https://en.wikipedia.org/wiki/Simplex_algorithm
-//------------------------------------------------------------------------------
-// https://sagecell.sagemath.org/
-// p = Polyhedron(ieqs = [[10,-3,-2,-1],[15,-2,-5,-3],[0,1,0,0],[0,0,1,0],[0,0,0,1]])
-// p.plot()
-//------------------------------------------------------------------------------
-// Elapsed time: 0
-// Number of iterations: 2
-// Computed objective value: 20.0000000000000213162821
-// Maximal objective value:  20
-// Relative error = 1.07e-15
-// Distance to polytope: 7.7804045e-15
-//------------------------------------------------------------------------------
-
-/*============================== simpleCube LP problem =========================*
-#define PP_MPS_FORMAT
-#define PP_PROBLEM_NAME	"simpleCube"
-#ifdef PP_MPS_FORMAT
-#define PP_M 3		// Number of constrains
-#define PP_N 3		// Number of variables
-#else
-#define PP_M 3	// Number of rows in *.mtx
-#define PP_N 6	// Number of cols in *.mtx
-#endif
-#define PP_MAX_OBJ_VALUE 		60000
-//------------------------------------------------------------------------------
-// Elapsed time: 0
-// Number of iterations: 3
-// Computed objective value: 60000
-// Maximal objective value:  60000
-// Relative error = 0
-// Distance to polytope: 0
-//------------------------------------------------------------------------------
-
-/*============================== square3D LP problem =========================*
-#define PP_MPS_FORMAT
-#define PP_PROBLEM_NAME	"square3D"
-#define PP_M 4		// Number of constrains
-#define PP_N 3		// Number of variables
-#define PP_MAX_OBJ_VALUE 		50000
-//------------------------------------------------------------------------------
-// Elapsed time: 0
-// Number of iterations: 3
-// Computed objective value: 50000
-// Maximal objective value:  50000
-// Relative error = 0
-//------------------------------------------------------------------------------
-
-/*============================== square4D LP problem =========================*
-#define PP_MPS_FORMAT
-#define PP_PROBLEM_NAME	"square4D"
-#define PP_M 7		// Number of constrains
-#define PP_N 4		// Number of variables
-#define PP_MAX_OBJ_VALUE 		36200
-//-------------------------- Compilation Modes ---------------------------------
-#define PP_BASIC_VECTORS_ONLY
-//------------------------------------------------------------------------------
-// Elapsed time: 0
-// Number of iterations: 2
-// Computed objective value: 36200
-// Maximal objective value:  36200
-// Relative error = 0
-// Distance to polytope: 0
-//------------------------------------------------------------------------------
-
-/*============================== pyramid LP problem =========================*
-#define PP_MPS_FORMAT
-#define PP_PROBLEM_NAME	"pyramid"
-#define PP_M 3		// Number of constrains
-#define PP_N 3		// Number of variables
-#define PP_MAX_OBJ_VALUE 		60000
-//------------------------------------------------------------------------------
-// https://sagecell.sagemath.org/
-// p = Polyhedron(ieqs = [[0,1,0,0],[0,0,1,0,],[0,-1,0,1],[0,0,-1,1],[200,0,0,-1,]])
-// p.plot()
-//------------------------------------------------------------------------------
-// Elapsed time: 0
-// Number of iterations: 1
-// Computed objective value: 60000
-// Maximal objective value:  60000
-// Relative error = 0
-// Distance to polytope: 0
-//------------------------------------------------------------------------------
-
-/*============================== featheredCube LP problem ======================*
-#define PP_MPS_FORMAT
-#define PP_PROBLEM_NAME	"featheredCube"
-#ifdef PP_MPS_FORMAT
-#define PP_M 15		// Number of constrains
-#define PP_N 3		// Number of variables
-#else
-#define PP_M 3	// Number of rows in *.mtx
-#define PP_N 6	// Number of cols in *.mtx
-#endif
-#define PP_MAX_OBJ_VALUE 		60000
-//------------------------------------------------------------------------------
-// Elapsed time: 0
-// Number of iterations: 3
-// Computed objective value: 60000
-// Maximal objective value:  60000
-// Relative error = 0
-// Distance to polytope: 0
-//------------------------------------------------------------------------------
-
-/*============================== cubeAndHyperplane LP problem ===================*
-#define PP_MPS_FORMAT
-#define PP_PROBLEM_NAME	"cubeAndHyperplane"
-#define PP_M 4		// Number of constrains
-#define PP_N 4		// Number of variables
-#define PP_MAX_OBJ_VALUE 		90000
-//------------------------------------------------------------------------------
-// Elapsed time: 0
-// Number of iterations: 1
-// Computed objective value: 90000.0000000000291038305
-// Maximal objective value:  90000
-// Relative error = 3.23e-16
-// Distance to polytope: 5.6843419e-14
-//------------------------------------------------------------------------------
-
-/*============================== simple1FxVar LP problem =======================*
-// Simple LP problem & x_1=150
-#define PP_MPS_FORMAT
-#define PP_PROBLEM_NAME	"simple1FxVar"
-#define PP_M 4		// Number of constraints
-#define PP_N 3		// Number of variables
-#define PP_MAX_OBJ_VALUE 52500
-//------------------------------------------------------------------------------
-// Elapsed time: 0
-// Number of iterations: 1
-// Computed objective value: 52500
-// Maximal objective value:  52500
-// Relative error = 0
-// Distance to polytope: 0
-//------------------------------------------------------------------------------
-
-/*============================== simple1 LP problem ============================*
-#define PP_PROBLEM_NAME	"simple1"
-#define PP_MPS_FORMAT
-#ifdef PP_MPS_FORMAT
-#define PP_M 4		// Number of constrains
-#define PP_N 3		// Number of variables
-#else
-#define PP_M 4		// Number of rows in *.mtx
-#define PP_N 7		// Nnumber of cols in *.mtx
-#endif
-#define PP_MAX_OBJ_VALUE 		55000
-//------------------------------------------------------------------------------
-// https://sagecell.sagemath.org/
-// p = Polyhedron(ieqs = [[200,-1,0,0],[200,0,-1,0],[200,0,0,-1],[500,-1,-1,-1],[0,1,0,0],[0,0,1,0],[0,0,0,1]])
-// p.plot()
-//------------------------------------------------------------------------------
-// Elapsed time: 0
-// Number of iterations: 3
-// Computed objective value: 55000
-// Maximal objective value:  55000
-// Relative error = 0
-// Distance to polytope: 0
-//------------------------------------------------------------------------------
-
-/*============================== simple1.1 LP problem ==========================*
-// Simple LP problem with alternating objective function
-#define PP_PROBLEM_NAME	"simple1.1"
-#define PP_M 4		// Number of equations (number of rows in *.mtx)
-#define PP_N 7		// Number of variables (number of cols in *.mtx)
-#define PP_MAX_OBJ_VALUE 		40000
-//------------------------------------------------------------------------------
-// Elapsed time: 0
-// Number of iterations: 2
-// Computed objective value: 40000
-// Maximal objective value:  40000
-// Relative error = 0
-// Distance to polytope: 0
-//------------------------------------------------------------------------------
-
-/*============================== simple2 LP problem ============================*
-// Simple LP problem & x_3=200; x_2>=110; x_0<=190
-#define PP_PROBLEM_NAME	"simple2"
-#define PP_MPS_FORMAT
-#ifdef PP_MPS_FORMAT
-#define PP_M 5		// Number of constrains
-#define PP_N 4		// Number of variables
-#else
-#define PP_M 5		// Number of rows in *.mtx
-#define PP_N 8		// Nnumber of cols in *.mtx
-#endif
-#define PP_MAX_OBJ_VALUE 		63500
-//------------------------------------------------------------------------------
-// Elapsed time: 0
-// Number of iterations: 1
-// Computed objective value: 63500
-// Maximal objective value:  63500
-// Relative error = 0
-// Distance to polytope: 0
-//------------------------------------------------------------------------------
-
-/*============================== simple2' LP problem ===========================*
-// Simple LP problem & x_3=200; 2*x_3=400; x_2>=110; x_0<=190
-#define PP_MPS_FORMAT
-#define PP_PROBLEM_NAME	"simple2'"
-#define PP_M 6		// Number of constraints
-#define PP_N 4		// Number of variables
-#define PP_MAX_OBJ_VALUE 	63500
-//-------------------------- Compilation Modes ---------------------------------
-#define PP_BASIC_VECTORS_ONLY
-//------------------------------------------------------------------------------
-// Elapsed time: 0
-// Number of iterations: 2
-// Computed objective value: 63500
-// Distance to polytope: 0
-//------------------------------------------------------------------------------
-
-/*============================== simple3 LP problem ============================*
-#define PP_PROBLEM_NAME	"simple3"
-#define PP_MPS_FORMAT
-#ifdef PP_MPS_FORMAT
-#define PP_M 5		// Number of constrains
-#define PP_N 5		// Number of variables
-#else
-#define PP_M 6		// Number of rows in *.mtx
-#define PP_N 8		// Nnumber of cols in *.mtx
-#endif
-#define PP_MAX_OBJ_VALUE 		55000
-//------------------------------------------------------------------------------
-// Elapsed time: 0
-// Number of iterations: 1
-// Computed objective value: 55000.0000000000072759576
-// Maximal objective value:  55000
-// Relative error = 1.32e-16
-//------------------------------------------------------------------------------
-
-/*============================== simple1min LP problem =========================*
-#define PP_PROBLEM_NAME	"simple1min"
-#define PP_M 5		// Number of equations (number of rows in *.mtx)
-#define PP_N 8		// Number of variables (number of cols in *.mtx)
-#define PP_MAX_OBJ_VALUE 		-5000
-//------------------------------------------------------------------------------
-// Elapsed time: 0
-// Number of iterations: 2
-// Computed objective value: -4999.9999999999990905053
-// Maximal objective value:  -5000
-// Relative error = 1.82e-16
-//------------------------------------------------------------------------------
-
-/*============================== simple_zcv LP problem =========================*
-#define PP_PROBLEM_NAME	"simple_zcv"
-#define PP_M 4		// Number of equations (number of rows in *.mtx)
-#define PP_N 7		// Number of variables (number of cols in *.mtx)
-#define PP_MAX_OBJ_VALUE 		50000
-//------------------------------------------------------------------------------
-// Elapsed time: 0
-// Number of iterations: 3
-// Computed objective value: 50000
-// Maximal objective value:  50000
-// Relative error = 0
-//------------------------------------------------------------------------------
-
-/*============================== simple_lcv LP problem =========================*
-#define PP_PROBLEM_NAME	"simple_lcv"
-#define PP_M 4		// Number of equations (number of rows in *.mtx)
-#define PP_N 7		// Number of variables (number of cols in *.mtx)
-#define PP_MAX_OBJ_VALUE 		50000.2
-//------------------------------------------------------------------------------
-// Elapsed time: 0
-// Number of iterations: 3
-// Computed objective value: 50000.199999999997089617
-// Maximal objective value:  50000.199999999997089617
-// Relative error = 0
-//------------------------------------------------------------------------------
-
-/*============================== simple_lcv_neg LP problem =====================*
-#define PP_PROBLEM_NAME	"simple_lcv_neg"
-#define PP_M 4		// Number of equations (number of rows in *.mtx)
-#define PP_N 7		// Number of variables (number of cols in *.mtx)
-#define PP_MAX_OBJ_VALUE 		49998
-//------------------------------------------------------------------------------
-// Elapsed time: 0
-// Number of iterations: 2
-// Computed objective value: 49998
-// Maximal objective value:  49998
-// Relative error = 0
-// Distance to polytope: 0
-//------------------------------------------------------------------------------
-
 /*============================== angle03 LP problem ============================*
 #define PP_PROBLEM_NAME	"angle03"
 #define PP_M 3		// Number of equations (number of rows in *.mtx)
@@ -411,6 +65,156 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 // Maximal objective value:  115
 // Relative error = 4.93e-14
 // Distance to polytope: 3.907985e-14
+//------------------------------------------------------------------------------
+
+/*============================== cube LP problem ===============================*/
+#define PP_MPS_FORMAT
+#define PP_PROBLEM_NAME	"cube"
+#ifdef PP_MPS_FORMAT
+#define PP_M 3		// Number of constrains
+#define PP_N 3		// Number of variables
+#else
+#define PP_M 3	// Number of rows in *.mtx
+#define PP_N 6	// Number of cols in *.mtx
+#endif
+#define PP_MAX_OBJ_VALUE 		60000
+//------------------------------------------------------------------------------
+// Elapsed time: 0
+// Number of iterations: 3
+// Computed objective value: 60000
+// Maximal objective value:  60000
+// Relative error = 0
+// Distance to polytope: 0
+//------------------------------------------------------------------------------
+
+/*============================== cubeAndHyperplane LP problem ===================*
+#define PP_MPS_FORMAT
+#define PP_PROBLEM_NAME	"cubeAndHyperplane"
+#define PP_M 4		// Number of constrains
+#define PP_N 4		// Number of variables
+#define PP_MAX_OBJ_VALUE 		90000
+//------------------------------------------------------------------------------
+// Elapsed time: 0
+// Number of iterations: 1
+// Computed objective value: 90000.0000000000291038305
+// Maximal objective value:  90000
+// Relative error = 3.23e-16
+// Distance to polytope: 5.6843419e-14
+//------------------------------------------------------------------------------
+
+/*============================== featheredCube LP problem ======================*
+#define PP_MPS_FORMAT
+#define PP_PROBLEM_NAME	"featheredCube"
+#ifdef PP_MPS_FORMAT
+#define PP_M 15		// Number of constrains
+#define PP_N 3		// Number of variables
+#else
+#define PP_M 3	// Number of rows in *.mtx
+#define PP_N 6	// Number of cols in *.mtx
+#endif
+#define PP_MAX_OBJ_VALUE 		60000
+//------------------------------------------------------------------------------
+// Elapsed time: 0
+// Number of iterations: 3
+// Computed objective value: 60000
+// Maximal objective value:  60000
+// Relative error = 0
+// Distance to polytope: 0
+//------------------------------------------------------------------------------
+
+/*============================== hamck26e LP problem ============================*
+// https://doi.org/10.1007/s10107-003-0488-1
+#define PP_PROBLEM_NAME	"hamck26e"
+#define PP_MPS_FORMAT
+#define PP_M 4		// Number of constrains
+#define PP_N 4		// Number of variables
+#define PP_MAX_OBJ_VALUE 3.25
+//------------------------------------------------------------------------------
+#undef PP_EPS_ON_HYPERPLANE
+#define PP_EPS_ON_HYPERPLANE		1E-7	// Accuracy of belonging to hyperplane
+//-------------------------- Compilation Modes ---------------------------------
+//#define PP_GRADIENT 
+//------------------------------------------------------------------------------
+// Elapsed time: 0
+// Number of iterations: 2
+// Computed objective value: 3.2499999999999866773237
+// Maximal objective value:  3.25
+// Relative error = 4.1e-15
+// Distance to polytope: 0
+//------------------------------------------------------------------------------
+
+/*============================== hamck26s LP problem ============================*
+// https://doi.org/10.1007/s10107-003-0488-1
+#define PP_PROBLEM_NAME	"hamck26s"
+#define PP_MPS_FORMAT
+#define PP_M 5		// Number of constrains
+#define PP_N 4		// Number of variables
+#define PP_MAX_OBJ_VALUE 1.25
+//------------------------------------------------------------------------------
+#undef PP_EPS_ON_HYPERPLANE
+#define PP_EPS_ON_HYPERPLANE		1E-7	// Accuracy of belonging to hyperplane
+//-------------------------- Compilation Modes ---------------------------------
+//#define PP_GRADIENT 
+//------------------------------------------------------------------------------
+// Elapsed time: 0
+// Number of iterations: 1
+// Computed objective value: 1.25000000000000355271368
+// Maximal objective value:  1.25
+// Relative error = 2.84e-15
+// Distance to polytope: 6.5494818e-16
+//------------------------------------------------------------------------------
+
+/*============================== nguyen5 LP problem ============================*
+#define PP_PROBLEM_NAME	"nguyen5"
+#define PP_MPS_FORMAT
+#define PP_M 4		// Number of constrains
+#define PP_N 5		// Number of variables
+#define PP_MAX_OBJ_VALUE 21.4549732313098893143888
+//------------------------------------------------------------------------------
+// Elapsed time: 0
+// Number of iterations: 4
+// Computed objective value: 21.4549732313098893143888
+// Maximal objective value:  21.4549732313097933911195
+// Relative error = 4.47e-15
+// Distance to polytope: 1.7897091e-15
+//------------------------------------------------------------------------------
+
+/*============================== pyramid LP problem =========================*
+#define PP_MPS_FORMAT
+#define PP_PROBLEM_NAME	"pyramid"
+#define PP_M 3		// Number of constrains
+#define PP_N 3		// Number of variables
+#define PP_MAX_OBJ_VALUE 		60000
+//------------------------------------------------------------------------------
+// https://sagecell.sagemath.org/
+// p = Polyhedron(ieqs = [[0,1,0,0],[0,0,1,0,],[0,-1,0,1],[0,0,-1,1],[200,0,0,-1,]])
+// p.plot()
+//------------------------------------------------------------------------------
+// Elapsed time: 0
+// Number of iterations: 1
+// Computed objective value: 60000
+// Maximal objective value:  60000
+// Relative error = 0
+// Distance to polytope: 0
+//------------------------------------------------------------------------------
+
+/*============================== pyramidInPyramid LP problem ===================*
+#define PP_MPS_FORMAT
+#define PP_PROBLEM_NAME	"pyramidInPyramid"
+#define PP_M 5		// Number of constrains
+#define PP_N 3		// Number of variables
+#define PP_MAX_OBJ_VALUE 		42000
+//------------------------------------------------------------------------------
+// https://sagecell.sagemath.org/
+// p = Polyhedron(ieqs = [[0,1,0,0],[0,0,1,0,],[0,-1,0,1],[0,0,-1,1],[0,-1,0,2],[0,0,-1,2],[200,0,0,-1,]])
+// p.plot()
+//------------------------------------------------------------------------------
+// Elapsed time: 0
+// Number of iterations: 1
+// Computed objective value: 41999.9999999999854480848
+// Maximal objective value:  42000
+// Relative error = 3.46e-16
+// Distance to polytope: 0
 //------------------------------------------------------------------------------
 
 /*============================== rnd3_3_Olkhovsky56 LP problem =================*
@@ -511,6 +315,221 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 // Maximal objective value:  617.50433700826386029803
 // Relative error = 0
 // Distance to polytope: 3.8671144e-16
+//------------------------------------------------------------------------------
+
+/*============================== simple_lcv LP problem =========================*
+#define PP_PROBLEM_NAME	"simple_lcv"
+#define PP_M 4		// Number of equations (number of rows in *.mtx)
+#define PP_N 7		// Number of variables (number of cols in *.mtx)
+#define PP_MAX_OBJ_VALUE 		50000.2
+//------------------------------------------------------------------------------
+// Elapsed time: 0
+// Number of iterations: 3
+// Computed objective value: 50000.199999999997089617
+// Maximal objective value:  50000.199999999997089617
+// Relative error = 0
+//------------------------------------------------------------------------------
+
+/*============================== simple_lcv_neg LP problem =====================*
+#define PP_PROBLEM_NAME	"simple_lcv_neg"
+#define PP_M 4		// Number of equations (number of rows in *.mtx)
+#define PP_N 7		// Number of variables (number of cols in *.mtx)
+#define PP_MAX_OBJ_VALUE 		49998
+//------------------------------------------------------------------------------
+// Elapsed time: 0
+// Number of iterations: 2
+// Computed objective value: 49998
+// Maximal objective value:  49998
+// Relative error = 0
+// Distance to polytope: 0
+//------------------------------------------------------------------------------
+
+/*============================== simple_zcv LP problem =========================*
+#define PP_PROBLEM_NAME	"simple_zcv"
+#define PP_M 4		// Number of equations (number of rows in *.mtx)
+#define PP_N 7		// Number of variables (number of cols in *.mtx)
+#define PP_MAX_OBJ_VALUE 		50000
+//------------------------------------------------------------------------------
+// Elapsed time: 0
+// Number of iterations: 3
+// Computed objective value: 50000
+// Maximal objective value:  50000
+// Relative error = 0
+//------------------------------------------------------------------------------
+
+/*============================== simple1 LP problem ============================*
+#define PP_PROBLEM_NAME	"simple1"
+#define PP_MPS_FORMAT
+#ifdef PP_MPS_FORMAT
+#define PP_M 4		// Number of constrains
+#define PP_N 3		// Number of variables
+#else
+#define PP_M 4		// Number of rows in *.mtx
+#define PP_N 7		// Nnumber of cols in *.mtx
+#endif
+#define PP_MAX_OBJ_VALUE 		55000
+//------------------------------------------------------------------------------
+// https://sagecell.sagemath.org/
+// p = Polyhedron(ieqs = [[200,-1,0,0],[200,0,-1,0],[200,0,0,-1],[500,-1,-1,-1],[0,1,0,0],[0,0,1,0],[0,0,0,1]])
+// p.plot()
+//------------------------------------------------------------------------------
+// Elapsed time: 0
+// Number of iterations: 3
+// Computed objective value: 55000
+// Maximal objective value:  55000
+// Relative error = 0
+// Distance to polytope: 0
+//------------------------------------------------------------------------------
+
+/*============================== simple1.1 LP problem ==========================*
+// Simple LP problem with alternating objective function
+#define PP_PROBLEM_NAME	"simple1.1"
+#define PP_M 4		// Number of equations (number of rows in *.mtx)
+#define PP_N 7		// Number of variables (number of cols in *.mtx)
+#define PP_MAX_OBJ_VALUE 		40000
+//------------------------------------------------------------------------------
+// Elapsed time: 0
+// Number of iterations: 2
+// Computed objective value: 40000
+// Maximal objective value:  40000
+// Relative error = 0
+// Distance to polytope: 0
+//------------------------------------------------------------------------------
+
+/*============================== simple1FxVar LP problem =======================*
+// Simple LP problem & x_1=150
+#define PP_MPS_FORMAT
+#define PP_PROBLEM_NAME	"simple1FxVar"
+#define PP_M 4		// Number of constraints
+#define PP_N 3		// Number of variables
+#define PP_MAX_OBJ_VALUE 52500
+//------------------------------------------------------------------------------
+// Elapsed time: 0
+// Number of iterations: 1
+// Computed objective value: 52500
+// Maximal objective value:  52500
+// Relative error = 0
+// Distance to polytope: 0
+//------------------------------------------------------------------------------
+
+/*============================== simple1min LP problem =========================*
+#define PP_PROBLEM_NAME	"simple1min"
+#define PP_M 5		// Number of equations (number of rows in *.mtx)
+#define PP_N 8		// Number of variables (number of cols in *.mtx)
+#define PP_MAX_OBJ_VALUE 		-5000
+//------------------------------------------------------------------------------
+// Elapsed time: 0
+// Number of iterations: 2
+// Computed objective value: -4999.9999999999990905053
+// Maximal objective value:  -5000
+// Relative error = 1.82e-16
+//------------------------------------------------------------------------------
+
+/*============================== simple2 LP problem ============================*
+// Simple LP problem & x_3=200; x_2>=110; x_0<=190
+#define PP_PROBLEM_NAME	"simple2"
+#define PP_MPS_FORMAT
+#ifdef PP_MPS_FORMAT
+#define PP_M 5		// Number of constrains
+#define PP_N 4		// Number of variables
+#else
+#define PP_M 5		// Number of rows in *.mtx
+#define PP_N 8		// Nnumber of cols in *.mtx
+#endif
+#define PP_MAX_OBJ_VALUE 		63500
+//------------------------------------------------------------------------------
+// Elapsed time: 0
+// Number of iterations: 1
+// Computed objective value: 63500
+// Maximal objective value:  63500
+// Relative error = 0
+// Distance to polytope: 0
+//------------------------------------------------------------------------------
+
+/*============================== simple2' LP problem ===========================*
+// Simple LP problem & x_3=200; 2*x_3=400; x_2>=110; x_0<=190
+#define PP_MPS_FORMAT
+#define PP_PROBLEM_NAME	"simple2'"
+#define PP_M 6		// Number of constraints
+#define PP_N 4		// Number of variables
+#define PP_MAX_OBJ_VALUE 	63500
+//-------------------------- Compilation Modes ---------------------------------
+#define PP_BASIC_VECTORS_ONLY
+//------------------------------------------------------------------------------
+// Elapsed time: 0
+// Number of iterations: 2
+// Computed objective value: 63500
+// Distance to polytope: 0
+//------------------------------------------------------------------------------
+
+/*============================== simple3 LP problem ============================*
+#define PP_PROBLEM_NAME	"simple3"
+#define PP_MPS_FORMAT
+#ifdef PP_MPS_FORMAT
+#define PP_M 5		// Number of constrains
+#define PP_N 5		// Number of variables
+#else
+#define PP_M 6		// Number of rows in *.mtx
+#define PP_N 8		// Nnumber of cols in *.mtx
+#endif
+#define PP_MAX_OBJ_VALUE 		55000
+//------------------------------------------------------------------------------
+// Elapsed time: 0
+// Number of iterations: 1
+// Computed objective value: 55000.0000000000072759576
+// Maximal objective value:  55000
+// Relative error = 1.32e-16
+//------------------------------------------------------------------------------
+
+/*============================== square3D LP problem =========================*
+#define PP_MPS_FORMAT
+#define PP_PROBLEM_NAME	"square3D"
+#define PP_M 4		// Number of constrains
+#define PP_N 3		// Number of variables
+#define PP_MAX_OBJ_VALUE 		50000
+//------------------------------------------------------------------------------
+// Elapsed time: 0
+// Number of iterations: 3
+// Computed objective value: 50000
+// Maximal objective value:  50000
+// Relative error = 0
+//------------------------------------------------------------------------------
+
+/*============================== square4D LP problem =========================*
+#define PP_MPS_FORMAT
+#define PP_PROBLEM_NAME	"square4D"
+#define PP_M 7		// Number of constrains
+#define PP_N 4		// Number of variables
+#define PP_MAX_OBJ_VALUE 		36200
+//-------------------------- Compilation Modes ---------------------------------
+#define PP_BASIC_VECTORS_ONLY
+//------------------------------------------------------------------------------
+// Elapsed time: 0
+// Number of iterations: 2
+// Computed objective value: 36200
+// Maximal objective value:  36200
+// Relative error = 0
+// Distance to polytope: 0
+//------------------------------------------------------------------------------
+
+/*============================== wiki LP problem ============================*
+#define PP_PROBLEM_NAME	"wiki"
+#define PP_MPS_FORMAT
+#define PP_M 2		// Number of constrains
+#define PP_N 3		// Number of variables
+#define PP_MAX_OBJ_VALUE 20
+// https://en.wikipedia.org/wiki/Simplex_algorithm
+//------------------------------------------------------------------------------
+// https://sagecell.sagemath.org/
+// p = Polyhedron(ieqs = [[10,-3,-2,-1],[15,-2,-5,-3],[0,1,0,0],[0,0,1,0],[0,0,0,1]])
+// p.plot()
+//------------------------------------------------------------------------------
+// Elapsed time: 0
+// Number of iterations: 2
+// Computed objective value: 20.0000000000000213162821
+// Maximal objective value:  20
+// Relative error = 1.07e-15
+// Distance to polytope: 7.7804045e-15
 //------------------------------------------------------------------------------
 
 /*==============================================================================*/
