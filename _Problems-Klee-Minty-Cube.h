@@ -22,7 +22,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_EPS_RELATIVE_ERROR		1E-3	// Used if defined PP_CHECK_MAX_OBJ_VALUE 
 #define PP_PROJECTION_COUNT				100000000	// Each PP_PROJECTION_COUNT iteration to be outputted inside Flat_MaxProjection(*)
 //-------------------------- Compilation Modes ---------------------------------
-#define PP_GRADIENT
+//#define PP_GRADIENT
 //------------------------------------------------------------------------------
 
 /*============================== Klee-Minty5 LP problem ========================*
@@ -104,7 +104,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 // Distance to polytope: 0.0037863188
 //------------------------------------------------------------------------------
 
-/*============================== Klee-Minty10 LP problem =======================*
+/*============================== Klee-Minty10 LP problem =======================*/
 #define PP_PROBLEM_NAME	"Klee-Minty10"
 #define PP_D 10			// Space dimension
 #define PP_M PP_D		// Number of equations (number of rows in *.mtx)
@@ -119,7 +119,7 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 // Distance to polytope: 0
 //------------------------------------------------------------------------------
 
-/*============================== Klee-Minty20 LP problem =======================*/
+/*============================== Klee-Minty20 LP problem =======================*
 #define PP_PROBLEM_NAME	"Klee-Minty20"
 #define PP_D 20			// Space dimension
 #define PP_M PP_D		// Number of equations (number of rows in *.mtx)

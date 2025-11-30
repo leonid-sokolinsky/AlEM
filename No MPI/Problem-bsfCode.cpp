@@ -75,7 +75,7 @@ void PC_bsf_Init(bool* success) {
 			Matrix_Basis(PD_edgeBasis_v, &PD_meq_basis, PP_EPS_ZERO);
 			#else  // !PP_BASIC_VECTORS_ONLY
 			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-				cout << "Number of equations = " << PD_meq_basis << " < rank = " << rankEq << ".\nYou should define the option PP_BASIC_VECTORS_ONLY." << endl;
+				cout << "Number of equations = " << PD_meq_basis << " > rank = " << rankEq << ".\nYou should define the option PP_BASIC_VECTORS_ONLY." << endl;
 			*success = false;
 			return;
 			#endif // PP_BASIC_VECTORS_ONLY
@@ -610,6 +610,10 @@ void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
 
 void PC_bsf_ProblemOutput(PT_bsf_reduceElem_T* reduceResult, int reduceCounter, PT_bsf_parameter_T parameter, double t) {
 	cout << setprecision(PP_SETW / 2);
+
+	#ifdef PP_MATRIX_OUTPUT
+	cout << "v =\t\t"; Vector_Print(PD_v); cout << endl;
+	#endif // PP_MATRIX_OUTPUT
 
 	cout << "=================================================" << endl;
 	cout << "// Elapsed time: " << t << endl;
@@ -1283,7 +1287,7 @@ namespace SF {
 						if (fabs(_D[i][j]) > eps_zero)
 							i_ne_0 = i;
 						else
-							_D[i][j];
+							_D[i][j] = 0;
 					}
 					else {
 						if (fabs(_D[i][j]) > fabs(_D[i_ne_0][j]))

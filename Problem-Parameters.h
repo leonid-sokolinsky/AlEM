@@ -17,7 +17,7 @@ This source code has been produced with using BSF-skeleton
 
 /**
 #include "_Problems100_1000-0.h"
-#define PP_PATH "../../Set-of-LP-Problems/Rnd-LP/"
+//#define PP_PATH "../../Set-of-LP-Problems/Rnd-LP/"
 
 /**
 #include "_Problems-Klee-Minty-Cube.h"

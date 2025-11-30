@@ -101,12 +101,28 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_MAX_OBJ_VALUE 64079900
 //-----------------------------------------------------------------------------
 
-/*============================== tcube1K LP problem =========================*/
+/*============================== tcube1K LP problem =========================*
 #define PP_PROBLEM_NAME	"tcube1K" // Truncated hypercube
-#define PP_KK	1000		// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
-#define PP_M	1001		// Number of equations (number of rows in *.mtx)
+#define PP_KK	1000	// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
+#define PP_M	1001	// Number of equations (number of rows in *.mtx)
 #define PP_N	2001	// Number of variables (number of cols in *.mtx)
 #define PP_MAX_OBJ_VALUE 100099900
+//-----------------------------------------------------------------------------
+
+/*============================== tcube1K5 LP problem =========================*/
+#define PP_PROBLEM_NAME	"tcube1K5" // Truncated hypercube
+#define PP_KK	1500	// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
+#define PP_M	1501	// Number of equations (number of rows in *.mtx)
+#define PP_N	3001	// Number of variables (number of cols in *.mtx)
+#define PP_MAX_OBJ_VALUE 225149900
+//-----------------------------------------------------------------------------
+
+/*============================== tcube2K LP problem =========================*
+#define PP_PROBLEM_NAME	"tcube2K" // Truncated hypercube
+#define PP_KK	2000	// Maximal number of edges that include surface point (compilator limit: 2 147 483 647)
+#define PP_M	2001	// Number of equations (number of rows in *.mtx)
+#define PP_N	4001	// Number of variables (number of cols in *.mtx)
+#define PP_MAX_OBJ_VALUE 400199900
 //-----------------------------------------------------------------------------
 
 /*=============================================================================*/
