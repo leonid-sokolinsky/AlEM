@@ -34,16 +34,18 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_PROJECTION_COUNT			100000000	// Each PP_PROJECTION_COUNT-th iteration to be outputted inside Flat_MaxProjection(*) or Flat_BipProjection(*)
 //------------------------------ ifdef PP_SAVE_ITER_RESULT ---------------------
 #define PP_SCALE_FACTOR					1E+3	// #ifdef PP_SAVE_LOCAL_RESULT; makes 9 digits before the decimal point of PP_MAX_OBJ_VALUE
-//------------------------------------------------------------------------------
-// Elapsed time: 0.4083998
+//------------------------- lp_adlittle_v - original.mtx -----------------------
+// Elapsed time: 0.33886        (AlEM)
 // Number of iterations: 3
 // Computed objective value: -225494.963163837848696858
 // Maximal objective value:  -225494.963162380387075245
 // Relative error = 6.46e-12
 // Distance to polytope: 6.0309014e-09
+//------------------------- lp_adlittle_v - VeRSAl.mtx -------------------------
+// TWIDDLE__BinomialCoefficient warning: value of integer variable B has exceeded PF_INT_MAX = 2147483647
 //------------------------------------------------------------------------------
 
-/*============================== afiro LP problem ==============================*
+/*============================== afiro LP problem ==============================*/
 // Number of equations : 8
 // Subspace dimension : 24
 #define PP_PROBLEM_NAME	"afiro"
@@ -56,8 +58,6 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 #define PP_OBJECTIVE_VECTOR_LENGTH		1E+6		// Length of Objective Vector
 #define PP_EPS_RELATIVE_ERROR			1E-8		// Termination criteria 
 //#define PP_BATCH_SIZE					5000		// Ìaximum number of combinations to process in PC_bsf_MapF
-//------------------------------ ifdef PP_DEBUG --------------------------------
-#define PP_PROJECTION_COUNT				100000000	// Each PP_PROJECTION_COUNT-th iteration to be outputted inside Flat_MaxProjection(*) or Flat_BipProjection(*)
 //------------------------------ ifdef PP_SAVE_ITER_RESULT ---------------------
 #define PP_SCALE_FACTOR					1E+6		// #ifdef PP_SAVE_LOCAL_RESULT; makes 9 digits before the decimal point of PP_MAX_OBJ_VALUE
 //-------------------------- Compilation Modes ---------------------------------
@@ -65,15 +65,57 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 //#define PP_MAXPROJECTION
 //#define PP_MEDIAN_LAUNCH_VECTOR
 //#define PP_RANDOM_LAUNCH_VECTOR 283
-//------------------------------------------------------------------------------
-// 1. ObjF = 458.92457	Number of edge combinations: 28048800
-// 2. ObjF = 464.75314	Number of edge combinations: 7888725
-// Elapsed time: 0
+//------------------------- lp_afiro_v - original.mtx --------------------------
+// Elapsed time: 138.03214      (AlEM)
 // Number of iterations: 2
-// Computed objective value: 464.753142857229079254466
+// Computed objective value: 464.753142857112493402383
 // Maximal objective value:  464.753142857142847788054
-// Relative error = 1.86e-13
-// Distance to polytope: 1.3403825e-11
+// Relative error = 6.53e-14
+// Distance to polytope: 1.3525404e-11
+//------------------------- lp_afiro_v  - VeRSAl.mtx ---------------------------
+
+//------------------------------------------------------------------------------
+
+/*============================== agg LP problem ================================*
+// Number of equations : 36
+// Subspace dimension : 127
+#define PP_PROBLEM_NAME		"agg"
+#define PP_M 488	// Number of constraints in mps-file
+#define PP_N 163	// Number of variables in mps-file
+#define PP_MAX_OBJ_VALUE 		35991767.286576506712640824319636
+//------------------------------------------------------------------------------
+#define PP_EPS_ZERO					1E-10	// Accuracy for comparison with zero
+#define PP_EPS_ON_HYPERPLANE		1E-5	// Accuracy of belonging to hyperplane
+#define PP_OBJECTIVE_VECTOR_LENGTH	1E+6	// Length of Objective Vector
+#define PP_EPS_RELATIVE_ERROR		1E-8	// Termination criteria 
+//------------------------------ ifdef PP_SAVE_ITER_RESULT ---------------------
+#define PP_SCALE_FACTOR				1E+1	// #ifdef PP_SAVE_LOCAL_RESULT; makes 9 digits before the decimal point of PP_MAX_OBJ_VALUE
+//-------------------------- Compilation Modes ---------------------------------
+#define PP_NORMALIZATION
+//#define PP_GRADIENT
+//------------------------------------------------------------------------------
+// TWIDDLE__BinomialCoefficient warning : value of integer variable B has exceeded PF_INT_MAX = 2147483647
+//------------------------------------------------------------------------------
+
+/*============================== agg2 LP problem ===============================*
+// Number of equations : 60
+// Subspace dimension : 242
+#define PP_PROBLEM_NAME		"agg2"
+#define PP_M 516	// Number of constraints in mps-file
+#define PP_N 302	// Number of variables in mps-file
+#define PP_MAX_OBJ_VALUE 		20239252.355977109024317661926133
+//------------------------------------------------------------------------------
+#define PP_EPS_ZERO					1E-11	// Accuracy for comparison with zero
+#define PP_EPS_ON_HYPERPLANE		1E-5	// Accuracy of belonging to hyperplane
+#define PP_OBJECTIVE_VECTOR_LENGTH	1E+6	// Length of Objective Vector
+#define PP_EPS_RELATIVE_ERROR		1E-8	// Termination criteria 
+#define PP_BATCH_SIZE				500		// Ìaximum number of combinations to process in PC_bsf_MapF by one worker
+//------------------------------ ifdef PP_SAVE_ITER_RESULT ---------------------
+#define PP_SCALE_FACTOR				1E+1	// #ifdef PP_SAVE_LOCAL_RESULT; makes 9 digits before the decimal point of PP_MAX_OBJ_VALUE
+//-------------------------- Compilation Modes ---------------------------------
+#define PP_NORMALIZATION
+//------------------------------------------------------------------------------
+// TWIDDLE__BinomialCoefficient warning : value of integer variable B has exceeded PF_INT_MAX = 2147483647
 //------------------------------------------------------------------------------
 
 /*============================== beaconfd LP problem ===========================*
@@ -317,8 +359,8 @@ LP problems are available in https://github.com/leonid-sokolinsky/Set-of-LP-Prob
 // Relative error = 2.03e-16
 //--------------------------------------------------------------------------
 
-/*============================== scagr7 LP problem =============================*/
-// Number of equations : 84
+/*============================== scagr7 LP problem =============================*
+// Number of equations: 84
 // Subspace dimension : 56
 #define PP_PROBLEM_NAME	"scagr7"
 #define PP_M 129		// Number of constraints in mps-file

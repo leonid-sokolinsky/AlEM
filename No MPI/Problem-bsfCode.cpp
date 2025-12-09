@@ -204,6 +204,11 @@ void PC_bsf_MapF(PT_bsf_mapElem_T* mapElem, PT_bsf_reduceElem_T* reduceElem, int
 	#endif // PP_DEBUG /**/
 	// Condition for breakpoint: PD_iterNo == 2 && (BSF_sv_addressOffset + BSF_sv_numberInSublist == 2)
 
+	if (PD_mco_v == -1) {
+		*mapSuccess = false;
+		return;
+	}
+
 	reduceElem->objF_nex = -PP_INFINITY;
 	reduceElem->objF_grd = -PP_INFINITY;
 
@@ -611,12 +616,17 @@ void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
 void PC_bsf_ProblemOutput(PT_bsf_reduceElem_T* reduceResult, int reduceCounter, PT_bsf_parameter_T parameter, double t) {
 	cout << setprecision(PP_SETW / 2);
 
+	if (PD_mco_v == -1) {
+		cout << "\nNumber of edge combinations has exceeded PF_INT_MAX = " << PF_INT_MAX << endl;
+		return;
+	}
+
 	#ifdef PP_MATRIX_OUTPUT
 	cout << "v =\t\t"; Vector_Print(PD_v); cout << endl;
 	#endif // PP_MATRIX_OUTPUT
 
 	cout << "=================================================" << endl;
-	cout << "// Elapsed time: " << t << endl;
+	cout << "// Elapsed time: " << t << "\t(" << PP_METHOD_NAME << ")" << endl;
 	cout << "// Number of iterations: " << PD_iterNo + 1 << endl;
 	cout << "// Computed objective value: " << setprecision(24) << ObjF(PD_v) << endl;
 	#ifdef PP_MAX_OBJ_VALUE
@@ -649,6 +659,11 @@ void PC_bsf_ProblemOutput_3(PT_bsf_reduceElem_T_3* reduceResult, int reduceCount
 }
 
 void PC_bsf_ProcessResults(PT_bsf_reduceElem_T* reduceResult, int reduceCounter, PT_bsf_parameter_T* parameter, int* nextJob, bool* exit) {
+
+	if (PD_mco_v == -1) {
+		*exit = true;
+		return;
+	}
 
 	double jumpLength = Distance_PointToPoint(reduceResult->v_nex, PD_v);
 
@@ -1162,6 +1177,8 @@ namespace SF {
 
 		if (*mi > rank)
 			for (int check_count = 0; check_count < meq_total; check_count++) { // always check the last
+				if (*mi == rank)
+					return;
 				Matrix_Rank(list_i, (*mi) - 1, PP_EPS_ZERO, &probeRank);
 				if (probeRank == rank)
 					(*mi)--;
@@ -1958,11 +1975,7 @@ namespace SF {
 						cout << "MPS_AddObjectiveFunction error: Coefficient redefinition of the objective function for " << column[i_col].varName << "." << endl;
 					return false;
 				}
-				#ifdef PP_OPT_MIN
-				_c[column[i_col].j] = column[i_col].value;
-				#else
 				_c[column[i_col].j] = -column[i_col].value;
-				#endif
 			}
 		return true;
 	}
@@ -2177,8 +2190,7 @@ namespace SF {
 			if (RHS_value != 0)
 			{
 				if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-					cout << "MPS_ReadRHS_line warning: RHS value for row of type 'N' is not equal to 0." << endl;
-				return false;
+					cout << "MPS_ReadRHS_line warning: RHS value " << RHS_value << " for row of type 'N' is not equal to 0." << endl;
 			}
 
 		MPS_SkipSpaces(stream);
@@ -2319,7 +2331,7 @@ namespace SF {
 
 		MTX_RemoveFreeVariables();
 
-		for (int i = 0; i < _n; i++) { // Adding lower bound conditions
+		for (int i = 0; i < _n; i++) { // Adding x >= 0
 			for (int j = 0; j < _n; j++)
 				_A[i + _m][j] = 0;
 			_A[i + _m][i] = -1;
@@ -2329,6 +2341,17 @@ namespace SF {
 				_b[i + _m] = -PD_lo[i];
 		}
 		_m += _n; assert(_m <= PP_MM);
+
+		for (int i = 0; i < _n; i++) { // Adding lower bound conditions
+			assert(PD_lo[i] >= 0);
+			if (PD_lo[i] > 0) {
+				for (int j = 0; j < _n; j++)
+					_A[_m][j] = 0;
+				_A[_m][i] = -1;
+				_b[_m] = -PD_lo[i];
+				_m++; assert(_m <= PP_MM);
+			}
+		}
 
 		for (int i = 0; i < _n; i++) { // Adding higher bound conditions
 			if (PD_hi[i] != PP_INFINITY) {
@@ -3073,6 +3096,7 @@ namespace SF {
 			if (B == PF_INT_MAX) cout << "TWIDDLE__BinomialCoefficient warning: value of integer variable B has exceeded PF_INT_MAX = " << PF_INT_MAX << endl;
 			B++;
 		}
+		assert(B > 0);
 		return B;
 	}
 
@@ -3184,6 +3208,14 @@ namespace SF {
 			toVector[j] = fromVector[j];
 	}
 
+	static inline void Vector_CopyNegative(PT_vector_T fromVector, PT_vector_T toVector) { // toPoint = fromPoint
+		for (int j = 0; j < _n; j++)
+			if (fromVector[j] != 0)
+				toVector[j] = -fromVector[j];
+			else
+				toVector[j] = 0;
+	}
+
 	static inline void Vector_DivideByNumber(PT_vector_T x, double r, PT_vector_T y) {  // y = x/r
 		for (int j = 0; j < _n; j++)
 			y[j] = x[j] / r;
@@ -3252,7 +3284,15 @@ namespace SF {
 			x[j] *= r;
 	}
 
-	static inline double Vector_Norm(PT_vector_T x) {
+	static inline void Vector_Negative(PT_vector_T x) {  // x = -x
+		for (int j = 0; j < _n; j++)
+			if (x[j] != 0)
+				x[j] = -x[j];
+			else
+				x[j] = 0;
+	}
+
+	static inline double Vector_Norm(PT_vector_T x) { // <- ||x||
 		double norm_x = sqrt(Vector_NormSquare(x));
 		return norm_x;
 	}
@@ -3334,8 +3374,13 @@ namespace PF {
 		if (mne_v == neq)
 			*mco_v = mne_v;
 		else {
-			if (mne_v < 63)
-				*mco_v = (int)BinomialCoefficient(mne_v, subspaceDim - 1);
+			if (mne_v < 63) {
+				unsigned B = (int)BinomialCoefficient(mne_v, subspaceDim - 1);
+				if (B > PF_INT_MAX)
+					*mco_v = -1;
+				else
+					*mco_v = (int)B;
+			}
 			else
 				*mco_v = TWIDDLE__BinomialCoefficient(mne_v, subspaceDim - 1, PD_TWIDDLE_p);
 		}
@@ -3527,8 +3572,10 @@ namespace PF {
 		assert(PD_mne_v <= PP_MM);
 		CalculateNumberOfCombinations(PD_subspaceDim, PD_mne_v, PD_subspaceDim, PD_TWIDDLE_p, &PD_mco_v);
 		#ifdef PP_DEBUG
-		if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
-			cout << "PreparationForIteration: Number of edge combinations: " << PD_mco_v << endl;
+		if (PD_mco_v > -1) {
+			if (BSF_sv_mpiRank == BSF_sv_mpiMaster)
+				cout << "PreparationForIteration: Number of edge combinations: " << PD_mco_v << endl;
+		}
 		#endif // PP_DEBUG /**/
 	}
 
@@ -3552,7 +3599,6 @@ namespace PF {
 			else
 				res = TWIDDLE__BinomialCoefficient(mne, PD_subspaceDim - 1, PD_TWIDDLE_p);
 		}
-
 		return res;
 	}
 }
