@@ -507,6 +507,12 @@ void PC_bsf_ParametersOutput(PT_bsf_parameter_T parameter) {
 	if (PD_meq_basis > 0)
 		cout << "Subspace dimension: " << PD_subspaceDim << endl;
 
+	#ifdef PP_DEGENERATE
+	cout << "Degeneracy: Yes" << endl;
+	#else
+	cout << "Degeneracy: No" << endl;
+	#endif // PP_GRADIENT
+
 	/**
 	#ifdef PP_BSF_FRAGMENTED_MAP_LIST
 	cout << "Map List is Fragmented" << endl;
@@ -617,7 +623,7 @@ void PC_bsf_ProblemOutput(PT_bsf_reduceElem_T* reduceResult, int reduceCounter, 
 	cout << setprecision(PP_SETW / 2);
 
 	if (PD_mco_v == -1) {
-		cout << "\nNumber of edge combinations has exceeded PF_INT_MAX = " << PF_INT_MAX << endl;
+		cout << "\n// Number of edge combinations has exceeded PF_INT_MAX = " << PF_INT_MAX << endl;
 		return;
 	}
 
